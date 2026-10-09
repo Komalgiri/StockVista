@@ -1,5 +1,5 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { getMarketQuote, getHistoricalData } from '../services/upstox';
+import { getMarketQuote, getHistoricalData } from '../services/yahoo';
 import NodeCache from 'node-cache';
 
 const router = Router();
@@ -59,75 +59,64 @@ router.get('/:isin', cacheMiddleware, asyncHandler(async (req: Request, res: Res
 router.get('/:isin/quote', cacheMiddleware, asyncHandler(async (req: Request, res: Response) => {
   const { isin } = req.params;
   try {
-    // Attempt real Upstox fetch if credentials exist
-    const instrumentKey = `NSE_EQ|${isin}`; // Simplistic mapping, real mapping requires instrument CSV parsing
-    const quote = await getMarketQuote(instrumentKey);
-    const data = quote.data[instrumentKey];
-    
-    respond(res, {
-      currentPrice: data.last_price,
-      dayChange: data.last_price - data.ohlc.close,
-      dayChangePercent: ((data.last_price - data.ohlc.close) / data.ohlc.close) * 100,
-      open: data.ohlc.open,
-      high: data.ohlc.high,
-      low: data.ohlc.low,
-      previousClose: data.ohlc.close,
-      volume: data.volume,
-      weekHigh52: data.lower_circuit_limit, // placeholders if 52w not directly available
-      weekLow52: data.upper_circuit_limit,
-      marketCap: null // Upstox doesn't provide MCAP in quotes
-    }, 'upstox');
-  } catch (error: unknown) {
-    if (error instanceof Error && error.message.includes('missing')) {
-      // Configuration Error / Graceful fallback for demo
+    const data = await getMarketQuote(isin);
+    if (data) {
       respond(res, {
-        currentPrice: 2914.40,
-        dayChange: 34.65,
-        dayChangePercent: 1.21,
-        open: 2880.00,
-        high: 2920.00,
-        low: 2875.00,
-        previousClose: 2879.85,
-        volume: 4540000,
-        weekHigh52: 3024.90,
-        weekLow52: 2220.30,
-        marketCap: "19,71,840 Cr"
-      }, 'mock (missing credentials)');
-    } else {
-      throw error;
+        currentPrice: data.price,
+        dayChange: data.dayChange,
+        dayChangePercent: data.dayChangePercent,
+        open: data.open,
+        high: data.high,
+        low: data.low,
+        previousClose: data.close,
+        volume: data.volume,
+        weekHigh52: data.weekHigh52,
+        weekLow52: data.weekLow52,
+        marketCap: data.marketCap
+      }, 'yahoo-finance');
+      return;
     }
+  } catch (error) {
+    console.error('Yahoo quote fetch failed', error);
   }
+
+  // Graceful fallback mock
+  respond(res, {
+    currentPrice: 2914.40,
+    dayChange: 34.65,
+    dayChangePercent: 1.21,
+    open: 2880.00,
+    high: 2920.00,
+    low: 2875.00,
+    previousClose: 2879.85,
+    volume: 4540000,
+    weekHigh52: 3024.90,
+    weekLow52: 2220.30,
+    marketCap: "19,71,840 Cr"
+  }, 'mock');
 }));
 
 // 3. Historical Chart
 router.get('/:isin/history', cacheMiddleware, asyncHandler(async (req: Request, res: Response) => {
   const { isin } = req.params;
   try {
-    // Need instrument key mapping and date calculations in reality
-    const instrumentKey = `NSE_EQ|${isin}`;
-    const toDate = '2024-03-26';
-    const fromDate = '2023-03-26';
-    const history = await getHistoricalData(instrumentKey, 'day', toDate, fromDate);
-    
-    const formatted = history.data.candles.map((candle: number[]) => ({
-      date: (candle[0] as unknown as string).substring(0, 10),
-      price: candle[4]
-    })).reverse();
-    
-    respond(res, formatted, 'upstox');
-  } catch (error: unknown) {
-    if (error instanceof Error && error.message.includes('missing')) {
-      respond(res, [
-        { date: "2023-04-01", price: 2300 },
-        { date: "2023-07-01", price: 2500 },
-        { date: "2023-10-01", price: 2450 },
-        { date: "2024-01-01", price: 2700 },
-        { date: "2024-03-26", price: 2914.4 }
-      ], 'mock (missing credentials)');
-    } else {
-      throw error;
+    const history = await getHistoricalData(isin, '1y');
+    if (history && history.length > 0) {
+      respond(res, history, 'yahoo-finance');
+      return;
     }
+  } catch (error) {
+    console.error('Yahoo history fetch failed', error);
   }
+
+  // Mock array fallback
+  respond(res, [
+    { date: "2023-04-01", price: 2300 },
+    { date: "2023-07-01", price: 2500 },
+    { date: "2023-10-01", price: 2450 },
+    { date: "2024-01-01", price: 2700 },
+    { date: "2024-03-26", price: 2914.4 }
+  ], 'mock');
 }));
 
 // 4. Ratios - Unavailable in Upstox
