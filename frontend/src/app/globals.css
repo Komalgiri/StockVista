@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+@theme {
+  --color-surface: #f8f9ff;
+  --color-surface-dim: #cbdbf5;
+  --color-surface-bright: #f8f9ff;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #eff4ff;
+  --color-surface-container: #e5eeff;
+  --color-surface-container-high: #dce9ff;
+  --color-surface-container-highest: #d3e4fe;
+  --color-on-surface: #0b1c30;
+  --color-on-surface-variant: #444653;
+  --color-inverse-surface: #213145;
+  --color-inverse-on-surface: #eaf1ff;
+  --color-outline: #757684;
+  --color-outline-variant: #c4c5d5;
+  --color-surface-tint: #3755c3;
+  --color-primary: #00288e;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #1e40af;
+  --color-on-primary-container: #a8b8ff;
+  --color-inverse-primary: #b8c4ff;
+  --color-secondary: #0051d5;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #316bf3;
+  --color-on-secondary-container: #fefcff;
+  --color-tertiary: #2d3449;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #434b60;
+  --color-on-tertiary-container: #b4bbd5;
+  --color-error: #ba1a1a;
+  --color-on-error: #ffffff;
+  --color-error-container: #ffdad6;
+  --color-on-error-container: #93000a;
+  
+  --color-background: #f8f9ff;
+  --color-on-background: #0b1c30;
+  
+  --color-market-positive: #16A34A;
+  --color-market-positive-subtle: #DCFCE7;
+  --color-market-negative: #DC2626;
+  --color-market-negative-subtle: #FEE2E2;
+  --color-market-neutral: #EAB308;
+  --color-market-neutral-subtle: #FEF9C3;
+  
+  --color-border-hairline: #E2E8F0;
+  --color-border-strong: #CBD5E1;
+  --color-text-primary: #0F172A;
+  --color-text-secondary: #475569;
+  --color-text-tertiary: #94A3B8;
+
+  --font-geist: var(--font-geist-sans);
+  --font-inter: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
+}
+
+:root {
+  --background: #f8f9ff;
+  --foreground: #0b1c30;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-inter), sans-serif;
+  @apply antialiased;
+}
