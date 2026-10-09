@@ -1,4 +1,4 @@
-import yahooFinance from 'yahoo-finance2';
+const yahooFinance = require('yahoo-finance2').default;
 
 // Helper to format Indian symbols (e.g. RELIANCE -> RELIANCE.NS)
 const getYahooSymbol = (isinOrTicker: string) => {
@@ -8,6 +8,27 @@ const getYahooSymbol = (isinOrTicker: string) => {
   }
   return isinOrTicker;
 };
+
+export async function getCompanyProfile(isin: string) {
+  try {
+    const symbol = getYahooSymbol(isin);
+    const profile: any = await yahooFinance.quoteSummary(symbol, { modules: ['summaryProfile', 'price'] });
+    
+    if (!profile) return null;
+    
+    return {
+      name: profile.price?.longName || profile.price?.shortName || isin,
+      ticker: isin,
+      exchange: "NSE",
+      sector: profile.summaryProfile?.sector || "Unknown",
+      isin: isin,
+      industry: profile.summaryProfile?.industry || "Unknown"
+    };
+  } catch (error) {
+    console.error("Yahoo Finance Profile Error:", error);
+    return null;
+  }
+}
 
 export async function getMarketQuote(isin: string) {
   try {

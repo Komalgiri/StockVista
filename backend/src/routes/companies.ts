@@ -1,5 +1,5 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { getMarketQuote, getHistoricalData } from '../services/yahoo';
+import { getMarketQuote, getHistoricalData, getCompanyProfile } from '../services/yahoo';
 import NodeCache from 'node-cache';
 
 const router = Router();
@@ -42,16 +42,24 @@ const cacheMiddleware = (req: Request, res: Response, next: NextFunction) => {
 
 // 1. Company Profile
 router.get('/:isin', cacheMiddleware, asyncHandler(async (req: Request, res: Response) => {
-  const { isin } = req.params;
-  // Upstox does not provide rich company profiles via a simple endpoint.
-  // We return a mock/fallback for identity since it's required for the UI to function gracefully.
+  const isin = req.params.isin as string;
+  try {
+    const profile = await getCompanyProfile(isin);
+    if (profile) {
+      respond(res, profile, 'yahoo-finance');
+      return;
+    }
+  } catch (error) {
+    console.error('Yahoo profile fetch failed', error);
+  }
+  
   respond(res, {
-    name: isin === 'RELIANCE' ? "Reliance Industries Ltd." : "Unknown Company",
+    name: isin,
     ticker: isin,
     exchange: "NSE",
-    sector: "Energy / Telecommunications",
+    sector: "Unknown",
     isin: isin,
-    industry: "Oil Refining & Marketing"
+    industry: "Unknown"
   }, 'mock');
 }));
 
