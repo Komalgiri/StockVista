@@ -12,7 +12,7 @@ const getYahooSymbol = (isinOrTicker: string) => {
 export async function getMarketQuote(isin: string) {
   try {
     const symbol = getYahooSymbol(isin);
-    const quote = await yahooFinance.quote(symbol);
+    const quote: any = await yahooFinance.quote(symbol);
     
     if (!quote) return null;
     
@@ -48,9 +48,9 @@ export async function getHistoricalData(isin: string, range: string = '1y') {
     else period1.setFullYear(period1.getFullYear() - 1);
 
     const queryOptions = { period1, interval: '1d' as const };
-    const result = await yahooFinance.historical(symbol, queryOptions);
+    const result: any[] = await yahooFinance.historical(symbol, queryOptions);
     
-    return result.map(day => ({
+    return result.map((day: any) => ({
       date: day.date.toISOString().split('T')[0],
       price: day.close,
       open: day.open,

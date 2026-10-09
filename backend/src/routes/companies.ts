@@ -57,7 +57,7 @@ router.get('/:isin', cacheMiddleware, asyncHandler(async (req: Request, res: Res
 
 // 2. Quote
 router.get('/:isin/quote', cacheMiddleware, asyncHandler(async (req: Request, res: Response) => {
-  const { isin } = req.params;
+  const isin = req.params.isin as string;
   try {
     const data = await getMarketQuote(isin);
     if (data) {
@@ -98,7 +98,7 @@ router.get('/:isin/quote', cacheMiddleware, asyncHandler(async (req: Request, re
 
 // 3. Historical Chart
 router.get('/:isin/history', cacheMiddleware, asyncHandler(async (req: Request, res: Response) => {
-  const { isin } = req.params;
+  const isin = req.params.isin as string;
   try {
     const history = await getHistoricalData(isin, '1y');
     if (history && history.length > 0) {
