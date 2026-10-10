@@ -68,7 +68,7 @@ export function HistoricalChart({ data }: { data: PricePoint[] }) {
               itemStyle={{ color: 'var(--color-text-primary)' }}
             />
             <Area type="monotone" dataKey="price" stroke="var(--color-primary)" strokeWidth={2} fillOpacity={1} fill="url(#colorPrice)" />
-            <Area type="monotone" dataKey="sma" stroke="#EAB308" strokeWidth={1.5} strokeDasharray="4 4" fill="none" />
+            <Area type="monotone" dataKey="sma" stroke="#71717a" strokeWidth={1.5} strokeDasharray="4 4" fill="none" />
           </AreaChart>
         </ResponsiveContainer>
         
@@ -99,7 +99,7 @@ export function HistoricalChart({ data }: { data: PricePoint[] }) {
       <div className="flex justify-between items-center mt-4 text-[10px] font-mono text-text-tertiary">
         <div className="flex gap-4">
           <span className="flex items-center gap-1"><span className="w-2 h-0.5 bg-primary"></span> Price Close</span>
-          <span className="flex items-center gap-1"><span className="w-2 h-0.5 bg-[#EAB308]"></span> SMA (50) ₹2,696.40</span>
+          <span className="flex items-center gap-1"><span className="w-2 h-0.5 bg-[#71717a]"></span> SMA (50) ₹2,696.40</span>
           <span className="flex items-center gap-1"><span className="w-2 h-0.5 bg-outline"></span> SMA (200) ₹2,475.20</span>
         </div>
         <div>Vol: 4.54M • 20D Avg: 5.20M</div>

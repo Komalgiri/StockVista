@@ -8,8 +8,7 @@ export function Shareholding({ shareholding }: { shareholding: FinancialData | n
 
   // Use the last column to generate a donut chart summary
   const lastColIndex = shareholding.headers.length - 2; // -1 because slice(1), actually values are 0-indexed corresponding to headers 1-indexed
-  
-  const colors = ['#2563EB', '#3B82F6', '#60A5FA', '#93C5FD', '#CBD5E1'];
+  const colors = ['#09090b', '#27272a', '#52525b', '#71717a', '#a1a1aa', '#d4d4d8'];
   const summaryData = shareholding.rows.map((row, i) => {
     return {
       category: row.title,
