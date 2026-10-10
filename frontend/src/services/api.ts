@@ -70,6 +70,10 @@ export const getCorporateActions = async (ticker: string) => {
   return await fetchAPI(`/companies/${ticker}/corporate-actions`);
 };
 
+export const getDocuments = async (ticker: string) => {
+  return await fetchAPI(`/companies/${ticker}/documents`);
+};
+
 // Fetches live NIFTY 50 and SENSEX from the backend (1-min cached).
 export const getMarketIndices = async (): Promise<MarketIndices | null> => {
   return await fetchAPI('/indices');

@@ -127,7 +127,7 @@ router.get('/:isin/history', cacheMiddleware, asyncHandler(async (req: Request, 
   ], 'mock');
 }));
 
-import { getScreenerRatios, getScreenerIncome, getScreenerBalanceSheet, getScreenerCashFlow, getScreenerShareholding, getScreenerPeers } from '../services/screener';
+import { getScreenerRatios, getScreenerIncome, getScreenerBalanceSheet, getScreenerCashFlow, getScreenerShareholding, getScreenerPeers, getScreenerDocuments } from '../services/screener';
 
 // 4. Ratios
 router.get('/:isin/ratios', cacheMiddleware, asyncHandler(async (req: Request, res: Response) => {
@@ -163,8 +163,12 @@ router.get('/:isin/peers', cacheMiddleware, asyncHandler(async (req: Request, re
   respond(res, data, 'screener.in'); 
 }));
 
-// 7. Corporate Actions & Documents - Still Unavailable (Requires NSE/BSE auth for robust data)
+// 7. Corporate Actions & Documents
 router.get('/:isin/corporate-actions', asyncHandler(async (req: Request, res: Response) => { respond(res, null, 'unavailable'); }));
-router.get('/:isin/documents', asyncHandler(async (req: Request, res: Response) => { respond(res, null, 'unavailable'); }));
+
+router.get('/:isin/documents', cacheMiddleware, asyncHandler(async (req: Request, res: Response) => { 
+  const data = await getScreenerDocuments(req.params.isin as string);
+  respond(res, data, 'screener.in'); 
+}));
 
 export default router;

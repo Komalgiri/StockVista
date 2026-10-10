@@ -1,6 +1,10 @@
-import { FileText, Download } from 'lucide-react';
+import { FileText, Download, ExternalLink } from 'lucide-react';
 
-export function DocumentsList() {
+export type DocumentsData = Record<string, { name: string, url: string }[]>;
+
+export function DocumentsList({ documents }: { documents?: DocumentsData | null }) {
+  const hasDocs = documents && Object.keys(documents).length > 0;
+
   return (
     <div className="flex flex-col gap-4">
       <div className="border border-border-hairline rounded-lg bg-surface-canvas p-4 shadow-sm flex items-start gap-3 bg-surface-muted/30">
@@ -24,33 +28,41 @@ export function DocumentsList() {
         <div className="flex justify-between items-start mb-6">
           <div>
             <h3 className="text-[10px] uppercase tracking-widest font-semibold text-text-tertiary mb-1">Exchange Filings</h3>
-            <h2 className="font-geist text-[18px] font-bold text-text-primary leading-tight">Annual Reports & Investor Balances</h2>
+            <h2 className="font-geist text-[18px] font-bold text-text-primary leading-tight">Documents & Reports</h2>
           </div>
           <FileText size={18} className="text-text-secondary" />
         </div>
 
-        <div className="flex flex-col gap-3">
-          <DocItem title="Annual Report FY 2023-24" meta="PDF • 46.2 MB • Released: Jun 2024" />
-          <DocItem title="Q4 FY24 Earnings Presentation" meta="PPT/PDF • 14.5 MB • Released: Jan 2024" />
-        </div>
+        {!hasDocs ? (
+          <div className="text-[12px] text-text-secondary text-center py-6">Company documents unavailable.</div>
+        ) : (
+          <div className="flex flex-col gap-6">
+            {Object.entries(documents).map(([title, links]) => (
+              <div key={title} className="flex flex-col gap-3">
+                <h4 className="text-[12px] font-semibold text-text-primary border-b border-border-hairline pb-1">{title}</h4>
+                {links.map((link, idx) => (
+                  <DocItem key={idx} title={link.name} url={link.url} />
+                ))}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
-function DocItem({ title, meta }: { title: string, meta: string }) {
+function DocItem({ title, url }: { title: string, url: string }) {
   return (
-    <div className="flex items-center justify-between p-3 border border-border-hairline rounded bg-surface-subtle hover:bg-surface-muted transition-colors cursor-pointer group">
+    <a href={url} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between p-3 border border-border-hairline rounded bg-surface-subtle hover:bg-surface-muted transition-colors group">
       <div className="flex items-center gap-3">
-        <div className="text-market-negative"><FileText size={20} /></div>
-        <div>
-          <div className="font-geist font-semibold text-[13px] text-text-primary group-hover:text-primary transition-colors">{title}</div>
-          <div className="text-[10px] text-text-tertiary font-inter">{meta}</div>
-        </div>
+        <div className="text-primary"><FileText size={20} /></div>
+        <div className="font-geist font-semibold text-[13px] text-text-primary group-hover:text-primary transition-colors">{title}</div>
       </div>
-      <button className="flex items-center gap-1 text-[10px] font-semibold text-text-secondary bg-surface-canvas border border-border-strong px-2 py-1 rounded hover:bg-surface-subtle transition-colors">
-        <Download size={12} /> PDF
-      </button>
-    </div>
+      <div className="text-text-tertiary group-hover:text-primary transition-colors">
+        <ExternalLink size={14} />
+      </div>
+    </a>
   );
 }
+

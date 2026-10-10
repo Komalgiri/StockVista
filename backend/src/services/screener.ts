@@ -95,3 +95,28 @@ export async function getScreenerPeers(ticker: string) {
   if (!$) return null;
   return parseTable($, 'section#peers');
 }
+
+export async function getScreenerDocuments(ticker: string) {
+  const $ = await fetchScreenerData(ticker);
+  if (!$) return null;
+  const docs: Record<string, { name: string, url: string }[]> = {};
+  
+  $('#documents .documents').each((i, list) => {
+    const title = $(list).find('h3').text().trim();
+    const links: { name: string, url: string }[] = [];
+    $(list).find('ul.list-links li a').each((j, aTag) => {
+      const url = $(aTag).attr('href');
+      if (url) {
+        links.push({
+          name: $(aTag).text().trim(),
+          url: url,
+        });
+      }
+    });
+    if (title && links.length > 0) {
+      docs[title] = links;
+    }
+  });
+
+  return docs;
+}

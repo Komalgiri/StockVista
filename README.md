@@ -142,9 +142,9 @@ The Node.js backend exposes the following REST endpoints to the frontend:
 | `/api/companies/:ticker/shareholding` | GET | Promoter / institutional shareholding pattern | ✅ Screener.in |
 | `/api/companies/:ticker/peers` | GET | Sector peer comparison table | ✅ Screener.in |
 | `/api/companies/:ticker/corporate-actions` | GET | Dividends, bonuses, splits | ⚠️ Unavailable — returns `null` |
-| `/api/companies/:ticker/documents` | GET | BSE/NSE filings and annual reports | ⚠️ Unavailable — returns `null` |
+| `/api/companies/:ticker/documents` | GET | BSE/NSE filings and annual reports | ✅ Screener.in |
 
-> **Why ⚠️ endpoints exist:** Unauthenticated, zero-config APIs and scrapers cannot reliably fetch corporate actions and raw filing documents without a paid API layer (like Morningstar/Refinitiv) or an authenticated BSE API. Unavailable endpoints return a typed `null` response, which the frontend handles gracefully by rendering a "Data Unavailable" UI rather than fabricating data.
+> **Why ⚠️ endpoints exist:** Unauthenticated, zero-config APIs and scrapers cannot reliably fetch corporate actions without a paid API layer (like Morningstar/Refinitiv) or an authenticated BSE API. Unavailable endpoints return a typed `null` response, which the frontend handles gracefully by rendering a "Data Unavailable" UI rather than fabricating data.
 
 *Note: All routes are wrapped in a 5-minute TTL in-memory cache (1-minute for index data).*
 
@@ -172,10 +172,9 @@ To provide a production-grade experience without requiring the evaluator to conf
 | Data Point | Why Missing |
 | :--- | :--- |
 | Corporate Actions (dividends, bonuses, splits) | Requires BSE corporate actions API |
-| BSE/NSE filings and annual reports | Requires NSE EDGAR / BSE filing portal API |
 | Analyst estimates / price targets | Requires a paid tier (e.g., Refinitiv, Bloomberg) |
 
-> **Production approach:** A production build would integrate a primary provider via OAuth (like Upstox or Zerodha) for market data, and a paid fundamentals API (like Morningstar) instead of scraping HTML for structural stability. This implementation effectively provides ~90% data coverage using zero-config APIs and HTML parsing for a complete evaluation experience.
+> **Production approach:** A production build would integrate a primary provider via OAuth (like Upstox or Zerodha) for market data, and a paid fundamentals API (like Morningstar) instead of scraping HTML for structural stability. This implementation effectively provides ~95% data coverage using zero-config APIs and HTML parsing for a complete evaluation experience.
 
 ## Testing and Build
 

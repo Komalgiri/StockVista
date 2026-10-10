@@ -23,13 +23,14 @@ import {
   getShareholding,
   getPeerComparison,
   getRatios,
-  getCorporateActions
+  getCorporateActions,
+  getDocuments
 } from '@/services/api';
 
 export const instant = false;
 
 async function DashboardData({ ticker }: { ticker: string }) {
-  const [profile, quote, financials, balanceSheet, historicalPrices, shareholding, peers, ratios, actions] = await Promise.all([
+  const [profile, quote, financials, balanceSheet, historicalPrices, shareholding, peers, ratios, actions, documents] = await Promise.all([
     getCompanyProfile(ticker),
     getMarketQuote(ticker),
     getFinancialStatements(ticker),
@@ -38,7 +39,8 @@ async function DashboardData({ ticker }: { ticker: string }) {
     getShareholding(ticker),
     getPeerComparison(ticker),
     getRatios(ticker),
-    getCorporateActions(ticker)
+    getCorporateActions(ticker),
+    getDocuments(ticker)
   ]);
 
   if (!profile) return <div>Failed to load company profile.</div>;
@@ -118,7 +120,7 @@ async function DashboardData({ ticker }: { ticker: string }) {
             {actions ? <CorporateActions /> : <div className="border border-border-hairline rounded-lg bg-surface-canvas p-5 h-full flex items-center justify-center text-text-secondary">Corporate actions unavailable.</div>}
           </div>
           <div className="xl:col-span-5">
-            <DocumentsList />
+            <DocumentsList documents={documents} />
           </div>
         </section>
       </div>
