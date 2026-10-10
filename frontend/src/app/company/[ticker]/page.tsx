@@ -50,9 +50,13 @@ async function DashboardData({ ticker }: { ticker: string }) {
         ticker={profile.ticker}
         exchange={profile.exchange}
         sector={profile.sector}
-        currentPrice={quote?.currentPrice || 0}
+        currentPrice={quote?.price || 0}
         dayChange={quote?.dayChange || 0}
         dayChangePercent={quote?.dayChangePercent || 0}
+        volume={quote?.volume || 0}
+        prevClose={quote?.close || 0}
+        industry={profile.industry}
+        description={profile.description}
       />
       
       <KeyMetricsBar 

@@ -8,9 +8,13 @@ interface CompanyHeaderProps {
   currentPrice: number;
   dayChange: number;
   dayChangePercent: number;
+  volume: number;
+  prevClose: number;
+  industry?: string;
+  description?: string;
 }
 
-export function CompanyHeader({ name, ticker, exchange, sector, currentPrice, dayChange, dayChangePercent }: CompanyHeaderProps) {
+export function CompanyHeader({ name, ticker, exchange, sector, currentPrice, dayChange, dayChangePercent, volume, prevClose, industry, description }: CompanyHeaderProps) {
   const isPositive = dayChange >= 0;
   
   return (
@@ -46,13 +50,13 @@ export function CompanyHeader({ name, ticker, exchange, sector, currentPrice, da
           </div>
           
           <div className="text-[12px] text-text-secondary font-medium mb-3 flex items-center gap-1.5">
-            <span className="text-primary">🏢 Energy & Petrochemicals</span>
+            <span className="text-primary">🏢 {sector}</span>
             <span className="text-text-tertiary">&gt;</span>
-            <span>Oil Refining & Marketing / Conglomerate</span>
+            <span>{industry || 'Equities'}</span>
           </div>
 
-          <p className="text-[13px] text-text-secondary leading-relaxed mb-4 max-w-3xl">
-            Reliance Industries Limited is an Indian multinational conglomerate headquartered in Mumbai. Its businesses include energy, petrochemicals, natural gas, retail, telecommunications, mass media, and textiles.
+          <p className="text-[13px] text-text-secondary leading-relaxed mb-4 max-w-3xl line-clamp-2" title={description}>
+            {description || 'Company description is currently unavailable.'}
           </p>
 
           <div className="flex gap-2 text-[12px] font-semibold">
@@ -79,17 +83,17 @@ export function CompanyHeader({ name, ticker, exchange, sector, currentPrice, da
           </div>
           <div className={`flex items-center justify-end gap-1 font-inter font-bold text-[14px] tabular-nums ${isPositive ? 'text-market-positive' : 'text-market-negative'}`}>
             {isPositive ? <ArrowUpRight size={16} strokeWidth={3} /> : <ArrowDownRight size={16} strokeWidth={3} />}
-            <span>+{Math.abs(dayChange).toFixed(2)} ({Math.abs(dayChangePercent).toFixed(2)}%)</span>
+            <span>{isPositive ? '+' : '-'}{Math.abs(dayChange).toFixed(2)} ({Math.abs(dayChangePercent).toFixed(2)}%)</span>
           </div>
           
           <div className="flex justify-between w-full mt-4 pt-3 border-t border-border-hairline text-[11px]">
             <div>
               <div className="text-text-tertiary mb-0.5">Prev. Close</div>
-              <div className="font-semibold text-text-primary tabular-nums">₹2,879.85</div>
+              <div className="font-semibold text-text-primary tabular-nums">₹{prevClose.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
             </div>
             <div className="text-right">
               <div className="text-text-tertiary mb-0.5">Volume</div>
-              <div className="font-semibold text-text-primary tabular-nums">4.54M shares</div>
+              <div className="font-semibold text-text-primary tabular-nums">{(volume / 1000000).toFixed(2)}M shares</div>
             </div>
           </div>
         </div>

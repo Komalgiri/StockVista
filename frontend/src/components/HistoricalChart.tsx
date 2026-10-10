@@ -57,8 +57,8 @@ export function HistoricalChart({ data }: { data: PricePoint[] }) {
           <AreaChart data={chartData} margin={{ top: 5, right: 0, left: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="var(--color-primary)" stopOpacity={0.2}/>
-                <stop offset="95%" stopColor="var(--color-primary)" stopOpacity={0}/>
+                <stop offset="5%" stopColor="#2563eb" stopOpacity={0.2}/>
+                <stop offset="95%" stopColor="#2563eb" stopOpacity={0}/>
               </linearGradient>
             </defs>
             <XAxis dataKey="date" hide />
@@ -67,8 +67,8 @@ export function HistoricalChart({ data }: { data: PricePoint[] }) {
               contentStyle={{ backgroundColor: 'var(--color-surface-canvas)', borderColor: 'var(--color-border-strong)', borderRadius: '6px', fontSize: '12px' }}
               itemStyle={{ color: 'var(--color-text-primary)' }}
             />
-            <Area type="monotone" dataKey="price" stroke="var(--color-primary)" strokeWidth={2} fillOpacity={1} fill="url(#colorPrice)" />
-            <Area type="monotone" dataKey="sma" stroke="#71717a" strokeWidth={1.5} strokeDasharray="4 4" fill="none" />
+            <Area type="monotone" dataKey="price" stroke="#2563eb" strokeWidth={2} fillOpacity={1} fill="url(#colorPrice)" />
+            <Area type="monotone" dataKey="sma" stroke="#3b82f6" strokeWidth={1.5} strokeDasharray="4 4" fill="none" />
           </AreaChart>
         </ResponsiveContainer>
         
@@ -98,8 +98,8 @@ export function HistoricalChart({ data }: { data: PricePoint[] }) {
       
       <div className="flex justify-between items-center mt-4 text-[10px] font-mono text-text-tertiary">
         <div className="flex gap-4">
-          <span className="flex items-center gap-1"><span className="w-2 h-0.5 bg-primary"></span> Price Close</span>
-          <span className="flex items-center gap-1"><span className="w-2 h-0.5 bg-[#71717a]"></span> SMA (50) ₹2,696.40</span>
+          <span className="flex items-center gap-1"><span className="w-2 h-0.5 bg-[#2563eb]"></span> Price Close</span>
+          <span className="flex items-center gap-1"><span className="w-2 h-0.5 bg-[#3b82f6]"></span> SMA (50) ₹2,696.40</span>
           <span className="flex items-center gap-1"><span className="w-2 h-0.5 bg-outline"></span> SMA (200) ₹2,475.20</span>
         </div>
         <div>Vol: 4.54M • 20D Avg: 5.20M</div>
