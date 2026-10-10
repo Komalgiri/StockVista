@@ -135,16 +135,16 @@ The Node.js backend exposes the following REST endpoints to the frontend:
 | `/api/companies/:ticker` | GET | Company profile: name, sector, industry, exchange | ✅ Yahoo Finance (with mock fallback) |
 | `/api/companies/:ticker/quote` | GET | Live LTP, day change, volume, 52W high/low, market cap | ✅ Yahoo Finance |
 | `/api/companies/:ticker/history` | GET | Daily OHLC historical data (1 year default) | ✅ Yahoo Finance |
-| `/api/companies/:ticker/ratios` | GET | Valuation ratios (P/E, P/B, ROE) | ⚠️ Unavailable — returns `null` |
-| `/api/companies/:ticker/income` | GET | Quarterly / annual P&L statement | ⚠️ Unavailable — returns `null` |
-| `/api/companies/:ticker/balance-sheet` | GET | Balance sheet data | ⚠️ Unavailable — returns `null` |
-| `/api/companies/:ticker/cash-flow` | GET | Cash flow statement | ⚠️ Unavailable — returns `null` |
-| `/api/companies/:ticker/shareholding` | GET | Promoter / institutional shareholding pattern | ⚠️ Unavailable — returns `null` |
-| `/api/companies/:ticker/peers` | GET | Sector peer comparison table | ⚠️ Unavailable — returns `null` |
+| `/api/companies/:ticker/ratios` | GET | Valuation ratios (P/E, P/B, ROE) | ✅ Screener.in |
+| `/api/companies/:ticker/income` | GET | Quarterly / annual P&L statement | ✅ Screener.in |
+| `/api/companies/:ticker/balance-sheet` | GET | Balance sheet data | ✅ Screener.in |
+| `/api/companies/:ticker/cash-flow` | GET | Cash flow statement | ✅ Screener.in |
+| `/api/companies/:ticker/shareholding` | GET | Promoter / institutional shareholding pattern | ✅ Screener.in |
+| `/api/companies/:ticker/peers` | GET | Sector peer comparison table | ✅ Screener.in |
 | `/api/companies/:ticker/corporate-actions` | GET | Dividends, bonuses, splits | ⚠️ Unavailable — returns `null` |
 | `/api/companies/:ticker/documents` | GET | BSE/NSE filings and annual reports | ⚠️ Unavailable — returns `null` |
 
-> **Why ⚠️ endpoints exist:** Yahoo Finance's free (unauthenticated) layer provides excellent market data (prices, history, basic profile) but does **not** expose fundamental financial statements, shareholding data, or corporate actions. All unavailable endpoints return a typed `null` response — the frontend handles this gracefully by rendering an explicit "Data Unavailable" UI state rather than crashing or fabricating data. See the [Limitations](#limitations-and-future-improvements) section below.
+> **Why ⚠️ endpoints exist:** Unauthenticated, zero-config APIs and scrapers cannot reliably fetch corporate actions and raw filing documents without a paid API layer (like Morningstar/Refinitiv) or an authenticated BSE API. Unavailable endpoints return a typed `null` response, which the frontend handles gracefully by rendering a "Data Unavailable" UI rather than fabricating data.
 
 *Note: All routes are wrapped in a 5-minute TTL in-memory cache (1-minute for index data).*
 
