@@ -47,8 +47,11 @@ export const getHistoricalPrices = async (ticker: string) => {
 };
 
 export const getFinancialStatements = async (ticker: string) => {
-  // Using income endpoint to simulate financials fetch
   return await fetchAPI(`/companies/${ticker}/income`);
+};
+
+export const getBalanceSheet = async (ticker: string) => {
+  return await fetchAPI(`/companies/${ticker}/balance-sheet`);
 };
 
 export const getPeerComparison = async (ticker: string) => {
@@ -57,6 +60,10 @@ export const getPeerComparison = async (ticker: string) => {
 
 export const getShareholding = async (ticker: string) => {
   return await fetchAPI(`/companies/${ticker}/shareholding`);
+};
+
+export const getRatios = async (ticker: string) => {
+  return await fetchAPI(`/companies/${ticker}/ratios`);
 };
 
 export const getCorporateActions = async (ticker: string) => {

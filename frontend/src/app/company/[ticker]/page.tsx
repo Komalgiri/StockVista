@@ -18,22 +18,26 @@ import {
   getCompanyProfile,
   getMarketQuote,
   getFinancialStatements, 
+  getBalanceSheet,
   getHistoricalPrices,
   getShareholding,
   getPeerComparison,
+  getRatios,
   getCorporateActions
 } from '@/services/api';
 
 export const instant = false;
 
 async function DashboardData({ ticker }: { ticker: string }) {
-  const [profile, quote, financials, historicalPrices, shareholding, peers, actions] = await Promise.all([
+  const [profile, quote, financials, balanceSheet, historicalPrices, shareholding, peers, ratios, actions] = await Promise.all([
     getCompanyProfile(ticker),
     getMarketQuote(ticker),
     getFinancialStatements(ticker),
+    getBalanceSheet(ticker),
     getHistoricalPrices(ticker),
     getShareholding(ticker),
     getPeerComparison(ticker),
+    getRatios(ticker),
     getCorporateActions(ticker)
   ]);
 
@@ -53,11 +57,11 @@ async function DashboardData({ ticker }: { ticker: string }) {
       
       <KeyMetricsBar 
         marketCap={quote?.marketCap || "N/A"}
-        peRatio={0} // Not in Upstox
+        peRatio={parseFloat(ratios?.['Stock P/E'] || '0')} 
         weekHigh52={quote?.weekHigh52 || 0}
         weekLow52={quote?.weekLow52 || 0}
-        bookValue={0} // Not in Upstox
-        faceValue={10.0}
+        bookValue={parseFloat(ratios?.['Book Value'] || '0')}
+        faceValue={parseFloat(ratios?.['Face Value'] || '0')}
       />
 
       <div className="flex gap-6 mb-6 font-geist font-semibold text-[13px]">
@@ -79,30 +83,23 @@ async function DashboardData({ ticker }: { ticker: string }) {
 
         <section className="grid grid-cols-1 xl:grid-cols-12 gap-6">
           <div className="xl:col-span-8">
-            <ValuationGrid 
-              peRatio={0}
-              pbRatio={0}
-              dividendYield={0}
-            />
-            {/* Note: In production, we'd overlay an 'Unavailable' state here */}
+            <ValuationGrid ratios={ratios} />
           </div>
           <div className="xl:col-span-4">
             <CorporateMetadata />
           </div>
         </section>
 
-        {financials && financials.incomeStatement && (
-          <section>
-            <FinancialTables data={financials.incomeStatement} />
-          </section>
-        )}
+        <section>
+          <FinancialTables income={financials} balanceSheet={balanceSheet} />
+        </section>
 
         <section className="grid grid-cols-1 xl:grid-cols-12 gap-6">
           <div className="xl:col-span-5">
-            {shareholding ? <Shareholding /> : <div className="border border-border-hairline rounded-lg bg-surface-canvas p-5 h-full flex items-center justify-center text-text-secondary">Shareholding data unavailable.</div>}
+            <Shareholding shareholding={shareholding} />
           </div>
           <div className="xl:col-span-7">
-            {peers ? <PeerComparison /> : <div className="border border-border-hairline rounded-lg bg-surface-canvas p-5 h-full flex items-center justify-center text-text-secondary">Peer comparison data unavailable.</div>}
+            <PeerComparison peers={peers} />
           </div>
         </section>
 

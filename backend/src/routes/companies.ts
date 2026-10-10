@@ -127,22 +127,43 @@ router.get('/:isin/history', cacheMiddleware, asyncHandler(async (req: Request, 
   ], 'mock');
 }));
 
-// 4. Ratios - Unavailable in Upstox
+import { getScreenerRatios, getScreenerIncome, getScreenerBalanceSheet, getScreenerCashFlow, getScreenerShareholding, getScreenerPeers } from '../services/screener';
+
+// 4. Ratios
 router.get('/:isin/ratios', cacheMiddleware, asyncHandler(async (req: Request, res: Response) => {
-  // Upstox does not provide fundamentals.
-  respond(res, null, 'unavailable');
+  const isin = req.params.isin as string;
+  const data = await getScreenerRatios(isin);
+  respond(res, data, 'screener.in');
 }));
 
-// 5. Financials - Unavailable in Upstox
-router.get('/:isin/income', asyncHandler(async (req: Request, res: Response) => { respond(res, null, 'unavailable'); }));
-router.get('/:isin/balance-sheet', asyncHandler(async (req: Request, res: Response) => { respond(res, null, 'unavailable'); }));
-router.get('/:isin/cash-flow', asyncHandler(async (req: Request, res: Response) => { respond(res, null, 'unavailable'); }));
+// 5. Financials
+router.get('/:isin/income', cacheMiddleware, asyncHandler(async (req: Request, res: Response) => { 
+  const data = await getScreenerIncome(req.params.isin);
+  respond(res, data, 'screener.in'); 
+}));
 
-// 6. Ownership & Peers - Unavailable in Upstox
-router.get('/:isin/shareholding', asyncHandler(async (req: Request, res: Response) => { respond(res, null, 'unavailable'); }));
-router.get('/:isin/peers', asyncHandler(async (req: Request, res: Response) => { respond(res, null, 'unavailable'); }));
+router.get('/:isin/balance-sheet', cacheMiddleware, asyncHandler(async (req: Request, res: Response) => { 
+  const data = await getScreenerBalanceSheet(req.params.isin);
+  respond(res, data, 'screener.in'); 
+}));
 
-// 7. Corporate Actions & Documents - Unavailable
+router.get('/:isin/cash-flow', cacheMiddleware, asyncHandler(async (req: Request, res: Response) => { 
+  const data = await getScreenerCashFlow(req.params.isin);
+  respond(res, data, 'screener.in'); 
+}));
+
+// 6. Ownership & Peers
+router.get('/:isin/shareholding', cacheMiddleware, asyncHandler(async (req: Request, res: Response) => { 
+  const data = await getScreenerShareholding(req.params.isin);
+  respond(res, data, 'screener.in'); 
+}));
+
+router.get('/:isin/peers', cacheMiddleware, asyncHandler(async (req: Request, res: Response) => { 
+  const data = await getScreenerPeers(req.params.isin);
+  respond(res, data, 'screener.in'); 
+}));
+
+// 7. Corporate Actions & Documents - Still Unavailable (Requires NSE/BSE auth for robust data)
 router.get('/:isin/corporate-actions', asyncHandler(async (req: Request, res: Response) => { respond(res, null, 'unavailable'); }));
 router.get('/:isin/documents', asyncHandler(async (req: Request, res: Response) => { respond(res, null, 'unavailable'); }));
 

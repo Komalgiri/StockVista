@@ -1,4 +1,10 @@
-export function ValuationGrid({ peRatio, pbRatio, dividendYield }: { peRatio: number; pbRatio: number; dividendYield: number }) {
+export function ValuationGrid({ ratios }: { ratios: Record<string, string> | null }) {
+  if (!ratios || Object.keys(ratios).length === 0) {
+    return <div className="border border-border-hairline rounded-lg bg-surface-canvas p-5 shadow-sm h-full flex items-center justify-center text-text-secondary">Valuation ratios unavailable.</div>;
+  }
+
+  const parseVal = (key: string, fallback: string = 'N/A') => ratios[key] || fallback;
+
   return (
     <div className="border border-border-hairline rounded-lg bg-surface-canvas p-5 shadow-sm h-full">
       <div className="flex justify-between items-start mb-6">
@@ -6,18 +12,18 @@ export function ValuationGrid({ peRatio, pbRatio, dividendYield }: { peRatio: nu
           <h3 className="text-[10px] uppercase tracking-widest font-semibold text-text-tertiary mb-1">Key Multiples</h3>
           <h2 className="font-geist text-[18px] font-bold text-text-primary leading-tight">Valuation & Capital Efficiency</h2>
         </div>
-        <span className="text-[10px] text-text-secondary bg-surface-subtle px-2 py-1 rounded border border-border-hairline font-mono">TTM (Standalone & Cons.)</span>
+        <span className="text-[10px] text-text-secondary bg-surface-subtle px-2 py-1 rounded border border-border-hairline font-mono">TTM</span>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-6">
-        <ValuationItem title="P/E RATIO" value={peRatio.toFixed(1)} sub="Ind. PE 24.1" />
-        <ValuationItem title="PRICE TO BOOK" value={pbRatio.toFixed(2)} sub="Premium 2.2x" />
-        <ValuationItem title="RETURN ON EQUITY" value="9.8%" sub="3Yr Avg 9.4%" />
-        <ValuationItem title="ROCE" value="10.4%" sub="+40bps YoY" />
-        <ValuationItem title="RETURN ON ASSETS" value="4.9%" sub="Asset Base ₹15.5L Cr" />
-        <ValuationItem title="EV / EBITDA" value="13.8x" sub="Sector 12.2x" />
-        <ValuationItem title="DIVIDEND YIELD" value={`${dividendYield.toFixed(2)}%`} sub="₹10.0 / share" />
-        <ValuationItem title="DEBT TO EQUITY" value="0.38" sub="Comfortable" />
+        <ValuationItem title="P/E RATIO" value={parseVal('Stock P/E')} sub={`Ind. PE ${parseVal('Industry PE')}`} />
+        <ValuationItem title="PRICE TO BOOK" value={parseVal('Price to book value')} sub="TTM" />
+        <ValuationItem title="RETURN ON EQUITY" value={`${parseVal('ROE')} %`} sub="Trailing 12M" />
+        <ValuationItem title="ROCE" value={`${parseVal('ROCE')} %`} sub="Capital Emp." />
+        <ValuationItem title="FACE VALUE" value={`₹${parseVal('Face Value')}`} sub="Per Share" />
+        <ValuationItem title="EV / EBITDA" value={parseVal('EV / EBITDA')} sub="TTM" />
+        <ValuationItem title="DIVIDEND YIELD" value={`${parseVal('Dividend Yield')} %`} sub="Annualized" />
+        <ValuationItem title="DEBT TO EQUITY" value={parseVal('Debt to equity')} sub="Leverage" />
       </div>
     </div>
   );
