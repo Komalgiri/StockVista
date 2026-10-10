@@ -12,12 +12,16 @@ StockVista is a professional, institutional-grade equity research dashboard for 
 
 ## Screenshots and Demo
 
-> **Note to Evaluator:** Placeholders below. 
-> 
-> - **Live Demo URL:** `[Insert Deployed URL Here]`
-> 
-> ![Dashboard Screenshot](https://via.placeholder.com/800x450.png?text=Dashboard+Screenshot)
-> ![Search Screenshot](https://via.placeholder.com/800x450.png?text=Search+Screenshot)
+- **Live Demo URL:** `https://stockvista-7kk1.onrender.com/` (API Backend)
+
+### Dashboard Overview
+![Dashboard Screenshot](frontend/src/assets/readme01.png)
+
+### Search & Discovery
+![Search Screenshot](frontend/src/assets/readme02.png)
+
+### Market Analytics
+![Market View](frontend/src/assets/readme03.png)
 
 ## Technology Stack
 

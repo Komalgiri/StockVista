@@ -4,6 +4,8 @@ import { useRouter } from 'next/navigation';
 import { Search, TrendingUp, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { searchCompanies, type SearchResult } from '@/services/api';
+import Image from 'next/image';
+import bgImage from '@/assets/serach_bg.png';
 
 const POPULAR_SEARCHES = [
   { ticker: 'RELIANCE', name: 'Reliance Industries', sector: 'Energy' },
@@ -52,17 +54,24 @@ export function HomeSearch() {
   const showResults = query.trim().length > 0;
 
   return (
-    <div className="relative flex flex-col items-center justify-center min-h-[80vh] w-full max-w-5xl mx-auto px-4 overflow-hidden pt-20">
+    <div className="relative flex flex-col items-center justify-center min-h-[85vh] w-full overflow-hidden pt-20">
+      
+      {/* Background Image Cityscape */}
+      <div className="absolute bottom-0 left-0 right-0 w-full h-[50vh] -z-10 pointer-events-none">
+        <img src={bgImage.src} alt="Cityscape background" className="w-full h-full object-cover object-bottom opacity-100" />
+      </div>
+      
       {/* Arched Background */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[200%] h-[150%] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-50 via-white to-white rounded-[100%] -z-10 mt-[-10%] opacity-80 pointer-events-none"></div>
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[200%] md:w-[150%] h-[120%] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-50/90 via-transparent to-transparent rounded-[100%] -z-20 mt-[-10%] pointer-events-none"></div>
 
-      <h1 className="font-inter text-4xl md:text-6xl text-slate-500 mb-12 text-center tracking-tight">
-        Find Your <span className="font-bold text-slate-800">Perfect Stock.</span>
-      </h1>
+      <div className="relative z-10 w-full max-w-5xl mx-auto px-4 flex flex-col items-center justify-center">
+        <h1 className="font-inter text-4xl md:text-6xl text-slate-500 mb-12 text-center tracking-tight">
+          Find Your <span className="font-bold text-slate-800">Perfect Stock.</span>
+        </h1>
 
-      <div className="relative w-full max-w-3xl mb-16 shadow-[0_8px_30px_rgb(0,0,0,0.08)] rounded-full bg-white">
-        <form onSubmit={handleSubmit} className="relative flex items-center w-full">
-          <div className="absolute left-6 flex items-center pointer-events-none">
+        <div className="relative w-full max-w-3xl mb-16 shadow-[0_8px_30px_rgb(0,0,0,0.08)] rounded-full bg-white">
+          <form onSubmit={handleSubmit} className="relative flex items-center w-full">
+            <div className="absolute left-6 flex items-center pointer-events-none">
             {loading
               ? <Loader2 className="h-6 w-6 text-slate-400 animate-spin" />
               : <Search className="h-6 w-6 text-slate-400" />
@@ -141,6 +150,7 @@ export function HomeSearch() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }
