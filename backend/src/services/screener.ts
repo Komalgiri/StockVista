@@ -43,14 +43,26 @@ function parseTable($: cheerio.CheerioAPI, sectionSelector: string) {
   if (!table.length) return null;
 
   const headers: string[] = [];
-  table.find('thead th').each((i, el) => {
-    headers.push($(el).text().trim());
+  const headerEls = table.find('thead th').length > 0 
+    ? table.find('thead th')
+    : table.find('tbody tr:first-child th');
+
+  headerEls.each((i, el) => {
+    headers.push($(el).text().trim().replace(/[\n\r\t]+/g, ' ').replace(/\s+/g, ' '));
   });
 
   const rows: any[] = [];
   table.find('tbody tr').each((i, el) => {
     const row = $(el);
-    const title = row.find('td.text').text().trim().replace(/\+/g, '').replace(/\s+/g, ' ');
+    let title = '';
+    const anchor = row.find('td.text a');
+    if (anchor.length) {
+      title = anchor.text().trim();
+    } else {
+      title = row.find('td.text').last().text().trim();
+    }
+    title = title.replace(/\+/g, '').replace(/\s+/g, ' ');
+
     const values: string[] = [];
     row.find('td:not(.text)').each((j, td) => {
       values.push($(td).text().trim());
@@ -93,7 +105,21 @@ export async function getScreenerShareholding(ticker: string) {
 export async function getScreenerPeers(ticker: string) {
   const $ = await fetchScreenerData(ticker);
   if (!$) return null;
-  return parseTable($, 'section#peers');
+  const companyId = $('div[data-company-id]').attr('data-company-id');
+  if (!companyId) return null;
+
+  try {
+    const response = await axios.get(`https://www.screener.in/api/company/${companyId}/peers/`, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+      },
+    });
+    const $peers = cheerio.load(response.data);
+    return parseTable($peers, 'body');
+  } catch (error) {
+    console.error('Error fetching peers:', error);
+    return null;
+  }
 }
 
 export async function getScreenerDocuments(ticker: string) {
