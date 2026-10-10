@@ -39,7 +39,7 @@ export async function getScreenerRatios(ticker: string) {
 }
 
 function parseTable($: cheerio.CheerioAPI, sectionSelector: string) {
-  const table = $(`${sectionSelector} table.data-table`);
+  const table = $(`${sectionSelector} table.data-table`).first();
   if (!table.length) return null;
 
   const headers: string[] = [];
@@ -50,7 +50,7 @@ function parseTable($: cheerio.CheerioAPI, sectionSelector: string) {
   const rows: any[] = [];
   table.find('tbody tr').each((i, el) => {
     const row = $(el);
-    const title = row.find('td.text').text().trim().replace(/\\+/g, '').replace(/\\s+/g, ' ');
+    const title = row.find('td.text').text().trim().replace(/\+/g, '').replace(/\s+/g, ' ');
     const values: string[] = [];
     row.find('td:not(.text)').each((j, td) => {
       values.push($(td).text().trim());
@@ -66,7 +66,10 @@ function parseTable($: cheerio.CheerioAPI, sectionSelector: string) {
 export async function getScreenerIncome(ticker: string) {
   const $ = await fetchScreenerData(ticker);
   if (!$) return null;
-  return parseTable($, 'section#profit-loss');
+  return {
+    quarterly: parseTable($, 'section#quarters'),
+    annual: parseTable($, 'section#profit-loss')
+  };
 }
 
 export async function getScreenerBalanceSheet(ticker: string) {

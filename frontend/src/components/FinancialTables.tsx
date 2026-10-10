@@ -1,17 +1,24 @@
-import { ChevronDown, Download } from 'lucide-react';
+import { useState } from 'react';
+import { Download } from 'lucide-react';
 
 export interface FinancialData {
   headers: string[];
   rows: { title: string; values: string[] }[];
 }
 
-export function FinancialTables({ income, balanceSheet, cashFlow }: { income?: FinancialData | null, balanceSheet?: FinancialData | null, cashFlow?: FinancialData | null }) {
+export interface IncomeData {
+  quarterly: FinancialData | null;
+  annual: FinancialData | null;
+}
+
+export function FinancialTables({ income, balanceSheet, cashFlow }: { income?: IncomeData | null, balanceSheet?: FinancialData | null, cashFlow?: FinancialData | null }) {
+  const [activeTab, setActiveTab] = useState<'quarterly' | 'annual'>('annual');
+
   if (!income && !balanceSheet && !cashFlow) {
     return <div className="border border-border-hairline rounded-lg bg-surface-canvas p-5 shadow-sm h-full flex items-center justify-center text-text-secondary">Financial statements unavailable.</div>;
   }
 
-  // We'll just show Income for now for simplicity, or we could add state to toggle between them.
-  const data = income; 
+  const data = activeTab === 'quarterly' ? income?.quarterly : income?.annual; 
   if (!data || !data.headers || data.headers.length === 0) return null;
 
   return (
@@ -24,9 +31,18 @@ export function FinancialTables({ income, balanceSheet, cashFlow }: { income?: F
         
         <div className="flex items-center gap-4">
           <div className="flex bg-surface-subtle p-0.5 rounded-md border border-border-hairline">
-            <button className="text-[11px] px-4 py-1.5 rounded font-semibold bg-primary text-on-primary shadow-sm transition-colors">Profit & Loss</button>
-            <button className="text-[11px] px-4 py-1.5 rounded font-semibold text-text-secondary hover:text-text-primary transition-colors cursor-not-allowed opacity-50">Balance Sheet</button>
-            <button className="text-[11px] px-4 py-1.5 rounded font-semibold text-text-secondary hover:text-text-primary transition-colors cursor-not-allowed opacity-50">Cash Flow</button>
+            <button 
+              onClick={() => setActiveTab('quarterly')}
+              className={`text-[11px] px-4 py-1.5 rounded font-semibold transition-colors ${activeTab === 'quarterly' ? 'bg-primary text-on-primary shadow-sm' : 'text-text-secondary hover:text-text-primary'}`}
+            >
+              Quarterly
+            </button>
+            <button 
+              onClick={() => setActiveTab('annual')}
+              className={`text-[11px] px-4 py-1.5 rounded font-semibold transition-colors ${activeTab === 'annual' ? 'bg-primary text-on-primary shadow-sm' : 'text-text-secondary hover:text-text-primary'}`}
+            >
+              Annual
+            </button>
           </div>
           <button className="text-text-secondary hover:text-primary flex items-center gap-1 text-[11px] font-semibold"><Download size={14}/> CSV</button>
         </div>
