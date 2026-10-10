@@ -138,28 +138,28 @@ router.get('/:isin/ratios', cacheMiddleware, asyncHandler(async (req: Request, r
 
 // 5. Financials
 router.get('/:isin/income', cacheMiddleware, asyncHandler(async (req: Request, res: Response) => { 
-  const data = await getScreenerIncome(req.params.isin);
+  const data = await getScreenerIncome(req.params.isin as string);
   respond(res, data, 'screener.in'); 
 }));
 
 router.get('/:isin/balance-sheet', cacheMiddleware, asyncHandler(async (req: Request, res: Response) => { 
-  const data = await getScreenerBalanceSheet(req.params.isin);
+  const data = await getScreenerBalanceSheet(req.params.isin as string);
   respond(res, data, 'screener.in'); 
 }));
 
 router.get('/:isin/cash-flow', cacheMiddleware, asyncHandler(async (req: Request, res: Response) => { 
-  const data = await getScreenerCashFlow(req.params.isin);
+  const data = await getScreenerCashFlow(req.params.isin as string);
   respond(res, data, 'screener.in'); 
 }));
 
 // 6. Ownership & Peers
 router.get('/:isin/shareholding', cacheMiddleware, asyncHandler(async (req: Request, res: Response) => { 
-  const data = await getScreenerShareholding(req.params.isin);
+  const data = await getScreenerShareholding(req.params.isin as string);
   respond(res, data, 'screener.in'); 
 }));
 
 router.get('/:isin/peers', cacheMiddleware, asyncHandler(async (req: Request, res: Response) => { 
-  const data = await getScreenerPeers(req.params.isin);
+  const data = await getScreenerPeers(req.params.isin as string);
   respond(res, data, 'screener.in'); 
 }));
 
