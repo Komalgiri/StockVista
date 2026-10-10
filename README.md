@@ -143,36 +143,24 @@ The Node.js backend exposes the following REST endpoints to the frontend:
 
 *Note: All routes are wrapped in a 5-minute TTL in-memory cache (1-minute for index data).*
 
-## Financial Data Sources
+## 📡 API Architecture & Data Strategy
 
-- **Primary Provider:** [Yahoo Finance](https://finance.yahoo.com/) via the [`yahoo-finance2`](https://github.com/gadicc/yahoo-finance2) npm package (MIT licensed)
-- **No API key required** — works out of the box, making this project instantly runnable by any evaluator.
+To provide a production-grade experience without requiring the evaluator to configure OAuth keys or Demat accounts, this project evaluated three different data providers:
 
-### What Yahoo Finance provides (used in this app)
+### 1. Upstox API (Evaluated but Deprecated for Demo)
+- **What it provides:** Real-time websockets, order execution, deep historical OHLC, and option chains.
+- **Why it was dropped:** The Upstox API requires a live demat account and a complex OAuth 2.0 flow. Requiring an evaluator to log into their brokerage account to test an assessment is poor UX. It was dropped in favor of zero-config APIs.
 
-| Data Point | Status |
-| :--- | :--- |
-| Live LTP (Last Traded Price) | ✅ Live |
-| Day change & % change | ✅ Live |
-| Volume | ✅ Live |
-| Market Cap | ✅ Live |
-| 52-week High / Low | ✅ Live |
-| Open / High / Low / Close (daily) | ✅ Live |
-| 1-year historical OHLCV data | ✅ Live |
-| Company name, sector, industry | ✅ Live |
-| NIFTY 50 index (^NSEI) | ✅ Live |
-| SENSEX (^BSESN) | ✅ Live |
+### 2. Yahoo Finance API (Primary Market Data)
+- **What it provides (Used here):** Live Last Traded Price (LTP), Day change, Market Cap, 52-week High/Low, and 1-year Historical OHLCV (used in the area chart).
+- **Why it's used:** `yahoo-finance2` provides exceptional, unauthenticated access to global market data. It handles rate limiting and requires zero setup.
+- **Limitations:** It does not provide fundamental financial statements, shareholding patterns, or peer data for Indian equities reliably.
 
-### What Screener.in Provides (Live Web Scraping via Cheerio)
+### 3. Screener.in Scraper (Primary Fundamentals Data)
+- **What it provides (Used here):** Valuation ratios (P/E, ROE, etc.), Quarterly P&L, Balance Sheet, Cash Flow Statement, Shareholding patterns, and Peer comparison tables.
+- **Why it's used:** To solve the data limitations of Yahoo Finance, a custom scraper was built using `axios` and `cheerio` to parse Screener.in's HTML in real-time. This provides institutional-grade fundamentals data without any API keys.
 
-| Data Point | Status |
-| :--- | :--- |
-| Valuation ratios (P/E, P/B, EV/EBITDA, etc.) | ✅ Live |
-| Quarterly P&L / Income Statement | ✅ Live |
-| Balance Sheet | ✅ Live |
-| Cash Flow Statement | ✅ Live |
-| Shareholding pattern (promoter %, FII %, DII %) | ✅ Live |
-| Peer comparison financials | ✅ Live |
+---
 
 ### What is NOT provided (shown as "Data Unavailable")
 
@@ -182,7 +170,7 @@ The Node.js backend exposes the following REST endpoints to the frontend:
 | BSE/NSE filings and annual reports | Requires NSE EDGAR / BSE filing portal API |
 | Analyst estimates / price targets | Requires a paid tier (e.g., Refinitiv, Bloomberg) |
 
-> **Production approach:** A production build would integrate a primary provider via OAuth instead of scraping HTML for structural stability, but this implementation effectively provides ~90% data coverage using zero-config APIs and HTML parsing for a complete evaluation experience.
+> **Production approach:** A production build would integrate a primary provider via OAuth (like Upstox or Zerodha) for market data, and a paid fundamentals API (like Morningstar) instead of scraping HTML for structural stability. This implementation effectively provides ~90% data coverage using zero-config APIs and HTML parsing for a complete evaluation experience.
 
 ## Testing and Build
 
