@@ -43,6 +43,12 @@ async function DashboardData({ ticker }: { ticker: string }) {
 
   if (!profile) return <div>Failed to load company profile.</div>;
 
+  const parseRatio = (val?: string) => {
+    if (!val) return 0;
+    const parsed = parseFloat(val.replace(/[^0-9.-]+/g, ''));
+    return isNaN(parsed) ? 0 : parsed;
+  };
+
   return (
     <>
       <CompanyHeader 
@@ -50,22 +56,22 @@ async function DashboardData({ ticker }: { ticker: string }) {
         ticker={profile.ticker}
         exchange={profile.exchange}
         sector={profile.sector}
-        currentPrice={quote?.price || 0}
+        currentPrice={quote?.currentPrice || 0}
         dayChange={quote?.dayChange || 0}
         dayChangePercent={quote?.dayChangePercent || 0}
         volume={quote?.volume || 0}
-        prevClose={quote?.close || 0}
+        prevClose={quote?.previousClose || 0}
         industry={profile.industry}
         description={profile.description}
       />
       
       <KeyMetricsBar 
         marketCap={quote?.marketCap || "N/A"}
-        peRatio={parseFloat(ratios?.['Stock P/E'] || '0')} 
+        peRatio={parseRatio(ratios?.['Stock P/E'])} 
         weekHigh52={quote?.weekHigh52 || 0}
         weekLow52={quote?.weekLow52 || 0}
-        bookValue={parseFloat(ratios?.['Book Value'] || '0')}
-        faceValue={parseFloat(ratios?.['Face Value'] || '0')}
+        bookValue={parseRatio(ratios?.['Book Value'])}
+        faceValue={parseRatio(ratios?.['Face Value'])}
       />
 
       <div className="flex gap-6 mb-6 font-geist font-semibold text-[13px]">

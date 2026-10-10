@@ -12,7 +12,8 @@ StockVista is a professional, institutional-grade equity research dashboard for 
 
 ## Screenshots and Demo
 
-- **Live Demo URL:** `https://stockvista-7kk1.onrender.com/` (API Backend)
+- **Live Demo URL (Frontend):** [https://stock-vista-one.vercel.app/](https://stock-vista-one.vercel.app/)
+- **Live Demo URL (Backend API):** `https://stockvista-7kk1.onrender.com/`
 
 ### Dashboard Overview
 ![Dashboard Screenshot](frontend/src/assets/readme01.png)
@@ -210,4 +211,4 @@ npm run build   # Compiles TypeScript to dist/
 
 **Author:** Komal Giri  
 **Repository:** `https://github.com/Komalgiri/StockVista`  
-**Deployed App:** `[Insert Deployed URL after deployment]`
+**Deployed App:** [https://stock-vista-one.vercel.app/](https://stock-vista-one.vercel.app/)
