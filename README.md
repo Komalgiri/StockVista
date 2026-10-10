@@ -122,24 +122,62 @@ NEXT_PUBLIC_API_BASE_URL=http://localhost:8080/api
 
 The Node.js backend exposes the following REST endpoints to the frontend:
 
-| Endpoint | Method | Params | Description | Verified Source |
-| :--- | :--- | :--- | :--- | :--- |
-| `/api/search?q={query}` | GET | `q` | Returns list of companies matching the query. | Mock Catalog |
-| `/api/companies/:isin` | GET | `isin` | Returns company profile (Name, Sector, Exchange). | Mock Fallback |
-| `/api/companies/:isin/quote` | GET | `isin` | Returns live market LTP, volume, and 52W high/low. | **Yahoo Finance** |
-| `/api/companies/:isin/history`| GET | `isin` | Returns daily OHLC historical data for the chart. | **Yahoo Finance** |
-| `/api/companies/:isin/ratios` | GET | `isin` | Returns valuation metrics (P/E, ROE). | Unavailable |
+| Endpoint | Method | Description | Live Data? |
+| :--- | :--- | :--- | :--- |
+| `/api/health` | GET | Server health check | ✅ Always |
+| `/api/search?q={query}` | GET | Fuzzy search across 80+ NSE-listed companies by name, ticker, or sector | ✅ In-memory catalog |
+| `/api/indices` | GET | Live NIFTY 50 and SENSEX price, change, % change | ✅ Yahoo Finance |
+| `/api/companies/:ticker` | GET | Company profile: name, sector, industry, exchange | ✅ Yahoo Finance (with mock fallback) |
+| `/api/companies/:ticker/quote` | GET | Live LTP, day change, volume, 52W high/low, market cap | ✅ Yahoo Finance |
+| `/api/companies/:ticker/history` | GET | Daily OHLC historical data (1 year default) | ✅ Yahoo Finance |
+| `/api/companies/:ticker/ratios` | GET | Valuation ratios (P/E, P/B, ROE) | ⚠️ Unavailable — returns `null` |
+| `/api/companies/:ticker/income` | GET | Quarterly / annual P&L statement | ⚠️ Unavailable — returns `null` |
+| `/api/companies/:ticker/balance-sheet` | GET | Balance sheet data | ⚠️ Unavailable — returns `null` |
+| `/api/companies/:ticker/cash-flow` | GET | Cash flow statement | ⚠️ Unavailable — returns `null` |
+| `/api/companies/:ticker/shareholding` | GET | Promoter / institutional shareholding pattern | ⚠️ Unavailable — returns `null` |
+| `/api/companies/:ticker/peers` | GET | Sector peer comparison table | ⚠️ Unavailable — returns `null` |
+| `/api/companies/:ticker/corporate-actions` | GET | Dividends, bonuses, splits | ⚠️ Unavailable — returns `null` |
+| `/api/companies/:ticker/documents` | GET | BSE/NSE filings and annual reports | ⚠️ Unavailable — returns `null` |
 
-*Note: All routes are wrapped in a 5-minute TTL Cache middleware.*
+> **Why ⚠️ endpoints exist:** Yahoo Finance's free (unauthenticated) layer provides excellent market data (prices, history, basic profile) but does **not** expose fundamental financial statements, shareholding data, or corporate actions. All unavailable endpoints return a typed `null` response — the frontend handles this gracefully by rendering an explicit "Data Unavailable" UI state rather than crashing or fabricating data. See the [Limitations](#limitations-and-future-improvements) section below.
+
+*Note: All routes are wrapped in a 5-minute TTL in-memory cache (1-minute for index data).*
 
 ## Financial Data Sources
 
-- **Provider:** Yahoo Finance (via `yahoo-finance2`)
-- **Key Advantages for this Assessment:**
-  - **Zero Configuration:** Unlike broker APIs, Yahoo Finance requires **no API keys, OAuth tokens, or demat accounts**. The app can be instantly cloned and run by the evaluator.
-  - **Robust Data Coverage:** It seamlessly supports NSE/BSE stocks (e.g. `RELIANCE.NS`) out of the box, providing both live quotes and historical OHLC data.
-  - **Graceful Degradation:** While Yahoo provides excellent market data, the dashboard is built to elegantly degrade (showing "Data Unavailable" UI) for complex fundamentals we intentionally mock or omit, strictly adhering to the prompt's instructions not to fabricate data.
-  - **Caching:** An in-memory cache (`node-cache`) with a 5-minute TTL is implemented on the backend to prevent aggressively rate-limiting the Yahoo API on page refreshes.
+- **Primary Provider:** [Yahoo Finance](https://finance.yahoo.com/) via the [`yahoo-finance2`](https://github.com/gadicc/yahoo-finance2) npm package (MIT licensed)
+- **No API key required** — works out of the box, making this project instantly runnable by any evaluator.
+
+### What Yahoo Finance provides (used in this app)
+
+| Data Point | Status |
+| :--- | :--- |
+| Live LTP (Last Traded Price) | ✅ Live |
+| Day change & % change | ✅ Live |
+| Volume | ✅ Live |
+| Market Cap | ✅ Live |
+| 52-week High / Low | ✅ Live |
+| Open / High / Low / Close (daily) | ✅ Live |
+| 1-year historical OHLCV data | ✅ Live |
+| Company name, sector, industry | ✅ Live |
+| NIFTY 50 index (^NSEI) | ✅ Live |
+| SENSEX (^BSESN) | ✅ Live |
+
+### What Yahoo Finance does NOT provide (shown as "Data Unavailable")
+
+| Data Point | Why Missing |
+| :--- | :--- |
+| Quarterly P&L / Income Statement | Not available via the free unauthenticated Yahoo Finance API |
+| Balance Sheet | Not available via the free unauthenticated Yahoo Finance API |
+| Cash Flow Statement | Not available via the free unauthenticated Yahoo Finance API |
+| Shareholding pattern (promoter %, FII %, DII %) | Requires BSE/NSE direct data feeds or a paid provider |
+| Peer comparison financials | Requires a structured fundamentals database |
+| Valuation ratios (P/E, P/B, EV/EBITDA) | Yahoo Finance provides these inconsistently for Indian stocks |
+| Corporate Actions (dividends, bonuses, splits) | Requires BSE corporate actions API |
+| BSE/NSE filings and annual reports | Requires NSE EDGAR / BSE filing portal API |
+| Analyst estimates / price targets | Requires a paid tier (e.g., Refinitiv, Bloomberg) |
+
+> **Production approach:** A production build would integrate a secondary provider such as Screener.in's enterprise API, BSE India's data APIs, or a paid fundamentals provider (Morningstar, Refinitiv) to populate the unavailable sections above.
 
 ## Testing and Build
 
@@ -165,11 +203,14 @@ npm run build   # Compiles TypeScript to dist/
 
 ## Limitations and Future Improvements
 
-- **Database / Search:** We currently use an in-memory client-side array on the Express server to mock the NSE catalog search. A production build would require a PostgreSQL database synced with the NSE daily instrument list, indexed via Elasticsearch or a fuzzy search engine.
-- **Fundamental Data Missing:** Due to the scope of free-tier APIs, some fundamental and valuation metrics (Balance Sheet, Cash flow) are inherently missing. In a production environment, this would require integration with a secondary provider like Screener.in's enterprise API or Morningstar.
+- **Search catalog:** Currently uses an in-memory array of ~80 top NSE-listed companies. In production, this would be replaced by a PostgreSQL table synced daily with the NSE master instrument list (~2,200 securities), indexed with Elasticsearch or a full-text search engine.
+- **Fundamental data not available from free Yahoo Finance:** As documented above, balance sheet, P&L, cash flow, shareholding pattern, corporate actions, and analyst estimates are not available from Yahoo Finance's free unauthenticated API. All these sections render graceful "Data Unavailable" states.
+- **Upstox / NSE Direct not used:** The original design considered Upstox, but its API requires OAuth login via a demat account, making the evaluator's local setup impractical. Yahoo Finance was chosen as the pragmatic, zero-config alternative.
+- **Rate limiting:** Yahoo Finance is a public scraping target and may throttle high-frequency requests. The in-memory `node-cache` mitigates this for repeated page loads. Production usage would need a proper job queue.
+- **No database:** No persistent storage is used. All caching is in-memory and lost on server restart.
 
 ---
 
 **Author:** Komal Giri  
-**Repository:** `[Insert GitHub Repo URL]`  
-**Deployed App:** `[Insert Deployed URL]`
+**Repository:** `https://github.com/Komalgiri/StockVista`  
+**Deployed App:** `[Insert Deployed URL after deployment]`

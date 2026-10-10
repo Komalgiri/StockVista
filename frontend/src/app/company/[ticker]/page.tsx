@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import Link from 'next/link';
 import { Sidebar } from '@/components/Sidebar';
 import { HeaderSearch } from '@/components/HeaderSearch';
+import { MarketTicker } from '@/components/MarketTicker';
 import { CompanyHeader } from '@/components/CompanyHeader';
 import { KeyMetricsBar } from '@/components/KeyMetricsBar';
 import { HistoricalChart } from '@/components/HistoricalChart';
@@ -151,10 +152,7 @@ export default async function CompanyPage(props: { params: Promise<{ ticker: str
             <span className="font-geist font-semibold text-primary text-lg">StockVista</span>
           </div>
           <div className="flex items-center gap-5 ml-auto md:ml-0 text-text-secondary">
-            <div className="hidden md:flex items-center gap-4 text-[11px] font-semibold tracking-wider font-mono border-r border-border-hairline pr-5">
-              <span>NIFTY 50: <span className="text-text-primary">22,410.25</span> <span className="text-market-positive">+0.32%</span></span>
-              <span>SENSEX: <span className="text-text-primary">73,832.10</span> <span className="text-market-positive">+0.25%</span></span>
-            </div>
+            <MarketTicker />
             <Bell size={18} className="cursor-pointer hover:text-primary transition-colors" />
             <div className="w-7 h-7 rounded-full bg-surface-dim border border-border-strong flex items-center justify-center text-primary cursor-pointer hover:bg-surface-subtle transition-colors">
               <User size={14} />

@@ -1,12 +1,14 @@
 const yahooFinance = require('yahoo-finance2').default;
 
-// Helper to format Indian symbols (e.g. RELIANCE -> RELIANCE.NS)
+// Helper to format Indian symbols for Yahoo Finance.
+// e.g. RELIANCE → RELIANCE.NS, ^NSEI → ^NSEI (index, no suffix needed)
 const getYahooSymbol = (isinOrTicker: string) => {
-  // If it doesn't already have a suffix, default to National Stock Exchange (.NS)
-  if (!isinOrTicker.includes('.')) {
-    return `${isinOrTicker.toUpperCase()}.NS`;
+  // Already has a Yahoo suffix (e.g. .NS, .BO) or is a Yahoo index symbol (^NSEI, ^BSESN)
+  if (isinOrTicker.includes('.') || isinOrTicker.startsWith('^')) {
+    return isinOrTicker.toUpperCase();
   }
-  return isinOrTicker;
+  // Default: National Stock Exchange (.NS)
+  return `${isinOrTicker.toUpperCase()}.NS`;
 };
 
 export async function getCompanyProfile(isin: string) {
