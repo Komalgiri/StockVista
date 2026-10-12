@@ -48,31 +48,27 @@ Built with **Next.js 16 (App Router)** and an **Express 5 API Gateway**, StockVi
 
 ---
 
-## 📸 Visual Tour & Screenshots
+## 📸 Visual Showcase & Gallery
 
-### 1. Dashboard Overview & Company Header
-Complete equity overview showing live trading price, dynamic NSE/BSE exchange tags, official website link, sector breadcrumbs, and real-time NIFTY 50 / SENSEX index ticker.
-![Dashboard Overview](frontend/src/assets/readme01.png)
+<div align="center">
 
-### 2. Multi-Year Financial Statements (Quarterly, P&L, Balance Sheet, Cash Flow)
-All 4 audited financial statements rendered with historical fiscal columns, consolidated/standalone toggles, and one-click CSV export.
-![Financial Statements](frontend/src/assets/readme02.png)
+| 🖥️ **Dashboard Overview & Core Metrics** | 📈 **Price Trajectory & Real Volume Track** |
+| :---: | :---: |
+| [![Dashboard Overview](frontend/src/assets/readme01.png)](frontend/src/assets/readme01.png) | [![Market Analytics & Chart](frontend/src/assets/readme03.png)](frontend/src/assets/readme03.png) |
+| *Live CMP, 9 Screener metric cards, and dynamic exchange tags* | *Interactive 1M–ALL timeframes, 50 DMA, and real volume bars* |
 
-### 3. Interactive Historical Price Action & Volume Track
-Recharts area chart with dynamic timeframe filters (`1M`, `3M`, `6M`, `1Y`, `ALL`), calculated 50-day Moving Average (50 DMA), real trading volume bars, and automated return percentages.
-![Market Analytics & Chart](frontend/src/assets/readme03.png)
+| 📑 **Audited Financial Statements (4 Core Tabs)** | ⚖️ **Qualitative Pros/Cons & Valuation Grid** |
+| :---: | :---: |
+| [![Financial Statements](frontend/src/assets/readme02.png)](frontend/src/assets/readme02.png) | [![Qualitative Analysis & Multiples](frontend/src/assets/readme05.png)](frontend/src/assets/readme05.png) |
+| *Quarterly, P&L, Balance Sheet, and Cash Flow with CSV export* | *Automated health flags & derived valuation multiples* |
 
-### 4. Qualitative Analysis (Pros & Cons) & Valuation Multiples
-Automated investment strengths and limitations flagged from Screener.in alongside derived Price-to-Book, ROE, ROCE, and 52-week ranges.
-![Qualitative Analysis & Multiples](frontend/src/assets/readme05.png)
+| 🏢 **Industry Peer Group Benchmarking** | 📂 **Exchange Filings & Regulatory Repository** |
+| :---: | :---: |
+| [![Peer Group Comparison](frontend/src/assets/readme06.png)](frontend/src/assets/readme06.png) | [![Documents & Filings Repository](frontend/src/assets/readme07.png)](frontend/src/assets/readme07.png) |
+| *Dynamic sector valuation benchmarking via Screener API* | *Filter pills, real-time in-page search, and direct PDF links* |
 
-### 5. Peer Group Comparison & Industry Benchmarking
-Live sector peer valuation table synchronized with Screener's peer API showing comparative P/E, CMP, Market Cap, ROCE, and quarterly sales variances.
-![Peer Group Comparison](frontend/src/assets/readme06.png)
+</div>
 
-### 6. Premium Documents & Regulatory Filings Repository
-Exchange filings portal featuring interactive category filters, real-time in-page search, color-coded badges, and direct links to BSE/NSE PDFs and concall webcasts.
-![Documents and Filings Repository](frontend/src/assets/readme07.png)
 
 ---
 
