@@ -34,7 +34,26 @@ async function fetchAPI(endpoint: string) {
   }
 }
 
-export const getCompanyProfile = async (ticker: string) => {
+export interface CompanyProfile {
+  name: string;
+  ticker: string;
+  exchange: string;
+  sector: string;
+  industry: string;
+  isin: string;
+  description?: string;
+  website?: string | null;
+  bseCode?: string | null;
+  bseUrl?: string | null;
+  nseUrl?: string | null;
+}
+
+export interface AnalysisData {
+  pros: string[];
+  cons: string[];
+}
+
+export const getCompanyProfile = async (ticker: string): Promise<CompanyProfile | null> => {
   return await fetchAPI(`/companies/${ticker}`);
 };
 
@@ -52,6 +71,10 @@ export const getFinancialStatements = async (ticker: string) => {
 
 export const getBalanceSheet = async (ticker: string) => {
   return await fetchAPI(`/companies/${ticker}/balance-sheet`);
+};
+
+export const getCashFlow = async (ticker: string) => {
+  return await fetchAPI(`/companies/${ticker}/cash-flow`);
 };
 
 export const getPeerComparison = async (ticker: string) => {
@@ -72,6 +95,10 @@ export const getCorporateActions = async (ticker: string) => {
 
 export const getDocuments = async (ticker: string) => {
   return await fetchAPI(`/companies/${ticker}/documents`);
+};
+
+export const getAnalysis = async (ticker: string): Promise<AnalysisData | null> => {
+  return await fetchAPI(`/companies/${ticker}/analysis`);
 };
 
 // Fetches live NIFTY 50 and SENSEX from the backend (1-min cached).

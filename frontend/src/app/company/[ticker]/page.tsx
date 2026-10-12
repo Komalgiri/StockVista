@@ -11,39 +11,63 @@ import { CorporateMetadata } from '@/components/CorporateMetadata';
 import { FinancialTables } from '@/components/FinancialTables';
 import { PeerComparison } from '@/components/PeerComparison';
 import { Shareholding } from '@/components/Shareholding';
-import { CorporateActions } from '@/components/CorporateActions';
 import { DocumentsList } from '@/components/DocumentsList';
+import { AnalysisBox } from '@/components/AnalysisBox';
 import { Bell, User } from 'lucide-react';
 import { 
   getCompanyProfile,
   getMarketQuote,
   getFinancialStatements, 
   getBalanceSheet,
+  getCashFlow,
   getHistoricalPrices,
   getShareholding,
   getPeerComparison,
   getRatios,
-  getCorporateActions,
-  getDocuments
+  getDocuments,
+  getAnalysis
 } from '@/services/api';
 
 export const instant = false;
 
 async function DashboardData({ ticker }: { ticker: string }) {
-  const [profile, quote, financials, balanceSheet, historicalPrices, shareholding, peers, ratios, actions, documents] = await Promise.all([
+  const [
+    profile, 
+    quote, 
+    financials, 
+    balanceSheet, 
+    cashFlow,
+    historicalPrices, 
+    shareholding, 
+    peers, 
+    ratios, 
+    documents,
+    analysis
+  ] = await Promise.all([
     getCompanyProfile(ticker),
     getMarketQuote(ticker),
     getFinancialStatements(ticker),
     getBalanceSheet(ticker),
+    getCashFlow(ticker),
     getHistoricalPrices(ticker),
     getShareholding(ticker),
     getPeerComparison(ticker),
     getRatios(ticker),
-    getCorporateActions(ticker),
-    getDocuments(ticker)
+    getDocuments(ticker),
+    getAnalysis(ticker)
   ]);
 
-  if (!profile) return <div>Failed to load company profile.</div>;
+  if (!profile) {
+    return (
+      <div className="p-8 text-center border border-border-hairline rounded-lg bg-surface-canvas my-6">
+        <h2 className="text-lg font-bold text-text-primary mb-2">Company profile not found</h2>
+        <p className="text-[13px] text-text-secondary mb-4">We could not retrieve security data for ticker &quot;{ticker}&quot;.</p>
+        <Link href="/" className="inline-block bg-primary text-on-primary text-[12px] font-semibold px-4 py-2 rounded-md">
+          Return to Company Search
+        </Link>
+      </div>
+    );
+  }
 
   const parseRatio = (val?: string) => {
     if (!val) return 0;
@@ -51,77 +75,99 @@ async function DashboardData({ ticker }: { ticker: string }) {
     return isNaN(parsed) ? 0 : parsed;
   };
 
+  const currentPrice = quote?.currentPrice || parseRatio(ratios?.['Current Price']) || 0;
+
   return (
     <>
-      <CompanyHeader 
-        name={profile.name}
-        ticker={profile.ticker}
-        exchange={profile.exchange}
-        sector={profile.sector}
-        currentPrice={quote?.currentPrice || 0}
-        dayChange={quote?.dayChange || 0}
-        dayChangePercent={quote?.dayChangePercent || 0}
-        volume={quote?.volume || 0}
-        prevClose={quote?.previousClose || 0}
-        industry={profile.industry}
-        description={profile.description}
-      />
+      <div id="overview">
+        <CompanyHeader 
+          name={profile.name}
+          ticker={profile.ticker}
+          exchange={profile.exchange}
+          sector={profile.sector}
+          currentPrice={currentPrice}
+          dayChange={quote?.dayChange || 0}
+          dayChangePercent={quote?.dayChangePercent || 0}
+          volume={quote?.volume || 0}
+          prevClose={quote?.previousClose || currentPrice}
+          industry={profile.industry}
+          description={profile.description}
+          website={profile.website}
+          bseCode={profile.bseCode}
+          bseUrl={profile.bseUrl}
+          nseUrl={profile.nseUrl}
+        />
+      </div>
       
-      <KeyMetricsBar 
-        marketCap={quote?.marketCap || "N/A"}
-        peRatio={parseRatio(ratios?.['Stock P/E'])} 
-        weekHigh52={quote?.weekHigh52 || 0}
-        weekLow52={quote?.weekLow52 || 0}
-        bookValue={parseRatio(ratios?.['Book Value'])}
-        faceValue={parseRatio(ratios?.['Face Value'])}
-      />
+      <div id="ratios">
+        <KeyMetricsBar 
+          marketCap={quote?.marketCap}
+          currentPrice={currentPrice}
+          peRatio={parseRatio(ratios?.['Stock P/E'])} 
+          weekHigh52={quote?.weekHigh52 || 0}
+          weekLow52={quote?.weekLow52 || 0}
+          bookValue={parseRatio(ratios?.['Book Value'])}
+          faceValue={parseRatio(ratios?.['Face Value'])}
+          dividendYield={ratios?.['Dividend Yield']}
+          roce={ratios?.['ROCE']}
+          roe={ratios?.['ROE']}
+          ratios={ratios}
+        />
+      </div>
 
-      <div className="flex gap-6 mb-6 font-geist font-semibold text-[13px]">
-        <Link href="#" className="flex items-center gap-1.5 pb-2 border-b-2 border-primary text-primary">Overview</Link>
-        <Link href="#" className="flex items-center gap-1.5 pb-2 border-b-2 border-transparent text-text-secondary hover:text-text-primary transition-colors">Ratios</Link>
-        <Link href="#" className="flex items-center gap-1.5 pb-2 border-b-2 border-transparent text-text-secondary hover:text-text-primary transition-colors">Financials</Link>
-        <Link href="#" className="flex items-center gap-1.5 pb-2 border-b-2 border-transparent text-text-secondary hover:text-text-primary transition-colors">Shareholding</Link>
-        <Link href="#" className="flex items-center gap-1.5 pb-2 border-b-2 border-transparent text-text-secondary hover:text-text-primary transition-colors">Peers</Link>
-        <Link href="#" className="flex items-center gap-1.5 pb-2 border-b-2 border-transparent text-text-secondary hover:text-text-primary transition-colors">Corporate Actions</Link>
-        <Link href="#" className="flex items-center gap-1.5 pb-2 border-b-2 border-transparent text-text-secondary hover:text-text-primary transition-colors">Documents</Link>
+      <div className="flex gap-4 sm:gap-6 mb-6 font-geist font-semibold text-[13px] overflow-x-auto pb-2 border-b border-border-hairline scrollbar-none">
+        <a href="#overview" className="flex items-center gap-1.5 pb-2 text-primary border-b-2 border-primary whitespace-nowrap">Overview</a>
+        <a href="#chart" className="flex items-center gap-1.5 pb-2 text-text-secondary hover:text-text-primary transition-colors whitespace-nowrap">Chart</a>
+        {analysis && (analysis.pros.length > 0 || analysis.cons.length > 0) && (
+          <a href="#analysis" className="flex items-center gap-1.5 pb-2 text-text-secondary hover:text-text-primary transition-colors whitespace-nowrap">Pros &amp; Cons</a>
+        )}
+        <a href="#valuation" className="flex items-center gap-1.5 pb-2 text-text-secondary hover:text-text-primary transition-colors whitespace-nowrap">Valuation</a>
+        <a href="#financials" className="flex items-center gap-1.5 pb-2 text-text-secondary hover:text-text-primary transition-colors whitespace-nowrap">Financials</a>
+        <a href="#peers" className="flex items-center gap-1.5 pb-2 text-text-secondary hover:text-text-primary transition-colors whitespace-nowrap">Peers</a>
+        <a href="#shareholding" className="flex items-center gap-1.5 pb-2 text-text-secondary hover:text-text-primary transition-colors whitespace-nowrap">Shareholding</a>
+        <a href="#documents" className="flex items-center gap-1.5 pb-2 text-text-secondary hover:text-text-primary transition-colors whitespace-nowrap">Documents</a>
       </div>
       
       <div className="flex flex-col gap-6 pb-12">
-        {historicalPrices && (
-          <section>
+        {historicalPrices && historicalPrices.length > 0 && (
+          <section id="chart">
             <HistoricalChart data={historicalPrices} />
           </section>
         )}
 
-        <section className="grid grid-cols-1 xl:grid-cols-12 gap-6">
+        {analysis && (analysis.pros.length > 0 || analysis.cons.length > 0) && (
+          <section id="analysis">
+            <AnalysisBox analysis={analysis} />
+          </section>
+        )}
+
+        <section id="valuation" className="grid grid-cols-1 xl:grid-cols-12 gap-6">
           <div className="xl:col-span-8">
             <ValuationGrid ratios={ratios} />
           </div>
           <div className="xl:col-span-4">
-            <CorporateMetadata />
+            <CorporateMetadata profile={profile} ratios={ratios} />
           </div>
         </section>
 
-        <section>
-          <FinancialTables income={financials} balanceSheet={balanceSheet} />
+        <section id="financials">
+          <FinancialTables 
+            income={financials} 
+            balanceSheet={balanceSheet} 
+            cashFlow={cashFlow} 
+          />
         </section>
 
-        <section className="grid grid-cols-1 xl:grid-cols-12 gap-6">
-          <div className="xl:col-span-5">
-            <Shareholding shareholding={shareholding} />
-          </div>
-          <div className="xl:col-span-7">
-            <PeerComparison peers={peers} />
-          </div>
+        <section id="peers">
+          <PeerComparison peers={peers} />
         </section>
 
-        <section className="grid grid-cols-1 xl:grid-cols-12 gap-6">
-          <div className="xl:col-span-7">
-            {actions ? <CorporateActions /> : <div className="border border-border-hairline rounded-lg bg-surface-canvas p-5 h-full flex items-center justify-center text-text-secondary">Corporate actions unavailable.</div>}
-          </div>
-          <div className="xl:col-span-5">
-            <DocumentsList documents={documents} />
-          </div>
+        <section id="shareholding">
+          <Shareholding shareholding={shareholding} />
+        </section>
+
+        <section id="documents">
+          <DocumentsList documents={documents} />
         </section>
       </div>
     </>

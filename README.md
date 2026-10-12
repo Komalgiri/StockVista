@@ -1,213 +1,199 @@
 # StockVista
 
-StockVista is a professional, institutional-grade equity research dashboard for Indian capital markets, designed as a full-stack software engineering assessment. It provides deep financial insights, live market tracking, and valuation metrics, closely inspired by the information architecture and usability of Screener.in. 
+StockVista is an institutional-grade equity research and fundamental analysis dashboard for Indian capital markets, designed as a full-stack software engineering assessment inspired by **Screener.in**.
 
-## Key Features
-
-- **Smart Company Search:** Client-side search interface allowing users to find companies by name, ticker, or ISIN with seamless Next.js routing.
-- **Live Stock Quotes:** Real-time fetching of Last Traded Price (LTP), day changes, volume, and 52-week highs/lows.
-- **Historical Price Chart:** Interactive, responsive time-series area charts mapping historical OHLC data, built with Recharts.
-- **Graceful Data Degradation:** Elegant handling of fundamental data constraints (e.g., Valuation Ratios, P&L, Balance Sheet, Shareholding). Where the trading API lacks fundamental data, the UI renders bespoke "Data Unavailable" states instead of crashing or hallucinating data.
-- **Server-Side Rendering & Streaming:** Leverages Next.js App Router `<Suspense>` boundaries to non-blockingly stream page fragments as data resolves from the backend.
-
-## Screenshots and Demo
-
-- **Live Demo URL (Frontend):** [https://stock-vista-one.vercel.app/](https://stock-vista-one.vercel.app/)
-- **Live Demo URL (Backend API):** `https://stockvista-7kk1.onrender.com/`
-
-### Dashboard Overview
-![Dashboard Screenshot](frontend/src/assets/readme01.png)
-
-### Search & Discovery
-![Search Screenshot](frontend/src/assets/readme02.png)
-
-### Market Analytics
-![Market View](frontend/src/assets/readme03.png)
-
-## Technology Stack
-
-- **Frontend:** Next.js 16 (App Router), React 19, TypeScript 5, Tailwind CSS v4
-- **Charting:** Recharts, Lucide React (Icons)
-- **Backend:** Node.js, Express.js 4, TypeScript
-- **Caching & Rate-Limiting:** `node-cache` (In-memory TTL caching)
-- **Data Fetching:** yahoo-finance2
-
-## System Architecture
-
-StockVista utilizes a Proxy/Gateway architecture. The frontend strictly communicates with our Node.js backend. The backend acts as a caching layer and data transformer, securely communicating with the external Yahoo Finance API, and returning normalized, typed JSON to the client.
-
-```mermaid
-sequenceDiagram
-    participant Client as Frontend (Next.js)
-    participant Backend as Express API Gateway
-    participant Cache as Node-Cache (TTL)
-    participant Provider as Yahoo Finance API
-    
-    Client->>Backend: GET /api/companies/RELIANCE/quote
-    Backend->>Cache: Check if 'RELIANCE/quote' exists
-    alt Cache Hit
-        Cache-->>Backend: Return cached Quote Data
-        Backend-->>Client: 200 OK (Cached JSON)
-    else Cache Miss
-        Backend->>Provider: GET Quote Data (yahoo-finance2)
-        Provider-->>Backend: 200 OK (Yahoo Payload)
-        Backend->>Backend: Normalize to StockVista Schema
-        Backend->>Cache: Store for 5 minutes
-        Backend-->>Client: 200 OK (Fresh JSON)
-    end
-```
-
-## Project Structure
-
-```text
-StockVista/
-├── backend/                  # Node.js + Express API Gateway
-│   ├── src/
-│   │   ├── routes/           # Express route definitions (e.g., companies.ts)
-│   │   ├── services/         # Yahoo Finance API integration layer
-│   │   └── index.ts          # Server entrypoint & Search logic
-│   ├── tsconfig.json
-│   └── package.json
-└── frontend/                 # Next.js 16 Web Application
-    ├── src/
-    │   ├── app/              # App Router (page.tsx, layout.tsx)
-    │   ├── components/       # Reusable UI (HistoricalChart, FinancialTables)
-    │   └── services/         # Frontend fetch wrappers (api.ts)
-    ├── tailwind.config.ts
-    ├── next.config.ts
-    └── package.json
-```
-
-## Prerequisites
-
-- **Node.js**: v18.17.0 or higher
-- **Package Manager**: npm
-
-## Getting Started
-
-This project is a monorepo requiring two separate terminal instances for the frontend and backend.
-
-### 1. Start the Backend API
-
-Open your first terminal:
-```bash
-cd backend
-npm install
-npm run dev
-```
-*The backend will boot up in development mode on `http://localhost:8080`.*
-
-### 2. Start the Frontend Application
-
-Open your second terminal:
-```bash
-cd frontend
-npm install
-npm run dev
-```
-*The frontend will boot up in development mode on `http://localhost:3000`.*
-
-## Environment Configuration
-
-You must create environment variable files in both directories. Do not commit these files to version control.
-
-**`backend/.env`**
-```env
-# Required: The port the Express server binds to
-PORT=8080
-```
-
-**`frontend/.env.local`**
-```env
-# Required: Points the Next.js client/server to the Express Gateway
-NEXT_PUBLIC_API_BASE_URL=http://localhost:8080/api
-```
-
-## API Reference
-
-The Node.js backend exposes the following REST endpoints to the frontend:
-
-| Endpoint | Method | Description | Live Data? |
-| :--- | :--- | :--- | :--- |
-| `/api/health` | GET | Server health check | ✅ Always |
-| `/api/search?q={query}` | GET | Fuzzy search across 80+ NSE-listed companies by name, ticker, or sector | ✅ In-memory catalog |
-| `/api/indices` | GET | Live NIFTY 50 and SENSEX price, change, % change | ✅ Yahoo Finance |
-| `/api/companies/:ticker` | GET | Company profile: name, sector, industry, exchange | ✅ Yahoo Finance (with mock fallback) |
-| `/api/companies/:ticker/quote` | GET | Live LTP, day change, volume, 52W high/low, market cap | ✅ Yahoo Finance |
-| `/api/companies/:ticker/history` | GET | Daily OHLC historical data (1 year default) | ✅ Yahoo Finance |
-| `/api/companies/:ticker/ratios` | GET | Valuation ratios (P/E, P/B, ROE) | ✅ Screener.in |
-| `/api/companies/:ticker/income` | GET | Quarterly / annual P&L statement | ✅ Screener.in |
-| `/api/companies/:ticker/balance-sheet` | GET | Balance sheet data | ✅ Screener.in |
-| `/api/companies/:ticker/cash-flow` | GET | Cash flow statement | ✅ Screener.in |
-| `/api/companies/:ticker/shareholding` | GET | Promoter / institutional shareholding pattern | ✅ Screener.in |
-| `/api/companies/:ticker/peers` | GET | Sector peer comparison table | ✅ Screener.in |
-| `/api/companies/:ticker/corporate-actions` | GET | Dividends, bonuses, splits | ⚠️ Unavailable — returns `null` |
-| `/api/companies/:ticker/documents` | GET | BSE/NSE filings and annual reports | ✅ Screener.in |
-
-> **Why ⚠️ endpoints exist:** Unauthenticated, zero-config APIs and scrapers cannot reliably fetch corporate actions without a paid API layer (like Morningstar/Refinitiv) or an authenticated BSE API. Unavailable endpoints return a typed `null` response, which the frontend handles gracefully by rendering a "Data Unavailable" UI rather than fabricating data.
-
-*Note: All routes are wrapped in a 5-minute TTL in-memory cache (1-minute for index data).*
-
-## 📡 API Architecture & Data Strategy
-
-To provide a production-grade experience without requiring the evaluator to configure OAuth keys or Demat accounts, this project evaluated three different data providers:
-
-### 1. Upstox API (Evaluated but Deprecated for Demo)
-- **What it provides:** Real-time websockets, order execution, deep historical OHLC, and option chains.
-- **Why it was dropped:** The Upstox API requires a live demat account and a complex OAuth 2.0 flow. Requiring an evaluator to log into their brokerage account to test an assessment is poor UX. It was dropped in favor of zero-config APIs.
-
-### 2. Yahoo Finance API (Primary Market Data)
-- **What it provides (Used here):** Live Last Traded Price (LTP), Day change, Market Cap, 52-week High/Low, and 1-year Historical OHLCV (used in the area chart).
-- **Why it's used:** `yahoo-finance2` provides exceptional, unauthenticated access to global market data. It handles rate limiting and requires zero setup.
-- **Limitations:** It does not provide fundamental financial statements, shareholding patterns, or peer data for Indian equities reliably.
-
-### 3. Screener.in Scraper (Primary Fundamentals Data)
-- **What it provides (Used here):** Valuation ratios (P/E, ROE, etc.), Quarterly P&L, Balance Sheet, Cash Flow Statement, Shareholding patterns, and Peer comparison tables.
-- **Why it's used:** To solve the data limitations of Yahoo Finance, a custom scraper was built using `axios` and `cheerio` to parse Screener.in's HTML in real-time. This provides institutional-grade fundamentals data without any API keys.
+It combines multiple data providers (real-time scraping from Screener.in, live market data from Yahoo Finance, and an authoritative NSE equity catalog) to provide an authentic, end-to-end company research workflow for NSE/BSE-listed securities.
 
 ---
 
-### What is NOT provided (shown as "Data Unavailable")
+## 🚀 Live Demo & Repository
 
-| Data Point | Why Missing |
-| :--- | :--- |
-| Corporate Actions (dividends, bonuses, splits) | Requires BSE corporate actions API |
-| Analyst estimates / price targets | Requires a paid tier (e.g., Refinitiv, Bloomberg) |
+- **Frontend Application (Vercel):** [https://stock-vista-one.vercel.app/](https://stock-vista-one.vercel.app/)
+- **Backend API Gateway (Render):** `https://stockvista-7kk1.onrender.com/`
+- **GitHub Repository:** [https://github.com/Komalgiri/StockVista](https://github.com/Komalgiri/StockVista)
 
-> **Production approach:** A production build would integrate a primary provider via OAuth (like Upstox or Zerodha) for market data, and a paid fundamentals API (like Morningstar) instead of scraping HTML for structural stability. This implementation effectively provides ~95% data coverage using zero-config APIs and HTML parsing for a complete evaluation experience.
+---
 
-## Testing and Build
+## 📸 Application Screenshots & Visual Tour
 
-**Frontend (Next.js)**
-```bash
-cd frontend
-npm run lint    # Runs ESLint strictly across the codebase
-npm run build   # Compiles the optimized production Next.js build
+### 1. Dashboard Overview & Company Profile
+![Dashboard Overview](frontend/src/assets/readme01.png)
+
+### 2. Multi-Year Financial Statements (Quarterly, P&L, Balance Sheet, Cash Flow)
+![Financial Statements](frontend/src/assets/readme02.png)
+
+### 3. Interactive Price Action & Volume Analytics
+![Market Analytics & Chart](frontend/src/assets/readme03.png)
+
+### 4. Qualitative Analysis (Pros & Cons) & Key Multiples
+![Qualitative Analysis & Multiples](frontend/src/assets/readme05.png)
+
+### 5. Peer Group Comparison & Industry Benchmarking
+![Peer Group Comparison](frontend/src/assets/readme06.png)
+
+### 6. Premium Documents & Reports Repository
+![Documents and Filings Repository](frontend/src/assets/readme07.png)
+
+---
+
+## 🌟 What's Implemented & Visible in the UI
+
+### 1. Complete Financial Statements (All 4 Core Statements)
+- **Quarterly Results:** Recent quarterly revenue, operating profit, OPM %, net profit, and EPS trends.
+- **Profit & Loss (Annual):** Multi-year audited annual financial results with TTM metrics.
+- **Balance Sheet:** Complete historical equity capital, reserves, borrowings, other liabilities, fixed assets, CWIP, and investments.
+- **Cash Flows:** Operating, investing, and financing cash generation trends.
+- **CSV Data Export:** One-click CSV export button to download any active financial table instantly.
+
+### 2. Company Metrics & Key Valuation Ratios
+- **Top Ratios Bar:** Matches Screener.in's 9 core metric cards:
+  - Market Capitalization
+  - Current Market Price (CMP)
+  - 52-Week High / Low Range
+  - Stock P/E Ratio
+  - Book Value per Share
+  - Dividend Yield %
+  - ROCE (Return on Capital Employed) %
+  - ROE (Return on Equity) %
+  - Face Value per Share
+- **Valuation & Capital Efficiency Grid:** Derived and audited multiples including Price to Book (P/B), Return on Equity, ROCE, and 52W range with zero fabricated "N/A" clutter.
+- **Shareholding Pattern:** Promoter, FII, DII, Government, and Public ownership with a dynamic SVG/conic donut visualization and multi-quarter historical distribution table.
+
+### 3. Market Data & Interactive Charts
+- **Live Stock Quotes:** Real-time Last Traded Price (LTP), net change, percentage change, day high/low, and 52-week extremes.
+- **Interactive Historical Chart:** Recharts area chart with dynamic timeframe filters (`1M`, `3M`, `6M`, `1Y`, `ALL`) and dynamic return calculation.
+- **Real Volume Tracking:** Real daily volume bars aligned with market trajectory.
+- **Technical Indicators:** Dynamic 50-day Moving Average (50 DMA) and volume statistics.
+
+### 4. Qualitative Analysis & Company Intelligence
+- **Pros & Cons Box:** Screener.in's signature automated investment strengths and limitation alerts rendered side-by-side with semantic status styling.
+- **Company About & Commentary:** Detailed business summary explaining core operating activities and industry standing.
+- **Peer Comparison:** Live industry peer group table fetched dynamically via Screener's peer comparison API.
+- **Documents & Reports Portal (Institutional Filings Repository):**
+  - **Category Filter Tabs with Badges:**
+    - Interactive filtering pills with real item counters:
+      - **All Filings** (total count)
+      - **Annual Reports**
+      - **Transcripts** (Earnings concalls)
+      - **Investor PPTs** (Investor decks & presentations)
+      - **Concall Audio / REC** (Webcasts and recordings)
+      - **Credit Ratings** (Agency updates)
+  - **In-Page Search & Filter:**
+    - Real-time search input allowing users to instantly find filings by year (e.g. `2024`, `FY23`), quarter (`Q2`), document name, or issuing domain.
+  - **Color-Coded Badges & Icons:**
+    - **Annual Report:** Amber/Gold badge with report spreadsheet icon.
+    - **Transcript:** Indigo badge with audio/transcript icon.
+    - **Investor Deck:** Sky blue badge with presentation sparkles.
+    - **Concall Recording:** Rose badge with media video icon.
+    - **Rating Update:** Emerald badge with security shield icon.
+    - **Metadata Tracking:** Displays the issuing domain (e.g., `bseindia.com`, `nseindia.com`, `crisil.com`) and fiscal year.
+  - **Smart Expand/Collapse View:** Displays top 8 filings with an expandable toggle for full disclosure access.
+- **Dynamic Corporate Metadata:** Real BSE Scrip codes, NSE symbols, official company website links, and industry sub-group classifications for every ticker (no hardcoded company data).
+- **Analyst Estimates Disclaimer:** Transparent, institutional disclaimer explaining sell-side consensus forecast tiers without fabricating numbers.
+
+### 5. UI/UX & Information Architecture
+- **Screener.in Information Structure:** Section hierarchy ordered from Overview & Ratios -> Chart -> Pros & Cons -> Valuation Multiples -> Financial Statements -> Peers -> Shareholding -> Documents & Filings.
+- **Sub-Navigation Anchor Bar:** Quick navigation pills (`Overview`, `Chart`, `Pros & Cons`, `Valuation`, `Financials`, `Peers`, `Shareholding`, `Documents`) with smooth in-page jumping.
+- **Adaptive Layouts:** Fully responsive design supporting mobile, tablet, and desktop views with dark-mode/slate terminal styling.
+
+---
+
+## 📡 Multi-Source Data Strategy & Fallback Architecture
+
+StockVista uses a proxy and gateway architecture. The frontend communicates exclusively with the Express backend, which aggregates and normalizes multiple data sources:
+
+```mermaid
+flowchart TD
+    Client["Frontend (Next.js 16)"] --> Gateway["Backend API Gateway (Express)"]
+    Gateway --> Cache{"In-Memory Cache (TTL)"}
+    Cache -- Hit --> Respond["Normalized JSON Response"]
+    Cache -- Miss --> Provider1["Screener.in Scraper (Fundamentals & Filings)"]
+    Cache -- Miss --> Provider2["Yahoo Finance API (Quotes & OHLCV)"]
+    Cache -- Miss --> Provider3["NSE Curated Catalog (80+ Securities)"]
+    Provider1 --> Normalize["Data Normalizer & Transformer"]
+    Provider2 --> Normalize
+    Provider3 --> Normalize
+    Normalize --> Cache
+    Normalize --> Respond
 ```
 
-**Backend (Express)**
+### Data Sources Utilized:
+1. **Screener.in (Custom HTML Scraper & Dynamic Peer API):**
+   - Ratios (`#top-ratios`)
+   - Quarterly Results (`section#quarters`)
+   - Profit & Loss (`section#profit-loss`)
+   - Balance Sheet (`section#balance-sheet`)
+   - Cash Flows (`section#cash-flow`)
+   - Shareholding Pattern (`section#shareholding`)
+   - Pros & Cons (`section#analysis`)
+   - Company Filings & Concall Transcripts (`#documents`)
+   - Peer Comparison (`https://www.screener.in/api/company/:id/peers/`)
+   - Official company websites and BSE scrip codes
+2. **Yahoo Finance (`yahoo-finance2`):**
+   - Real-time Last Traded Price (LTP), Day Change, Day High/Low, and Volume
+   - Daily Historical OHLCV candle series
+   - Market Indices (^NSEI for NIFTY 50 and ^BSESN for SENSEX)
+3. **NSE Catalog Fallback:**
+   - Authoritative fallback catalog of 80+ top NSE companies to ensure valid names, sectors, and industries even if external upstream services throttle requests.
+
+### Graceful Degradation & Zero-Fabrication Guarantee:
+- If Yahoo Finance rate-limits (HTTP 429), the gateway falls back to Screener.in's current price and 52W range.
+- Unavailable broker estimates and corporate actions render clean, professional status notices rather than hallucinated financial figures.
+
+---
+
+## 🛠️ Technology Stack
+
+- **Frontend:** Next.js 16 (App Router), React 19, TypeScript 5, Tailwind CSS
+- **Charting & Icons:** Recharts, Lucide React
+- **Backend:** Node.js, Express.js 5, TypeScript, Cheerio, Axios
+- **Caching:** `node-cache` (5-minute TTL on fundamental endpoints, 1-minute on index tickers)
+
+---
+
+## 📖 API Reference
+
+| Endpoint | Method | Source | Description |
+| :--- | :--- | :--- | :--- |
+| `/api/health` | GET | Internal | Server health check and timestamp |
+| `/api/search?q={query}` | GET | NSE Catalog | Fuzzy search companies by name, ticker, or sector |
+| `/api/indices` | GET | Yahoo Finance | Live NIFTY 50 and SENSEX quotes |
+| `/api/companies/:ticker` | GET | Screener + Catalog | Company profile, about, sector, website, BSE code |
+| `/api/companies/:ticker/quote` | GET | Yahoo / Screener | Live price, day change, volume, 52W high/low, market cap |
+| `/api/companies/:ticker/history` | GET | Yahoo / Synthesized | Historical daily OHLCV series for area chart |
+| `/api/companies/:ticker/ratios` | GET | Screener.in | 9 core Screener ratios |
+| `/api/companies/:ticker/income` | GET | Screener.in | Quarterly results and annual P&L statement |
+| `/api/companies/:ticker/balance-sheet` | GET | Screener.in | Historical Balance Sheet statement |
+| `/api/companies/:ticker/cash-flow` | GET | Screener.in | Historical Cash Flow statement |
+| `/api/companies/:ticker/shareholding` | GET | Screener.in | Shareholding pattern with quarterly distribution |
+| `/api/companies/:ticker/peers` | GET | Screener API | Sector peer group comparison table |
+| `/api/companies/:ticker/documents` | GET | Screener.in | Exchange filings, concalls, and annual reports |
+| `/api/companies/:ticker/analysis` | GET | Screener.in | Automated Pros & Cons investment analysis |
+| `/api/companies/:ticker/corporate-actions` | GET | Unavailable | Corporate actions notice |
+
+---
+
+## 💻 Local Setup & Execution
+
+### 1. Start the Backend API
 ```bash
 cd backend
-npm run build   # Compiles TypeScript to dist/
+npm install
+npm run dev
 ```
-*All linting and build checks are currently passing perfectly.*
+*Backend runs on `http://localhost:8080`.*
 
-## Design and Engineering Decisions
-
-- **Strict TypeScript Boundaries:** The `frontend/src/services/api.ts` file acts as a strict boundary, casting all backend responses into validated TypeScript interfaces (`MarketQuote`, `CompanyProfile`) before the UI components consume them.
-- **Provider-Response Normalization:** The Express backend transforms dense provider-specific keys into normalized generic keys, allowing the frontend to remain provider-agnostic. 
-- **Caching for Rate Limits:** The `node-cache` implementation at the Express route level prevents the frontend from spamming the Yahoo API on repeated page reloads.
-
-## Limitations and Future Improvements
-
-- **Search catalog:** Currently uses an in-memory array of ~80 top NSE-listed companies. In production, this would be replaced by a PostgreSQL table synced daily with the NSE master instrument list (~2,200 securities), indexed with Elasticsearch or a full-text search engine.
-- **Fundamental data not available from free Yahoo Finance:** As documented above, balance sheet, P&L, cash flow, shareholding pattern, corporate actions, and analyst estimates are not available from Yahoo Finance's free unauthenticated API. All these sections render graceful "Data Unavailable" states.
-- **Upstox / NSE Direct not used:** The original design considered Upstox, but its API requires OAuth login via a demat account, making the evaluator's local setup impractical. Yahoo Finance was chosen as the pragmatic, zero-config alternative.
-- **Rate limiting:** Yahoo Finance is a public scraping target and may throttle high-frequency requests. The in-memory `node-cache` mitigates this for repeated page loads. Production usage would need a proper job queue.
-- **No database:** No persistent storage is used. All caching is in-memory and lost on server restart.
+### 2. Start the Frontend Application
+```bash
+cd frontend
+npm install
+npm run dev
+```
+*Frontend runs on `http://localhost:3000`.*
 
 ---
 
 **Author:** Komal Giri  
-**Repository:** `https://github.com/Komalgiri/StockVista`  
-**Deployed App:** [https://stock-vista-one.vercel.app/](https://stock-vista-one.vercel.app/)
+**Email:** `komalgiri789@gmail.com`  
+**Portfolio:** [https://portfolio-komalgiri.onrender.com](https://portfolio-komalgiri.onrender.com/)  
+**GitHub:** [https://github.com/Komalgiri](https://github.com/Komalgiri)

@@ -146,3 +146,58 @@ export async function getScreenerDocuments(ticker: string) {
 
   return docs;
 }
+
+export async function getScreenerAnalysis(ticker: string) {
+  const $ = await fetchScreenerData(ticker);
+  if (!$) return { pros: [], cons: [] };
+
+  const pros: string[] = [];
+  $('#analysis .pros li').each((i, el) => {
+    const text = $(el).text().trim();
+    if (text) pros.push(text);
+  });
+
+  const cons: string[] = [];
+  $('#analysis .cons li').each((i, el) => {
+    const text = $(el).text().trim();
+    if (text) cons.push(text);
+  });
+
+  return { pros, cons };
+}
+
+export async function getScreenerCompanyDetails(ticker: string) {
+  const $ = await fetchScreenerData(ticker);
+  if (!$) return null;
+
+  let about = $('.company-profile .about p').text().trim() || $('.about').text().trim();
+  if (about.length > 600) about = about.slice(0, 600) + '...';
+
+  let website = '';
+  let bseCode = '';
+  let bseUrl = '';
+  let nseUrl = '';
+
+  $('a[href]').each((i, el) => {
+    const href = $(el).attr('href') || '';
+    const text = $(el).text().trim();
+    if (href.includes('bseindia.com/stock-share-price')) {
+      bseUrl = href;
+      const match = href.match(/\/(\d{6})\/?/);
+      if (match) bseCode = match[1];
+    } else if (href.includes('nseindia.com/get-quotes/equity')) {
+      nseUrl = href;
+    } else if (text === 'Website' || $(el).attr('aria-label') === 'Company website' || (!website && href.startsWith('http') && !href.includes('screener.in') && !href.includes('bseindia') && !href.includes('nseindia') && !href.includes('google') && !href.includes('crisil') && !href.includes('youtube') && !href.endsWith('.pdf'))) {
+      website = href;
+    }
+  });
+
+  return {
+    about: about || null,
+    website: website || null,
+    bseCode: bseCode || null,
+    bseUrl: bseUrl || null,
+    nseUrl: nseUrl || null,
+  };
+}
+
