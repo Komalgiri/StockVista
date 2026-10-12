@@ -38,7 +38,7 @@ Built with **Next.js 16 (App Router)** and an **Express 5 API Gateway**, StockVi
    - [7. Shareholding Distribution & Donut Chart](#7-shareholding-distribution--donut-chart)
    - [8. Exchange Filings & Regulatory Documents](#8-exchange-filings--regulatory-documents)
    - [9. Dynamic Corporate Metadata](#9-dynamic-corporate-metadata)
-4. [Multi-Source Data Strategy & Resilience](#-multi-source-data-strategy--resilience)
+4. [Brief Explanation of Data Sources Used](#-brief-explanation-of-data-sources-used)
 5. [System Architecture & Sequence Flow](#-system-architecture--sequence-flow)
 6. [Complete REST API Reference](#-complete-rest-api-reference)
 7. [Repository File Structure](#-repository-file-structure)
@@ -179,41 +179,83 @@ A portal for regulatory disclosures, concalls, and reports:
 
 ---
 
-## 📡 Multi-Source Data Strategy & Resilience
+## 🌐 Brief Explanation of Data Sources Used
 
-To deliver institutional-grade equity analysis without requiring evaluators to configure Demat accounts or paid API keys, StockVista implements a layered fallback architecture:
+To provide a complete, institutional company analysis experience without requiring evaluators to configure Demat accounts or paid API keys, StockVista combines **three distinct data sources**, each selected for its specific strengths:
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                 Client (Next.js 16 Browser)                 │
-└──────────────────────────────┬──────────────────────────────┘
-                               │ HTTP / JSON
-                               ▼
-┌─────────────────────────────────────────────────────────────┐
-│                 Express 5 API Gateway                       │
-│      (In-Memory Node-Cache: 5-min TTL Fundamentals)         │
-└──────┬───────────────────────┬───────────────────────┬──────┘
-       │                       │                       │
-       ▼                       ▼                       ▼
-┌──────────────┐       ┌──────────────┐       ┌──────────────┐
-│ Screener.in  │       │    Yahoo     │       │     NSE      │
-│ HTML Scraper │       │   Finance    │       │   Curated    │
-│  & Peer API  │       │  (v2 Engine) │       │   Catalog    │
-└──────┬───────┘       └──────┬───────┘       └──────┬───────┘
-       │                      │                      │
-       ├─ Balance Sheet       ├─ Live LTP            └─ Master Names
-       ├─ P&L Statement       ├─ OHLCV History          Sectors &
-       ├─ Cash Flow           ├─ NIFTY 50               Industries
-       ├─ 9 Top Ratios        ├─ SENSEX                 (Fallback)
-       ├─ Pros & Cons         └─ Day Change
-       ├─ Filings/Docs
-       └─ Peer Group Table
+┌──────────────────────────────────────────────────────────────────────────┐
+│                      Client (Next.js 16 Web App)                         │
+└────────────────────────────────────┬─────────────────────────────────────┘
+                                     │ HTTP / JSON
+                                     ▼
+┌──────────────────────────────────────────────────────────────────────────┐
+│                   Express 5 API Gateway & Caching Layer                  │
+│             (In-Memory Node-Cache: 5-min TTL Fundamentals)               │
+└────────────┬───────────────────────┬───────────────────────┬─────────────┘
+             │                       │                       │
+             ▼                       ▼                       ▼
+┌─────────────────────────┐ ┌──────────────────┐ ┌─────────────────────────┐
+│       Screener.in       │ │  Yahoo Finance   │ │   NSE Curated Catalog   │
+│ (Custom Cheerio Scraper │ │ (v2 Query Engine)│ │  (In-Memory Directory)  │
+│      & Peer API)        │ │                  │ │                         │
+└────────────┬────────────┘ └────────┬─────────┘ └────────────┬────────────┘
+             │                       │                        │
+             ├─ 4 Financial Tables   ├─ Live Market Price     └─ Authoritative Names
+             ├─ 9 Top Ratios         ├─ Historical OHLCV         Sectors & Industries
+             ├─ Pros & Cons Flags    ├─ Session Volume           Fast Fuzzy Search
+             ├─ Exchange Filings     ├─ NIFTY 50 (^NSEI)         Immutable Fallback
+             ├─ Peer Group Table     ├─ SENSEX (^BSESN)
+             └─ BSE Code & Domain    └─ 52W Extremes
 ```
 
-### Rate-Limiting & Error Resilience:
-1. **Yahoo Finance 429 Throttle Defense:** If Yahoo Finance rate-limits public requests, the backend automatically falls back to Screener.in's real scraped CMP, 52W range, and market cap. It never returns hardcoded placeholder quotes.
-2. **Missing Data Handling:** If a company does not have concall recordings or credit ratings, the UI gracefully suppresses empty sections rather than breaking the layout.
-3. **Consensus Forecasts:** Since sell-side consensus estimates (e.g., Bloomberg/Refinitiv price targets) require expensive enterprise subscriptions, StockVista provides a transparent institutional status notice.
+---
+
+### 1. Screener.in (Custom Web Scraper & Internal REST API)
+- **Primary Role:** Fundamental financial data engine, qualitative analysis, and regulatory filings repository.
+- **Specific Data Provided:**
+  - **All 4 Audited Financial Statements:** Quarterly Results (`#quarters`), Multi-year Profit & Loss (`#profit-loss`), Balance Sheet (`#balance-sheet`), and Cash Flow Statements (`#cash-flow`).
+  - **Screener.in 9 Top Ratios:** ROCE %, ROE %, Stock P/E, Book Value, Dividend Yield %, Face Value, and Market Capitalization.
+  - **Algorithmic Qualitative Assessment:** Automated investment strengths (Pros) and risk alerts (Cons) from `#analysis`.
+  - **Exchange Filings & Investor Relations:** Direct links to audited Annual Report PDFs, Earnings Concall Transcripts, Quarterly Investor Presentations (PPT), and Management Audio Webcasts.
+  - **Sector Peer Benchmarking:** Queries Screener's dynamic peer endpoint (`/api/company/:companyId/peers/`) to retrieve live industry cohort valuation tables.
+  - **Corporate Metadata:** Extracts official corporate website domains, BSE scrip codes, and in-depth business commentary.
+- **Why Chosen:** Screener.in is the gold standard for Indian fundamental equity research, aggregating audited filings directly from the National Stock Exchange (NSE), Bombay Stock Exchange (BSE), and the Ministry of Corporate Affairs (MCA) without requiring expensive enterprise subscriptions (like Bloomberg or Refinitiv).
+
+---
+
+### 2. Yahoo Finance (`yahoo-finance2` Engine)
+- **Primary Role:** Real-time market trading feeds, historical price action, and benchmark indices.
+- **Specific Data Provided:**
+  - **Live Trading Metrics:** Real-time Last Traded Price (LTP), session change (₹ and %), day open/high/low/close, session volume, and 52-week High/Low envelope.
+  - **Historical OHLCV Series:** 1-year daily candlestick time-series data powering the interactive area chart.
+  - **Broad Market Indices:** Live tracking of NIFTY 50 (`^NSEI`) and SENSEX (`^BSESN`).
+- **Why Chosen:** Yahoo Finance provides reliable, unauthenticated market data for Indian equities (via `.NS` and `.BO` instrument tickers) with zero credential requirements, allowing evaluators to run the application immediately out of the box.
+
+---
+
+### 3. NSE Curated Master Catalog
+- **Primary Role:** Client-side autocompletion search index and authoritative fallback metadata.
+- **Specific Data Provided:**
+  - Curated directory of 80+ top NSE-listed companies across large-cap and mid-cap sectors.
+  - Standardized company names, official NSE symbols, primary macro sectors, and industry subgroup taxonomy.
+- **Why Chosen:** Guarantees sub-5ms fuzzy search autocompletion across the navbar and landing page, while ensuring that core company identities (sector, industry, and name) remain resilient even during third-party network outages.
+
+---
+
+### 4. Why Brokerage Trading APIs (Upstox / Zerodha) Were Deprecated for this Assessment
+During early architecture evaluation, the **Upstox Developer API v2** was built and tested (`backend/src/services/upstox.ts`). However, it was intentionally dropped for the following reasons:
+1. **Mandatory Demat Login & OAuth Barrier:** Brokerage APIs require daily OAuth 2.0 user authorization tied to an active, KYC-verified Demat trading account with mobile OTP 2FA. Forcing an evaluator or recruiter to log into their personal brokerage account creates a prohibitive user experience barrier.
+2. **Trading Focus vs. Fundamental Depth:** Broker APIs are designed for order routing, live WebSocket ticks, and option chains. They **do not provide** audited balance sheets, multi-year P&L statements, cash flows, concall transcripts, or credit ratings.
+
+---
+
+### 5. Multi-Source Combining & Fallback Mechanics
+StockVista employs a resilient gateway strategy to combine these sources:
+1. **Parallel Ingestion (`Promise.allSettled`):** Market quotes and fundamental statements resolve concurrently to minimize latency.
+2. **Yahoo 429 Throttle Defense:** If Yahoo Finance returns HTTP 429 (Too Many Requests), the gateway automatically falls back to Screener.in's real scraped CMP, 52W range, and market cap. The application **never** serves hardcoded placeholder quotes for different tickers.
+3. **In-Memory TTL Caching (`node-cache`):** Fundamental statements are cached for 5 minutes, while market index quotes are cached for 1 minute, preventing repeated page reloads from triggering upstream rate limits.
+4. **Zero-Fabrication Disclaimers:** Where sell-side consensus estimates or corporate action calendars require paid enterprise feeds, StockVista renders clear institutional disclaimers rather than hallucinated numbers.
 
 ---
 
