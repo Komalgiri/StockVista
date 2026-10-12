@@ -48,26 +48,48 @@ Built with **Next.js 16 (App Router)** and an **Express 5 API Gateway**, StockVi
 
 ---
 
-## 📸 Visual Showcase & Gallery
+## 📸 Application Visual Tour
 
-<div align="center">
+### 1. Dashboard Overview & Live Market Feed
+> Real-time quote ticker, 9 core Screener.in metric cards, dynamic exchange tags (NSE / BSE), official company website, and sector breadcrumbs.
 
-| 🖥️ **Dashboard Overview & Core Metrics** | 📈 **Price Trajectory & Real Volume Track** |
-| :---: | :---: |
-| [![Dashboard Overview](frontend/src/assets/readme01.png)](frontend/src/assets/readme01.png) | [![Market Analytics & Chart](frontend/src/assets/readme03.png)](frontend/src/assets/readme03.png) |
-| *Live CMP, 9 Screener metric cards, and dynamic exchange tags* | *Interactive 1M–ALL timeframes, 50 DMA, and real volume bars* |
+![Dashboard Overview](frontend/src/assets/readme01.png)
 
-| 📑 **Audited Financial Statements (4 Core Tabs)** | ⚖️ **Qualitative Pros/Cons & Valuation Grid** |
-| :---: | :---: |
-| [![Financial Statements](frontend/src/assets/readme02.png)](frontend/src/assets/readme02.png) | [![Qualitative Analysis & Multiples](frontend/src/assets/readme05.png)](frontend/src/assets/readme05.png) |
-| *Quarterly, P&L, Balance Sheet, and Cash Flow with CSV export* | *Automated health flags & derived valuation multiples* |
+---
 
-| 🏢 **Industry Peer Group Benchmarking** | 📂 **Exchange Filings & Regulatory Repository** |
-| :---: | :---: |
-| [![Peer Group Comparison](frontend/src/assets/readme06.png)](frontend/src/assets/readme06.png) | [![Documents & Filings Repository](frontend/src/assets/readme07.png)](frontend/src/assets/readme07.png) |
-| *Dynamic sector valuation benchmarking via Screener API* | *Filter pills, real-time in-page search, and direct PDF links* |
+### 2. Multi-Year Financial Statements (Quarterly, P&L, Balance Sheet, Cash Flow)
+> Complete tabbed financial performance view across all four audited statements with consolidated figures and one-click CSV export for spreadsheet modeling.
 
-</div>
+![Financial Statements](frontend/src/assets/readme02.png)
+
+---
+
+### 3. Interactive Historical Price Trajectory & Real Volume Track
+> Time-series area chart featuring dynamic period return calculation (`+X.X%`), interactive timeframe selectors (`1M`, `3M`, `6M`, `1Y`, `ALL`), 50-day Moving Average (50 DMA), and real directional volume bars.
+
+![Market Analytics & Chart](frontend/src/assets/readme03.png)
+
+---
+
+### 4. Qualitative Analysis (Pros & Cons) & Valuation Multiples
+> Side-by-side automated strengths and limitation alerts derived directly from Screener.in paired with audited capital efficiency metrics and derived Price-to-Book (P/B).
+
+![Qualitative Analysis & Multiples](frontend/src/assets/readme05.png)
+
+---
+
+### 5. Industry Peer Group Comparison & Sector Valuation
+> Live sector peer group table fetched dynamically via Screener's peer API showing comparative CMP, P/E, Market Cap, ROCE, and quarterly growth metrics.
+
+![Peer Group Comparison](frontend/src/assets/readme06.png)
+
+---
+
+### 6. Premium Documents & Regulatory Filings Repository
+> Exchange filings portal featuring category filter tabs (Annual Reports, Concalls, Presentations, Ratings), in-page search, color-coded badges, and direct links to BSE/NSE PDFs.
+
+![Documents & Filings Repository](frontend/src/assets/readme07.png)
+
 
 
 ---
