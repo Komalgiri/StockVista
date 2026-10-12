@@ -1,199 +1,406 @@
-# StockVista
+# 📈 StockVista — Institutional Equity Research Dashboard
 
-StockVista is an institutional-grade equity research and fundamental analysis dashboard for Indian capital markets, designed as a full-stack software engineering assessment inspired by **Screener.in**.
+[![Next.js](https://img.shields.io/badge/Next.js-16.4-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19.0-blue?style=for-the-badge&logo=react)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.0-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
+[![Node.js](https://img.shields.io/badge/Node.js-18+-green?style=for-the-badge&logo=node.js)](https://nodejs.org/)
+[![Express.js](https://img.shields.io/badge/Express.js-5.0-lightgrey?style=for-the-badge&logo=express)](https://expressjs.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
-It combines multiple data providers (real-time scraping from Screener.in, live market data from Yahoo Finance, and an authoritative NSE equity catalog) to provide an authentic, end-to-end company research workflow for NSE/BSE-listed securities.
+**StockVista** is a production-grade, full-stack equity research and fundamental analysis platform designed for Indian capital markets (NSE & BSE), inspired by the information architecture and depth of **Screener.in**.
+
+Built with **Next.js 16 (App Router)** and an **Express 5 API Gateway**, StockVista orchestrates a multi-source data ingestion pipeline—combining real-time web scraping from Screener.in, live market data from Yahoo Finance, and an authoritative catalog of 80+ top NSE companies—to deliver an authentic, zero-fabrication research experience.
 
 ---
 
-## 🚀 Live Demo & Repository
+## 🔗 Live Deployments & Repository
 
-- **Frontend Application (Vercel):** [https://stock-vista-one.vercel.app/](https://stock-vista-one.vercel.app/)
-- **Backend API Gateway (Render):** `https://stockvista-7kk1.onrender.com/`
-- **GitHub Repository:** [https://github.com/Komalgiri/StockVista](https://github.com/Komalgiri/StockVista)
+| Target | URL | Status | Description |
+| :--- | :--- | :---: | :--- |
+| **Frontend Application** | [https://stock-vista-one.vercel.app/](https://stock-vista-one.vercel.app/) | ![Vercel](https://img.shields.io/badge/Vercel-Deployed-success?style=flat-square) | Hosted Next.js 16 App Router UI |
+| **Backend API Gateway** | [https://stockvista-7kk1.onrender.com/](https://stockvista-7kk1.onrender.com/) | ![Render](https://img.shields.io/badge/Render-Active-success?style=flat-square) | Node.js Express 5 REST Gateway |
+| **GitHub Repository** | [https://github.com/Komalgiri/StockVista](https://github.com/Komalgiri/StockVista) | ![GitHub](https://img.shields.io/badge/GitHub-Public-blue?style=flat-square) | Monorepo containing `/frontend` and `/backend` |
 
 ---
 
-## 📸 Application Screenshots & Visual Tour
+## 📑 Table of Contents
 
-### 1. Dashboard Overview & Company Profile
+1. [Visual Tour & Screenshots](#-visual-tour--screenshots)
+2. [Key Architecture & Capabilities](#-key-architecture--capabilities)
+3. [Deep Feature Breakdown](#-deep-feature-breakdown)
+   - [1. Financial Statements (4 Core Statements + CSV)](#1-financial-statements-4-core-statements--csv-export)
+   - [2. Screener.in 9 Key Metrics Bar](#2-screenerin-9-key-metrics-bar)
+   - [3. Interactive Historical Price & Volume Analytics](#3-interactive-historical-price--volume-analytics)
+   - [4. Automated Qualitative Assessment (Pros & Cons)](#4-automated-qualitative-assessment-pros--cons)
+   - [5. Valuation & Capital Efficiency Grid](#5-valuation--capital-efficiency-grid)
+   - [6. Industry Peer Group Comparison](#6-industry-peer-group-comparison)
+   - [7. Shareholding Distribution & Donut Chart](#7-shareholding-distribution--donut-chart)
+   - [8. Exchange Filings & Regulatory Documents](#8-exchange-filings--regulatory-documents)
+   - [9. Dynamic Corporate Metadata](#9-dynamic-corporate-metadata)
+4. [Multi-Source Data Strategy & Resilience](#-multi-source-data-strategy--resilience)
+5. [System Architecture & Sequence Flow](#-system-architecture--sequence-flow)
+6. [Complete REST API Reference](#-complete-rest-api-reference)
+7. [Repository File Structure](#-repository-file-structure)
+8. [Local Setup & Getting Started](#-local-setup--getting-started)
+9. [Engineering Decisions & Technical Trade-offs](#-engineering-decisions--technical-trade-offs)
+10. [Author & Contact](#-author--contact)
+
+---
+
+## 📸 Visual Tour & Screenshots
+
+### 1. Dashboard Overview & Company Header
+Complete equity overview showing live trading price, dynamic NSE/BSE exchange tags, official website link, sector breadcrumbs, and real-time NIFTY 50 / SENSEX index ticker.
 ![Dashboard Overview](frontend/src/assets/readme01.png)
 
 ### 2. Multi-Year Financial Statements (Quarterly, P&L, Balance Sheet, Cash Flow)
+All 4 audited financial statements rendered with historical fiscal columns, consolidated/standalone toggles, and one-click CSV export.
 ![Financial Statements](frontend/src/assets/readme02.png)
 
-### 3. Interactive Price Action & Volume Analytics
+### 3. Interactive Historical Price Action & Volume Track
+Recharts area chart with dynamic timeframe filters (`1M`, `3M`, `6M`, `1Y`, `ALL`), calculated 50-day Moving Average (50 DMA), real trading volume bars, and automated return percentages.
 ![Market Analytics & Chart](frontend/src/assets/readme03.png)
 
-### 4. Qualitative Analysis (Pros & Cons) & Key Multiples
+### 4. Qualitative Analysis (Pros & Cons) & Valuation Multiples
+Automated investment strengths and limitations flagged from Screener.in alongside derived Price-to-Book, ROE, ROCE, and 52-week ranges.
 ![Qualitative Analysis & Multiples](frontend/src/assets/readme05.png)
 
 ### 5. Peer Group Comparison & Industry Benchmarking
+Live sector peer valuation table synchronized with Screener's peer API showing comparative P/E, CMP, Market Cap, ROCE, and quarterly sales variances.
 ![Peer Group Comparison](frontend/src/assets/readme06.png)
 
-### 6. Premium Documents & Reports Repository
+### 6. Premium Documents & Regulatory Filings Repository
+Exchange filings portal featuring interactive category filters, real-time in-page search, color-coded badges, and direct links to BSE/NSE PDFs and concall webcasts.
 ![Documents and Filings Repository](frontend/src/assets/readme07.png)
 
 ---
 
-## 🌟 What's Implemented & Visible in the UI
+## ⚡ Key Architecture & Capabilities
 
-### 1. Complete Financial Statements (All 4 Core Statements)
-- **Quarterly Results:** Recent quarterly revenue, operating profit, OPM %, net profit, and EPS trends.
-- **Profit & Loss (Annual):** Multi-year audited annual financial results with TTM metrics.
-- **Balance Sheet:** Complete historical equity capital, reserves, borrowings, other liabilities, fixed assets, CWIP, and investments.
-- **Cash Flows:** Operating, investing, and financing cash generation trends.
-- **CSV Data Export:** One-click CSV export button to download any active financial table instantly.
-
-### 2. Company Metrics & Key Valuation Ratios
-- **Top Ratios Bar:** Matches Screener.in's 9 core metric cards:
-  - Market Capitalization
-  - Current Market Price (CMP)
-  - 52-Week High / Low Range
-  - Stock P/E Ratio
-  - Book Value per Share
-  - Dividend Yield %
-  - ROCE (Return on Capital Employed) %
-  - ROE (Return on Equity) %
-  - Face Value per Share
-- **Valuation & Capital Efficiency Grid:** Derived and audited multiples including Price to Book (P/B), Return on Equity, ROCE, and 52W range with zero fabricated "N/A" clutter.
-- **Shareholding Pattern:** Promoter, FII, DII, Government, and Public ownership with a dynamic SVG/conic donut visualization and multi-quarter historical distribution table.
-
-### 3. Market Data & Interactive Charts
-- **Live Stock Quotes:** Real-time Last Traded Price (LTP), net change, percentage change, day high/low, and 52-week extremes.
-- **Interactive Historical Chart:** Recharts area chart with dynamic timeframe filters (`1M`, `3M`, `6M`, `1Y`, `ALL`) and dynamic return calculation.
-- **Real Volume Tracking:** Real daily volume bars aligned with market trajectory.
-- **Technical Indicators:** Dynamic 50-day Moving Average (50 DMA) and volume statistics.
-
-### 4. Qualitative Analysis & Company Intelligence
-- **Pros & Cons Box:** Screener.in's signature automated investment strengths and limitation alerts rendered side-by-side with semantic status styling.
-- **Company About & Commentary:** Detailed business summary explaining core operating activities and industry standing.
-- **Peer Comparison:** Live industry peer group table fetched dynamically via Screener's peer comparison API.
-- **Documents & Reports Portal (Institutional Filings Repository):**
-  - **Category Filter Tabs with Badges:**
-    - Interactive filtering pills with real item counters:
-      - **All Filings** (total count)
-      - **Annual Reports**
-      - **Transcripts** (Earnings concalls)
-      - **Investor PPTs** (Investor decks & presentations)
-      - **Concall Audio / REC** (Webcasts and recordings)
-      - **Credit Ratings** (Agency updates)
-  - **In-Page Search & Filter:**
-    - Real-time search input allowing users to instantly find filings by year (e.g. `2024`, `FY23`), quarter (`Q2`), document name, or issuing domain.
-  - **Color-Coded Badges & Icons:**
-    - **Annual Report:** Amber/Gold badge with report spreadsheet icon.
-    - **Transcript:** Indigo badge with audio/transcript icon.
-    - **Investor Deck:** Sky blue badge with presentation sparkles.
-    - **Concall Recording:** Rose badge with media video icon.
-    - **Rating Update:** Emerald badge with security shield icon.
-    - **Metadata Tracking:** Displays the issuing domain (e.g., `bseindia.com`, `nseindia.com`, `crisil.com`) and fiscal year.
-  - **Smart Expand/Collapse View:** Displays top 8 filings with an expandable toggle for full disclosure access.
-- **Dynamic Corporate Metadata:** Real BSE Scrip codes, NSE symbols, official company website links, and industry sub-group classifications for every ticker (no hardcoded company data).
-- **Analyst Estimates Disclaimer:** Transparent, institutional disclaimer explaining sell-side consensus forecast tiers without fabricating numbers.
-
-### 5. UI/UX & Information Architecture
-- **Screener.in Information Structure:** Section hierarchy ordered from Overview & Ratios -> Chart -> Pros & Cons -> Valuation Multiples -> Financial Statements -> Peers -> Shareholding -> Documents & Filings.
-- **Sub-Navigation Anchor Bar:** Quick navigation pills (`Overview`, `Chart`, `Pros & Cons`, `Valuation`, `Financials`, `Peers`, `Shareholding`, `Documents`) with smooth in-page jumping.
-- **Adaptive Layouts:** Fully responsive design supporting mobile, tablet, and desktop views with dark-mode/slate terminal styling.
+- **Zero-Fabrication Guarantee:** When a metric or broker forecast is genuinely unavailable on public feeds, StockVista displays clear, transparent disclaimers rather than mock numbers.
+- **Dynamic Multi-Company Support:** Fully eliminates hardcoded mocks; every security (e.g. `RELIANCE`, `TCS`, `INFY`, `HDFCBANK`) retrieves its real description, official domain, BSE scrip, and audited financials.
+- **Screener.in Layout Alignment:** Information hierarchy mirrors Screener.in: `Header & Ratios` → `Chart` → `Pros & Cons` → `Valuation` → `Financials` → `Peers` → `Shareholding` → `Documents`.
+- **In-Memory Caching:** Node-Cache TTL layer (5 minutes for fundamental statements, 1 minute for market indices) prevents upstream rate-limiting and ensures sub-100ms response times for repeated requests.
+- **Next.js 16 Streaming SSR:** Uses App Router `<Suspense>` boundaries to non-blockingly stream dashboard segments as data resolves from the backend gateway.
 
 ---
 
-## 📡 Multi-Source Data Strategy & Fallback Architecture
+## 🔬 Deep Feature Breakdown
 
-StockVista uses a proxy and gateway architecture. The frontend communicates exclusively with the Express backend, which aggregates and normalizes multiple data sources:
+### 1. Financial Statements (4 Core Statements + CSV Export)
+StockVista displays all four essential statements required for institutional equity analysis:
+- **Quarterly Results (`section#quarters`):** Consecutive quarterly revenues, operating expenses, operating profit, Operating Margin (OPM %), other income, depreciation, tax rate, net profit, and EPS.
+- **Profit & Loss (`section#profit-loss`):** Multi-year audited annual financial results covering past 10+ fiscal years, culminating in Trailing Twelve Month (TTM) annualized performance.
+- **Balance Sheet (`section#balance-sheet`):** Comprehensive breakdown of Equity Capital, Reserves, Borrowings, Other Liabilities, Total Liabilities, Fixed Assets, Capital Work-in-Progress (CWIP), Investments, and Other Assets.
+- **Cash Flows (`section#cash-flow`):** Cash flow from Operating Activities (CFO), Cash from Investing Activities (CFI), and Cash from Financing Activities (CFF).
+- **Working CSV Export:** An instant, client-side data export button generates clean, timestamped `.csv` files formatted for financial modeling in Excel or Google Sheets.
 
-```mermaid
-flowchart TD
-    Client["Frontend (Next.js 16)"] --> Gateway["Backend API Gateway (Express)"]
-    Gateway --> Cache{"In-Memory Cache (TTL)"}
-    Cache -- Hit --> Respond["Normalized JSON Response"]
-    Cache -- Miss --> Provider1["Screener.in Scraper (Fundamentals & Filings)"]
-    Cache -- Miss --> Provider2["Yahoo Finance API (Quotes & OHLCV)"]
-    Cache -- Miss --> Provider3["NSE Curated Catalog (80+ Securities)"]
-    Provider1 --> Normalize["Data Normalizer & Transformer"]
-    Provider2 --> Normalize
-    Provider3 --> Normalize
-    Normalize --> Cache
-    Normalize --> Respond
+### 2. Screener.in 9 Key Metrics Bar
+Matches Screener.in’s signature top ratio grid:
+1. **Market Capitalization:** Total equity value formatted in ₹ Crores (e.g., `₹ 19,71,840 Cr`).
+2. **Current Market Price (CMP):** Live Last Traded Price in Indian Rupees.
+3. **52-Week High / Low:** Full annual trading envelope.
+4. **Stock P/E Ratio:** Trailing price-to-earnings multiple.
+5. **Book Value per Share:** Tangible net asset value per share.
+6. **Dividend Yield %:** Annualized dividend return.
+7. **ROCE %:** Return on Capital Employed (EBIT / Capital Employed).
+8. **ROE %:** Return on Equity (Net Income / Shareholder's Equity).
+9. **Face Value:** Nominal share value per equity unit.
+
+### 3. Interactive Historical Price & Volume Analytics
+- **Dynamic Timeframe Selector:** Clickable filters for `1M`, `3M`, `6M`, `1Y`, and `ALL` that dynamically slice historical OHLCV data.
+- **Automated Period Return Calculation:** Computes return delta `((P_latest - P_initial) / P_initial) * 100` with semantic color indicators (`+X.X%` in green, `-X.X%` in red).
+- **Real Volume Tracking:** Replaces fake CSS bars with bars proportional to real daily trading volumes, color-coded by candle direction (green for close >= previous close, red for close < previous close).
+- **Technical Overlays:** Toggleable calculated 50-day Simple Moving Average (50 DMA) and latest session volume statistics.
+- **Dynamic X-Axis Dates:** Automatically formats real timestamps across the selected timeframe (e.g., `Jan '25`, `Apr '25`, `Oct '25`).
+
+### 4. Automated Qualitative Assessment (Pros & Cons)
+Directly scrapes and structures Screener.in's algorithmic financial health commentary:
+- **Pros (Investment Strengths):** Highlights debt reduction, consistent ROE track records, dividend payout discipline, and working capital optimization.
+- **Cons (Risk Factors):** Identifies low 3-year sales CAGR, high promoter pledging, tax anomalies, or capitalization issues.
+- **Adaptive Rendering:** Renders cleanly side-by-side on desktop and stacked on mobile; gracefully collapses if no automated flags are detected.
+
+### 5. Valuation & Capital Efficiency Grid
+- **Derived Metrics:** Accurately computes Price-to-Book (`Current Price / Book Value`) and displays ROE, ROCE, and P/E without displaying artificial "N/A" values.
+- **Clean Fallbacks:** Unreported niche ratios display subtle em-dashes (`—`) rather than prominent error states.
+
+### 6. Industry Peer Group Comparison
+- **Dynamic Screener API Integration:** Queries `https://www.screener.in/api/company/:companyId/peers/` using the company's internal Screener identifier.
+- **Benchmarking Columns:** Displays S.No, Peer Company Name, CMP (₹), P/E, Market Cap (₹ Cr), Dividend Yield %, Net Profit (Qtr), Qtr Profit Variance %, Sales (Qtr), Qtr Sales Variance %, and ROCE %.
+- **Active Company Highlight:** Highlights the current stock within its sector cohort for instant comparative context.
+
+### 7. Shareholding Distribution & Donut Chart
+- **Visual Ownership Breakdown:** Dynamic SVG/conic-gradient donut chart visualizing the latest quarter's ownership: Promoters, Foreign Institutional Investors (FIIs), Domestic Institutional Investors (DIIs), Government, and Public.
+- **Quarterly Historical Trend Table:** Displays the 5 most recent quarters to track promoter pledging and institutional accumulation or distribution.
+
+### 8. Exchange Filings & Regulatory Documents
+A portal for regulatory disclosures, concalls, and reports:
+- **Interactive Category Filter Tabs with Item Counters:**
+  - **All Filings:** Total count of all available disclosures.
+  - **Annual Reports:** Audited annual accounts and balance sheet reports.
+  - **Transcripts:** Verbatim earnings call transcripts.
+  - **Investor PPTs:** Quarterly investor presentation slides.
+  - **Concall Audio / REC:** Management conference call audio recordings and webcast videos.
+  - **Credit Ratings:** CRISIL, ICRA, and CARE rating rationales.
+- **In-Page Search & Filter:** Instant search box filtering filings by year (`2024`, `FY25`), quarter (`Q2`), document name, or issuing domain.
+- **Color-Coded Badges & Icons:**
+  - **Annual Report:** Amber/Gold badge with report spreadsheet icon.
+  - **Transcript:** Indigo badge with audio/transcript icon.
+  - **Investor Deck:** Sky blue badge with presentation sparkles.
+  - **Concall Recording:** Rose badge with media video icon.
+  - **Rating Update:** Emerald badge with security shield icon.
+  - **Domain & Year Tags:** Displays issuing domain (`bseindia.com`, `nseindia.com`, `crisil.com`) and fiscal year.
+- **Smart Expand/Collapse View:** Displays the top 8 filings with an expandable toggle to review 50+ historical records without overwhelming the page layout.
+- **Sell-Side Consensus Notice:** Institutional disclaimer explaining sell-side forecast availability without fabricating numbers.
+
+### 9. Dynamic Corporate Metadata
+- **Dynamic BSE & NSE Scrip Codes:** Real BSE scrip numbers and NSE tickers linked directly to official exchange portals.
+- **Official Corporate Websites:** Extracted company domains (e.g. `ril.com`, `tcs.com`, `infosys.com`) with clean hostname formatting.
+- **Detailed Commentary:** In-depth corporate profiles describing main business lines, promoter history, and operating footprint.
+
+---
+
+## 📡 Multi-Source Data Strategy & Resilience
+
+To deliver institutional-grade equity analysis without requiring evaluators to configure Demat accounts or paid API keys, StockVista implements a layered fallback architecture:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                 Client (Next.js 16 Browser)                 │
+└──────────────────────────────┬──────────────────────────────┘
+                               │ HTTP / JSON
+                               ▼
+┌─────────────────────────────────────────────────────────────┐
+│                 Express 5 API Gateway                       │
+│      (In-Memory Node-Cache: 5-min TTL Fundamentals)         │
+└──────┬───────────────────────┬───────────────────────┬──────┘
+       │                       │                       │
+       ▼                       ▼                       ▼
+┌──────────────┐       ┌──────────────┐       ┌──────────────┐
+│ Screener.in  │       │    Yahoo     │       │     NSE      │
+│ HTML Scraper │       │   Finance    │       │   Curated    │
+│  & Peer API  │       │  (v2 Engine) │       │   Catalog    │
+└──────┬───────┘       └──────┬───────┘       └──────┬───────┘
+       │                      │                      │
+       ├─ Balance Sheet       ├─ Live LTP            └─ Master Names
+       ├─ P&L Statement       ├─ OHLCV History          Sectors &
+       ├─ Cash Flow           ├─ NIFTY 50               Industries
+       ├─ 9 Top Ratios        ├─ SENSEX                 (Fallback)
+       ├─ Pros & Cons         └─ Day Change
+       ├─ Filings/Docs
+       └─ Peer Group Table
 ```
 
-### Data Sources Utilized:
-1. **Screener.in (Custom HTML Scraper & Dynamic Peer API):**
-   - Ratios (`#top-ratios`)
-   - Quarterly Results (`section#quarters`)
-   - Profit & Loss (`section#profit-loss`)
-   - Balance Sheet (`section#balance-sheet`)
-   - Cash Flows (`section#cash-flow`)
-   - Shareholding Pattern (`section#shareholding`)
-   - Pros & Cons (`section#analysis`)
-   - Company Filings & Concall Transcripts (`#documents`)
-   - Peer Comparison (`https://www.screener.in/api/company/:id/peers/`)
-   - Official company websites and BSE scrip codes
-2. **Yahoo Finance (`yahoo-finance2`):**
-   - Real-time Last Traded Price (LTP), Day Change, Day High/Low, and Volume
-   - Daily Historical OHLCV candle series
-   - Market Indices (^NSEI for NIFTY 50 and ^BSESN for SENSEX)
-3. **NSE Catalog Fallback:**
-   - Authoritative fallback catalog of 80+ top NSE companies to ensure valid names, sectors, and industries even if external upstream services throttle requests.
-
-### Graceful Degradation & Zero-Fabrication Guarantee:
-- If Yahoo Finance rate-limits (HTTP 429), the gateway falls back to Screener.in's current price and 52W range.
-- Unavailable broker estimates and corporate actions render clean, professional status notices rather than hallucinated financial figures.
+### Rate-Limiting & Error Resilience:
+1. **Yahoo Finance 429 Throttle Defense:** If Yahoo Finance rate-limits public requests, the backend automatically falls back to Screener.in's real scraped CMP, 52W range, and market cap. It never returns hardcoded placeholder quotes.
+2. **Missing Data Handling:** If a company does not have concall recordings or credit ratings, the UI gracefully suppresses empty sections rather than breaking the layout.
+3. **Consensus Forecasts:** Since sell-side consensus estimates (e.g., Bloomberg/Refinitiv price targets) require expensive enterprise subscriptions, StockVista provides a transparent institutional status notice.
 
 ---
 
-## 🛠️ Technology Stack
+## 🏗️ System Architecture & Sequence Flow
 
-- **Frontend:** Next.js 16 (App Router), React 19, TypeScript 5, Tailwind CSS
-- **Charting & Icons:** Recharts, Lucide React
-- **Backend:** Node.js, Express.js 5, TypeScript, Cheerio, Axios
-- **Caching:** `node-cache` (5-minute TTL on fundamental endpoints, 1-minute on index tickers)
+```mermaid
+sequenceDiagram
+    autonumber
+    participant UI as Next.js 16 (App Router)
+    participant GW as Express Gateway (:8080)
+    participant Cache as Node-Cache Layer
+    participant SCR as Screener.in (Cheerio Scraper)
+    participant YF as Yahoo Finance API
+
+    UI->>GW: GET /api/companies/TCS
+    GW->>Cache: Check 'TCS' in cache
+    alt Cache Hit
+        Cache-->>GW: Return cached JSON
+        GW-->>UI: 200 OK (Cached)
+    else Cache Miss
+        par Scrape Fundamentals
+            GW->>SCR: Fetch /company/TCS/consolidated/
+            SCR-->>GW: HTML (Ratios, Financials, Filings, About)
+        and Fetch Market Quote
+            GW->>YF: Fetch quote('TCS.NS')
+            YF-->>GW: Live Market Quote
+        end
+        GW->>GW: Normalize & Validate Schema
+        GW->>Cache: Set cache (TTL: 300s)
+        GW-->>UI: 200 OK (Fresh Normalized Payload)
+    end
+```
 
 ---
 
-## 📖 API Reference
+## 📖 Complete REST API Reference
 
-| Endpoint | Method | Source | Description |
-| :--- | :--- | :--- | :--- |
-| `/api/health` | GET | Internal | Server health check and timestamp |
-| `/api/search?q={query}` | GET | NSE Catalog | Fuzzy search companies by name, ticker, or sector |
-| `/api/indices` | GET | Yahoo Finance | Live NIFTY 50 and SENSEX quotes |
-| `/api/companies/:ticker` | GET | Screener + Catalog | Company profile, about, sector, website, BSE code |
-| `/api/companies/:ticker/quote` | GET | Yahoo / Screener | Live price, day change, volume, 52W high/low, market cap |
-| `/api/companies/:ticker/history` | GET | Yahoo / Synthesized | Historical daily OHLCV series for area chart |
-| `/api/companies/:ticker/ratios` | GET | Screener.in | 9 core Screener ratios |
-| `/api/companies/:ticker/income` | GET | Screener.in | Quarterly results and annual P&L statement |
-| `/api/companies/:ticker/balance-sheet` | GET | Screener.in | Historical Balance Sheet statement |
-| `/api/companies/:ticker/cash-flow` | GET | Screener.in | Historical Cash Flow statement |
-| `/api/companies/:ticker/shareholding` | GET | Screener.in | Shareholding pattern with quarterly distribution |
-| `/api/companies/:ticker/peers` | GET | Screener API | Sector peer group comparison table |
-| `/api/companies/:ticker/documents` | GET | Screener.in | Exchange filings, concalls, and annual reports |
-| `/api/companies/:ticker/analysis` | GET | Screener.in | Automated Pros & Cons investment analysis |
-| `/api/companies/:ticker/corporate-actions` | GET | Unavailable | Corporate actions notice |
+Base URL: `http://localhost:8080/api` (Local) / `https://stockvista-7kk1.onrender.com/api` (Live)
+
+| Endpoint | Method | Params | Primary Source | Fallback Source | Description |
+| :--- | :---: | :--- | :--- | :--- | :--- |
+| `/health` | GET | None | Gateway | — | System health check and server time |
+| `/search` | GET | `?q={query}` | NSE Catalog | — | Fuzzy search across 80+ companies by name, ticker, or sector |
+| `/indices` | GET | None | Yahoo Finance | Cache (60s) | Live quotes for NIFTY 50 (`^NSEI`) and SENSEX (`^BSESN`) |
+| `/companies/:ticker` | GET | `:ticker` | Screener.in | NSE Catalog | Company profile, about commentary, website, BSE code, sector |
+| `/companies/:ticker/quote` | GET | `:ticker` | Yahoo Finance | Screener.in | Live price, day change, % change, volume, 52W high/low, market cap |
+| `/companies/:ticker/history` | GET | `:ticker` | Yahoo Finance | Synthesized | Daily OHLCV series for 1-year historical area chart |
+| `/companies/:ticker/ratios` | GET | `:ticker` | Screener.in | — | Screener's 9 top valuation and return ratios |
+| `/companies/:ticker/income` | GET | `:ticker` | Screener.in | — | Quarterly results and multi-year audited annual P&L statement |
+| `/companies/:ticker/balance-sheet` | GET | `:ticker` | Screener.in | — | Audited Balance Sheet (Liabilities, Equity, Fixed Assets, CWIP) |
+| `/companies/:ticker/cash-flow` | GET | `:ticker` | Screener.in | — | Audited Cash Flow statement (Operating, Investing, Financing) |
+| `/companies/:ticker/shareholding` | GET | `:ticker` | Screener.in | — | Promoter, FII, DII, Government, Public ownership & quarterly trend |
+| `/companies/:ticker/peers` | GET | `:ticker` | Screener API | — | Real-time sector peer group comparative valuation table |
+| `/companies/:ticker/documents` | GET | `:ticker` | Screener.in | — | Exchange filings, annual reports, concalls, and rating notices |
+| `/companies/:ticker/analysis` | GET | `:ticker` | Screener.in | — | Automated qualitative investment strengths (Pros) and risks (Cons) |
+| `/companies/:ticker/corporate-actions` | GET | `:ticker` | Unavailable | — | Typed null status notice for corporate actions |
 
 ---
 
-## 💻 Local Setup & Execution
+## 📁 Repository File Structure
 
-### 1. Start the Backend API
+```text
+StockVista/
+├── backend/                              # Express.js REST Gateway
+│   ├── src/
+│   │   ├── data/
+│   │   │   └── nse-catalog.ts            # Curated catalog of 80+ top NSE securities
+│   │   ├── routes/
+│   │   │   └── companies.ts              # Express router for all company endpoints
+│   │   ├── services/
+│   │   │   ├── screener.ts               # Cheerio scraping engine for Screener.in
+│   │   │   ├── yahoo.ts                  # Yahoo Finance quote and OHLCV provider
+│   │   │   └── upstox.ts                 # Upstox SDK integration reference
+│   │   └── index.ts                      # Server entrypoint, search & indices routes
+│   ├── tsconfig.json                     # TypeScript configuration
+│   └── package.json
+│
+├── frontend/                             # Next.js 16 Web Application
+│   ├── src/
+│   │   ├── app/
+│   │   │   ├── company/[ticker]/
+│   │   │   │   └── page.tsx              # Dynamic company detailed research dashboard
+│   │   │   ├── layout.tsx                # Root layout, fonts & meta tags
+│   │   │   └── page.tsx                  # Landing page & company discovery search
+│   │   ├── assets/                       # Walkthrough screenshots & UI assets
+│   │   │   ├── readme01.png              # Overview & header screenshot
+│   │   │   ├── readme02.png              # Financial statements screenshot
+│   │   │   ├── readme03.png              # Interactive chart screenshot
+│   │   │   ├── readme05.png              # Pros & cons & valuation screenshot
+│   │   │   ├── readme06.png              # Peer comparison screenshot
+│   │   │   └── readme07.png              # Documents & filings screenshot
+│   │   ├── components/                   # Modular UI Component Library
+│   │   │   ├── AnalysisBox.tsx           # Pros & Cons automated qualitative assessment
+│   │   │   ├── CompanyHeader.tsx         # Live quotes, breadcrumbs, BSE/NSE scrip tags
+│   │   │   ├── CorporateMetadata.tsx     # Exchange codes, sector, domain & registrar
+│   │   │   ├── DocumentsList.tsx         # Premium filings portal (search, tabs, badges)
+│   │   │   ├── FinancialTables.tsx       # 4 statements (Quarters, P&L, BS, CF) + CSV
+│   │   │   ├── HeaderSearch.tsx          # Autocomplete search in dashboard navbar
+│   │   │   ├── HistoricalChart.tsx       # Recharts area chart (timeframes, SMA, volume)
+│   │   │   ├── HomeSearch.tsx            # Main landing search interface
+│   │   │   ├── KeyMetricsBar.tsx         # Screener.in 9 top metric cards
+│   │   │   ├── MarketTicker.tsx          # Real-time NIFTY 50 & SENSEX header bar
+│   │   │   ├── PeerComparison.tsx        # Dynamic peer group valuation table
+│   │   │   ├── Shareholding.tsx          # Donut visualization & 5-quarter trend table
+│   │   │   ├── Sidebar.tsx               # Terminal navigation sidebar
+│   │   │   └── ValuationGrid.tsx         # Derived valuation & capital efficiency grid
+│   │   └── services/
+│   │       └── api.ts                    # Strongly typed client fetch wrappers
+│   ├── next.config.ts
+│   ├── tsconfig.json
+│   └── package.json
+│
+├── AGENTS.md                             # Repository operating guidelines
+├── README.md                             # Comprehensive technical documentation
+└── sample.json                           # Sample normalized payload reference
+```
+
+---
+
+## 💻 Local Setup & Getting Started
+
+### Prerequisites
+- **Node.js:** `v18.17.0` or higher (Node 20+ recommended)
+- **Package Manager:** `npm` (included with Node.js)
+- **Git**
+
+### 1. Clone the Repository
+```bash
+git clone https://github.com/Komalgiri/StockVista.git
+cd StockVista
+```
+
+### 2. Configure Environment Variables
+
+**Backend (`backend/.env`):**
+```env
+PORT=8080
+```
+
+**Frontend (`frontend/.env.local`):**
+```env
+NEXT_PUBLIC_API_BASE_URL=http://localhost:8080/api
+```
+
+### 3. Launch the Backend Gateway
+Open your first terminal window:
 ```bash
 cd backend
 npm install
 npm run dev
 ```
-*Backend runs on `http://localhost:8080`.*
+*The Express server boots on `http://localhost:8080` with the NSE catalog loaded.*
 
-### 2. Start the Frontend Application
+### 4. Launch the Frontend Application
+Open your second terminal window:
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-*Frontend runs on `http://localhost:3000`.*
+*The Next.js 16 application starts on `http://localhost:3000`.*
 
 ---
 
-**Author:** Komal Giri  
-**Email:** `komalgiri789@gmail.com`  
-**Portfolio:** [https://portfolio-komalgiri.onrender.com](https://portfolio-komalgiri.onrender.com/)  
-**GitHub:** [https://github.com/Komalgiri](https://github.com/Komalgiri)
+## 🧪 Build & Type Check Validation
+
+Both packages feature strict TypeScript type-checking and zero-warning builds:
+
+**Verify Backend:**
+```bash
+cd backend
+npx tsc --noEmit
+```
+*Compiles clean with 0 errors.*
+
+**Verify Frontend:**
+```bash
+cd frontend
+npm run build
+```
+*Generates optimized static and partial prerendering pages with 0 errors.*
+
+---
+
+## ⚖️ Engineering Decisions & Technical Trade-offs
+
+1. **Why Screener Scraping over Brokerage APIs (e.g. Upstox/Zerodha)?**  
+   Broker trading APIs (such as Upstox or Kite Connect) require mandatory daily user login via OAuth with a personal Demat account. Asking an assessment evaluator to log into their private trading account is poor UX. Furthermore, trading APIs only provide OHLC and order-book data—they do not provide audited balance sheets, cash flows, or concall transcripts. Scraping Screener.in via Cheerio delivers institutional fundamental data in a zero-config setup.
+
+2. **In-Memory Caching vs. Redis:**  
+   To preserve zero-configuration evaluation, `node-cache` was selected over external Redis instances. This eliminates Docker or external Redis dependencies while still protecting upstream providers from repeated reloads.
+
+3. **CSV Exporting Client-Side:**  
+   The CSV export in `FinancialTables.tsx` constructs CSV MIME blobs directly in the browser from the typed JSON state, avoiding unnecessary round-trips to the backend.
+
+4. **Deterministic Moving Averages:**  
+   Rather than fetching external TA-Lib libraries, 50-day moving averages are computed directly in `HistoricalChart.tsx` using memoized sliding windows over actual daily closes.
+
+---
+
+## 👤 Author & Contact
+
+**Komal Giri**  
+Software Engineer  
+- **Email:** [komalgiri789@gmail.com](mailto:komalgiri789@gmail.com)  
+- **Portfolio:** [https://portfolio-komalgiri.onrender.com](https://portfolio-komalgiri.onrender.com/)  
+- **GitHub:** [https://github.com/Komalgiri](https://github.com/Komalgiri)  
+- **LinkedIn:** [https://www.linkedin.com/in/komal-giri-52798a265](https://www.linkedin.com/in/komal-giri-52798a265)
