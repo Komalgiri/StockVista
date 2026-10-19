@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { ArrowUpRight, ArrowDownRight, Plus, Download, Bell, ExternalLink, Globe } from 'lucide-react';
 
 interface CompanyHeaderProps {
@@ -42,9 +43,9 @@ export function CompanyHeader({
       {/* Breadcrumbs and Live Tag */}
       <div className="flex justify-between items-center text-[11px] font-inter">
         <div className="flex gap-2 text-text-secondary font-medium">
-          <span className="hover:text-primary cursor-pointer">Equities</span>
+          <Link href="/" className="hover:text-primary transition-colors">Equities</Link>
           <span>/</span>
-          <span className="hover:text-primary cursor-pointer">{sector}</span>
+          <Link href={`/sectors/${encodeURIComponent(sector)}`} className="hover:text-primary transition-colors">{sector}</Link>
           <span>/</span>
           <span className="text-text-primary font-semibold">{ticker}</span>
         </div>
