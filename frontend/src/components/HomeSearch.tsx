@@ -110,17 +110,22 @@ export function HomeSearch() {
             )}
             {results.map((r) => (
               <button
-                key={r.ticker}
+                key={`${r.ticker}-${r.scrip_bse || ''}`}
                 onClick={() => handleSelect(r.ticker)}
                 className="w-full flex items-center justify-between px-6 py-4 hover:bg-slate-50 transition-colors text-left border-b border-slate-50 last:border-0"
               >
-                <div className="flex items-center gap-4">
-                  <span className="font-geist font-bold text-slate-800 text-base w-24 shrink-0">{r.ticker}</span>
-                  <span className="text-slate-600 text-sm truncate max-w-[300px] font-medium">{r.name}</span>
+                <div className="flex items-center gap-4 min-w-0 mr-4">
+                  <span className="font-geist font-bold text-slate-800 text-base shrink-0">{r.ticker}</span>
+                  {r.scrip_bse && (
+                    <span className="text-[10px] bg-amber-50 text-amber-800 border border-amber-200/60 px-1.5 py-0.5 rounded font-mono shrink-0">
+                      BSE: {r.scrip_bse}
+                    </span>
+                  )}
+                  <span className="text-slate-600 text-sm truncate font-medium">{r.name}</span>
                 </div>
                 <div className="flex items-center gap-3 shrink-0">
-                  <span className="text-xs text-slate-400 font-mono">{r.sector}</span>
-                  <span className="text-[10px] bg-slate-100 text-slate-500 px-2 py-1 rounded font-mono font-bold">{r.exchange}</span>
+                  <span className="text-xs text-slate-400 font-mono hidden sm:inline">{r.sector}</span>
+                  <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-1 rounded font-mono font-bold">{r.exchange}</span>
                 </div>
               </button>
             ))}

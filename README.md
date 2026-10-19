@@ -10,7 +10,7 @@
 
 **StockVista** is a production-grade, full-stack equity research and fundamental analysis platform designed for Indian capital markets (NSE & BSE), inspired by the information architecture and depth of **Screener.in**.
 
-Built with **Next.js 16 (App Router)** and an **Express 5 API Gateway**, StockVista orchestrates a multi-source data ingestion pipeline—combining real-time web scraping from Screener.in, live market data from Yahoo Finance, and an authoritative catalog of 80+ top NSE companies—to deliver an authentic, zero-fabrication research experience.
+Built with **Next.js 16 (App Router)** and an **Express 5 API Gateway**, StockVista orchestrates a multi-source data ingestion pipeline—combining real-time web scraping from Screener.in, live market data from Yahoo Finance, and an active indexed universe of **3,000+ Indian equities (scaling to 5,500+ across NSE & BSE)** backed by persistent SQLite storage—to deliver an authentic, zero-fabrication research experience.
 
 ---
 
@@ -26,9 +26,10 @@ Built with **Next.js 16 (App Router)** and an **Express 5 API Gateway**, StockVi
 
 ## 📑 Table of Contents
 
-1. [Visual Tour & Screenshots](#-visual-tour--screenshots)
-2. [Key Architecture & Capabilities](#-key-architecture--capabilities)
-3. [Deep Feature Breakdown](#-deep-feature-breakdown)
+1. [🏆 Achievements Till Now & Current Progress (Post-Oct 14 Updates)](#-achievements-till-now--current-progress-post-oct-14-updates)
+2. [Visual Tour & Screenshots](#-visual-tour--screenshots)
+3. [Key Architecture & Capabilities](#-key-architecture--capabilities)
+4. [Deep Feature Breakdown](#-deep-feature-breakdown)
    - [1. Financial Statements (4 Core Statements + CSV)](#1-financial-statements-4-core-statements--csv-export)
    - [2. Screener.in 9 Key Metrics Bar](#2-screenerin-9-key-metrics-bar)
    - [3. Interactive Historical Price & Volume Analytics](#3-interactive-historical-price--volume-analytics)
@@ -38,13 +39,55 @@ Built with **Next.js 16 (App Router)** and an **Express 5 API Gateway**, StockVi
    - [7. Shareholding Distribution & Donut Chart](#7-shareholding-distribution--donut-chart)
    - [8. Exchange Filings & Regulatory Documents](#8-exchange-filings--regulatory-documents)
    - [9. Dynamic Corporate Metadata](#9-dynamic-corporate-metadata)
-4. [Brief Explanation of Data Sources Used](#-brief-explanation-of-data-sources-used)
-5. [System Architecture & Sequence Flow](#-system-architecture--sequence-flow)
-6. [Complete REST API Reference](#-complete-rest-api-reference)
-7. [Repository File Structure](#-repository-file-structure)
-8. [Local Setup & Getting Started](#-local-setup--getting-started)
-9. [Engineering Decisions & Technical Trade-offs](#-engineering-decisions--technical-trade-offs)
-10. [Author & Contact](#-author--contact)
+5. [Brief Explanation of Data Sources Used](#-brief-explanation-of-data-sources-used)
+6. [System Architecture & Sequence Flow](#-system-architecture--sequence-flow)
+7. [Complete REST API Reference](#-complete-rest-api-reference)
+8. [Repository File Structure](#-repository-file-structure)
+9. [Local Setup & Getting Started](#-local-setup--getting-started)
+10. [Engineering Decisions & Technical Trade-offs](#-engineering-decisions--technical-trade-offs)
+11. [Author & Contact](#-author--contact)
+
+---
+
+## 🏆 Achievements Till Now & Current Progress (Post-Oct 14 Updates)
+
+Following the initial prototype phase, significant architectural milestones were engineered and rolled out after **October 14th** to transform StockVista from a curated 80-stock proof-of-concept into a scalable, Screener.in-grade financial platform covering the wider Indian stock market universe.
+
+### 1. Catalog Expansion: 3,000+ Listed Equities Active (Progressing to 5,500+)
+- **Removed the ~80 Stock Ceiling:** Replaced static lists with a dynamic dual-exchange catalog synchronization pipeline (`sync-catalog.ts`).
+- **3,000+ Primary Stocks Listed & Searchable:** The catalog has already indexed active companies across NSE and BSE, with 5,588 total securities parsed into the ingestion pipeline (including dual-listed, BSE-only scrips, and SME-listed companies).
+- **Official Exchange Integration:** Direct ingestion from the **NSE Active Equity Master** (`EQUITY_L.csv`) and **BSE/Zerodha Instrument Directory**, extracting official ISINs, face values, trading series, and 6-digit BSE security codes.
+
+### 2. High-Performance Persistent Database Layer
+- **Engineered SQLite with WAL (Write-Ahead Logging):** Implemented a production-ready persistent database (`stockvista.db`) using `better-sqlite3` operating in high-concurrency WAL mode (`synchronous = NORMAL`).
+- **Multi-Column Indexing:** Built composite indexes covering `ticker`, `symbol_nse`, `scrip_bse`, `name`, `sector`, and `industry` to achieve sub-millisecond query lookups across thousands of records.
+- **Two-Tier Caching Schema:** Created persistent disk cache tables (`financial_cache` and `market_quotes_cache`) with TTL expirations to support high-throughput, rate-limit-resistant financial querying.
+
+### 3. Dynamic Universal Search (Prefix & Exact Weighted Matching)
+- **Unified Dynamic Search Engine (`/api/search`):** Rewrote the search experience in both the navigation header ([HeaderSearch.tsx](file:///d:/StockVista/frontend/src/components/HeaderSearch.tsx)) and hero section ([HomeSearch.tsx](file:///d:/StockVista/frontend/src/components/HomeSearch.tsx)).
+- **Multi-Attribute Matching:** Users can locate securities instantly by company name, NSE symbol, or BSE 6-digit scrip code.
+- **Weighted Relevance Ranking:** Custom SQL sort ordering prioritizes exact symbol matches first, followed by ticker prefixes, scrip codes, and company name substring matches.
+
+### 4. Sector & Industry Taxonomy Classification
+- **Automated Heuristic Sector Categorization:** Implemented a classification system sorting stocks into **23 distinct economic sectors** (e.g., Financial Services, Technology, Healthcare, Energy & Power, FMCG, Auto Components, Construction & Real Estate, Chemicals, Metals & Mining).
+- **Sector Directory APIs:** Deployed REST endpoints for sector-level exploration:
+  - `GET /api/sectors`: Aggregated list of all 23 sectors with live company counts.
+  - `GET /api/sectors/:sector`: Paginated, sorted company listings filtered by sector.
+
+### 5. Multi-Source Financial Resolution Pipeline
+- **Screener.in Scraping Engine:** Robust Cheerio-based scrapers extracting all core financial categories without manual mocks:
+  - 10-Year Annual Profit & Loss statements + TTM
+  - Consecutive Quarterly Results
+  - Comprehensive Balance Sheet & Cash Flow breakdown
+  - Institutional Shareholding Patterns (Promoter, FII, DII, Public)
+  - Live Sector Peer Comparison matrix
+  - Algorithmic Pros & Cons qualitative evaluation
+  - Categorized Corporate Filings (Annual Reports, Concalls, Presentations, Credit Ratings)
+- **Yahoo Finance Fallback & Live Ticker:** Real-time intraday quotes, trading volume, day change %, and index quotes for `^NSEI` (NIFTY 50) and `^BSESN` (SENSEX).
+
+### 6. Real-Time Coverage Telemetry & Sync Endpoint
+- **Live Coverage Diagnostics (`GET /api/coverage`):** Exposes transparent real-time metrics on total companies indexed, exchange distribution breakdown, cached statements count, and sector distribution.
+- **On-Demand Catalog Sync (`POST /api/sync-catalog`):** Administrative trigger allowing automated updates when new companies list or change trading status.
 
 ---
 

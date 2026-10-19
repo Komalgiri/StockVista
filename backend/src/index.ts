@@ -2,7 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import companiesRouter from './routes/companies';
-import { NSE_CATALOG } from './data/nse-catalog';
+import { CompanyService } from './db';
+import { syncMasterCatalog } from './scripts/sync-catalog';
 import { getMarketQuote } from './services/yahoo';
 import NodeCache from 'node-cache';
 
@@ -17,38 +18,102 @@ app.use(express.json());
 
 // ─── Health Check ─────────────────────────────────────────────────────────────
 app.get('/api/health', (req, res) => {
-  res.json({ success: true, data: { status: 'ok', timestamp: new Date().toISOString() } });
+  res.json({
+    success: true,
+    data: {
+      status: 'ok',
+      timestamp: new Date().toISOString(),
+      totalCompaniesIndexed: CompanyService.getTotalCount()
+    }
+  });
 });
 
-// ─── Company Search ───────────────────────────────────────────────────────────
-// Searches the 80+ company catalog by name or ticker. Case-insensitive fuzzy match.
+// ─── Dynamic Company Search (NSE & BSE) ───────────────────────────────────────
+// Fast indexed search across 5,500+ companies by Name, NSE Symbol, or BSE Code.
 app.get('/api/search', (req: express.Request, res: express.Response) => {
-  const query = (req.query.q as string || '').trim().toLowerCase();
+  const query = (req.query.q as string || '').trim();
 
   if (!query || query.length < 1) {
     return res.json({ success: true, data: [], meta: { total: 0 } });
   }
 
-  const results = NSE_CATALOG
-    .filter(c =>
-      c.name.toLowerCase().includes(query) ||
-      c.ticker.toLowerCase().includes(query) ||
-      c.sector.toLowerCase().includes(query)
-    )
-    .slice(0, 10) // Cap at 10 results for fast response
-    .map(c => ({
-      name: c.name,
-      ticker: c.ticker,
-      exchange: c.exchange,
-      sector: c.sector
-    }));
+  const results = CompanyService.search(query, 12).map(c => ({
+    name: c.name,
+    ticker: c.symbol_nse || c.ticker,
+    symbol_nse: c.symbol_nse,
+    scrip_bse: c.scrip_bse,
+    exchange: c.exchange,
+    sector: c.sector,
+    industry: c.industry
+  }));
 
-  res.json({ success: true, data: results, meta: { total: results.length, source: 'nse-catalog' } });
+  res.json({
+    success: true,
+    data: results,
+    meta: {
+      total: results.length,
+      source: 'sqlite-db',
+      universeSize: CompanyService.getTotalCount()
+    }
+  });
+});
+
+// ─── Sector Directory Endpoints ───────────────────────────────────────────────
+app.get('/api/sectors', (req: express.Request, res: express.Response) => {
+  const sectors = CompanyService.getSectors();
+  res.json({
+    success: true,
+    data: sectors,
+    meta: {
+      totalSectors: sectors.length,
+      totalCompanies: CompanyService.getTotalCount()
+    }
+  });
+});
+
+app.get('/api/sectors/:sector', (req: express.Request, res: express.Response) => {
+  const sector = req.params.sector as string;
+  const page = parseInt(req.query.page as string || '1', 10);
+  const limit = parseInt(req.query.limit as string || '50', 10);
+  const offset = (Math.max(1, page) - 1) * limit;
+
+  const { companies, total } = CompanyService.getCompaniesBySector(sector, limit, offset);
+
+  res.json({
+    success: true,
+    data: {
+      sector,
+      companies,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit)
+      }
+    }
+  });
+});
+
+// ─── Data Coverage & Diagnostics Report ───────────────────────────────────────
+app.get('/api/coverage', (req: express.Request, res: express.Response) => {
+  const report = CompanyService.getCoverageReport();
+  res.json({
+    success: true,
+    data: report
+  });
+});
+
+// ─── Trigger Manual Sync ──────────────────────────────────────────────────────
+app.post('/api/sync-catalog', async (req: express.Request, res: express.Response) => {
+  try {
+    const result = await syncMasterCatalog();
+    res.json({ success: true, data: result });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: { message: error.message } });
+  }
 });
 
 // ─── Live Market Indices ──────────────────────────────────────────────────────
-// Fetches live NIFTY 50 and SENSEX from Yahoo Finance.
-// Both are listed on Yahoo as ^NSEI and ^BSESN respectively.
 app.get('/api/indices', async (req: express.Request, res: express.Response) => {
   const cacheKey = 'market-indices';
   const cached = indicesCache.get(cacheKey);
@@ -57,7 +122,6 @@ app.get('/api/indices', async (req: express.Request, res: express.Response) => {
   }
 
   try {
-    // Fetch NIFTY 50 and SENSEX in parallel using yahoo symbols
     const [niftyRaw, sensexRaw] = await Promise.allSettled([
       getMarketQuote('^NSEI'),
       getMarketQuote('^BSESN'),
@@ -101,7 +165,18 @@ app.use((err: Error, req: express.Request, res: express.Response, _next: express
   });
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
+  const total = CompanyService.getTotalCount();
   console.log(`✅ StockVista backend running on http://localhost:${PORT}`);
-  console.log(`   NSE catalog loaded: ${NSE_CATALOG.length} companies`);
+  console.log(`   Database loaded: ${total} NSE & BSE companies indexed in SQLite.`);
+
+  // Auto-sync if DB is empty
+  if (total === 0) {
+    console.log(`⚠️ Database is empty. Triggering automated master catalog sync...`);
+    try {
+      await syncMasterCatalog();
+    } catch (err) {
+      console.error('Initial catalog sync failed:', err);
+    }
+  }
 });

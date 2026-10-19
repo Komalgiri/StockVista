@@ -1,6 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { getMarketQuote, getHistoricalData, getCompanyProfile } from '../services/yahoo';
-import { NSE_CATALOG } from '../data/nse-catalog';
+import { CompanyService } from '../db';
 import { 
   getScreenerRatios, 
   getScreenerIncome, 
@@ -56,7 +56,7 @@ const cacheMiddleware = (req: Request, res: Response, next: NextFunction) => {
 router.get('/:isin', cacheMiddleware, asyncHandler(async (req: Request, res: Response) => {
   const isin = req.params.isin as string;
   const upperTicker = isin.toUpperCase();
-  const catalogEntry = NSE_CATALOG.find(c => c.ticker.toUpperCase() === upperTicker);
+  const dbCompany = CompanyService.getCompany(isin);
 
   const [profile, screenerDetails] = await Promise.all([
     getCompanyProfile(isin).catch(() => null),
@@ -65,26 +65,35 @@ router.get('/:isin', cacheMiddleware, asyncHandler(async (req: Request, res: Res
 
   const resolvedName = (profile?.name && !profile.name.includes('.NS') && profile.name !== isin)
     ? profile.name
-    : (catalogEntry?.name || `${upperTicker} India Ltd.`);
+    : (dbCompany?.name || `${upperTicker} India Ltd.`);
 
-  const resolvedSector = (catalogEntry?.sector) || (profile?.sector !== 'Unknown' ? profile?.sector : 'Equities') || 'Equities';
-  const resolvedIndustry = (catalogEntry?.industry) || (profile?.industry !== 'Unknown' ? profile?.industry : 'Diversified Business') || 'Diversified Business';
+  const resolvedSector = (dbCompany?.sector && dbCompany.sector !== 'Diversified' ? dbCompany.sector : null)
+    || (profile?.sector && profile.sector !== 'Unknown' ? profile.sector : null)
+    || (dbCompany?.sector)
+    || 'Diversified';
+
+  const resolvedIndustry = (dbCompany?.industry && dbCompany.industry !== 'Diversified Business' ? dbCompany.industry : null)
+    || (profile?.industry && profile.industry !== 'Unknown' ? profile.industry : null)
+    || (dbCompany?.industry)
+    || 'Diversified Business';
+
+  const resolvedBseCode = dbCompany?.scrip_bse || screenerDetails?.bseCode || null;
 
   const result = {
     name: resolvedName,
-    ticker: upperTicker,
-    exchange: catalogEntry?.exchange || "NSE",
+    ticker: dbCompany?.symbol_nse || upperTicker,
+    exchange: dbCompany?.exchange || (dbCompany?.scrip_bse && !dbCompany?.symbol_nse ? "BSE" : "NSE"),
     sector: resolvedSector,
     industry: resolvedIndustry,
-    isin: upperTicker,
-    description: screenerDetails?.about || `${resolvedName} is one of India's prominent public companies listed on the National Stock Exchange (NSE).`,
+    isin: dbCompany?.isin || upperTicker,
+    description: screenerDetails?.about || `${resolvedName} is one of India's prominent public companies listed on the ${dbCompany?.exchange || 'Indian stock exchanges'}.`,
     website: screenerDetails?.website || null,
-    bseCode: screenerDetails?.bseCode || null,
-    bseUrl: screenerDetails?.bseUrl || null,
-    nseUrl: screenerDetails?.nseUrl || `https://www.nseindia.com/get-quotes/equity?symbol=${upperTicker}`
+    bseCode: resolvedBseCode,
+    bseUrl: screenerDetails?.bseUrl || (resolvedBseCode ? `https://www.bseindia.com/stock-share-price/x/y/${resolvedBseCode}/` : null),
+    nseUrl: screenerDetails?.nseUrl || (dbCompany?.symbol_nse ? `https://www.nseindia.com/get-quotes/equity?symbol=${dbCompany.symbol_nse}` : null)
   };
 
-  respond(res, result, screenerDetails ? 'screener+catalog' : (profile ? 'yahoo-finance' : 'catalog'));
+  respond(res, result, screenerDetails ? 'screener+db' : (profile ? 'yahoo-finance' : 'db'));
 }));
 
 // 2. Quote

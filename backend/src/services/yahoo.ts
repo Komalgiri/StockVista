@@ -7,6 +7,10 @@ const getYahooSymbol = (isinOrTicker: string) => {
   if (isinOrTicker.includes('.') || isinOrTicker.startsWith('^')) {
     return isinOrTicker.toUpperCase();
   }
+  // If it's a 6-digit BSE Scrip code (e.g. 500008, 500112), route to Bombay Stock Exchange (.BO)
+  if (/^\d{6}$/.test(isinOrTicker.trim())) {
+    return `${isinOrTicker.trim()}.BO`;
+  }
   // Default: National Stock Exchange (.NS)
   return `${isinOrTicker.toUpperCase()}.NS`;
 };

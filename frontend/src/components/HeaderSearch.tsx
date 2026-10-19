@@ -76,15 +76,23 @@ export function HeaderSearch() {
         <div className="absolute top-full left-0 mt-1 w-full bg-surface-canvas border border-border-strong rounded-lg shadow-xl z-50 overflow-hidden">
           {results.map((r) => (
             <button
-              key={r.ticker}
+              key={`${r.ticker}-${r.scrip_bse || ''}`}
               onClick={() => handleSelect(r.ticker)}
-              className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-surface-subtle transition-colors text-left"
+              className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-surface-subtle transition-colors text-left border-b border-border-hairline last:border-0"
             >
-              <div>
-                <span className="font-geist font-semibold text-text-primary text-[13px]">{r.ticker}</span>
-                <span className="ml-2 text-text-secondary text-[12px] truncate max-w-[220px] inline-block align-middle">{r.name}</span>
+              <div className="flex items-center gap-2 overflow-hidden mr-2">
+                <span className="font-geist font-semibold text-text-primary text-[13px] shrink-0">{r.ticker}</span>
+                {r.scrip_bse && (
+                  <span className="text-[9px] bg-surface-subtle border border-border-hairline text-text-tertiary px-1 rounded font-mono shrink-0">
+                    {r.scrip_bse}
+                  </span>
+                )}
+                <span className="text-text-secondary text-[12px] truncate inline-block align-middle">{r.name}</span>
               </div>
-              <span className="text-[10px] font-mono text-text-tertiary shrink-0">{r.sector}</span>
+              <div className="flex items-center gap-2 shrink-0">
+                <span className="text-[10px] font-mono text-text-tertiary">{r.sector}</span>
+                <span className="text-[9px] bg-primary/10 text-primary font-bold px-1.5 py-0.5 rounded font-mono">{r.exchange}</span>
+              </div>
             </button>
           ))}
         </div>
