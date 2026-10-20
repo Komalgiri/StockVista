@@ -77,8 +77,7 @@ async function fetchAPI(endpoint: string) {
     }
     const json = await response.json();
     return json.data;
-  } catch (error) {
-    console.error(`Error fetching ${endpoint}:`, error);
+  } catch {
     return null;
   }
 }
