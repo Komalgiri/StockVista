@@ -56,29 +56,46 @@ export function MarketTicker() {
   if (!indices?.nifty50 && !indices?.sensex) return null;
 
   return (
-    <div className="hidden md:flex items-center gap-4 text-[11px] font-semibold tracking-wider font-mono border-r border-border-hairline pr-5">
+    <div className="hidden md:flex items-center gap-3">
       {indices?.nifty50 && (
-        <span className="flex items-center gap-1">
-          {(indices.nifty50.changePercent ?? 0) >= 0
-            ? <TrendingUp size={11} className="text-market-positive" />
-            : <TrendingDown size={11} className="text-market-negative" />
-          }
-          NIFTY&nbsp;50:&nbsp;
-          <span className="text-text-primary">{fmt(indices.nifty50.value, 2)}</span>
-          &nbsp;<ChangeLabel pct={indices.nifty50.changePercent} />
-        </span>
+        <div className="flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl bg-slate-50 border border-slate-200/90 text-xs font-mono shadow-2xs">
+          <div className="flex items-center gap-1.5">
+            {(indices.nifty50.changePercent ?? 0) >= 0
+              ? <TrendingUp size={13} className="text-emerald-600" />
+              : <TrendingDown size={13} className="text-red-600" />
+            }
+            <span className="font-bold text-slate-500 text-[11px]">NIFTY 50</span>
+          </div>
+          <span className="font-extrabold text-slate-950 text-xs tabular-nums">{fmt(indices.nifty50.value, 2)}</span>
+          <span className={`px-1.5 py-0.5 rounded text-[10.5px] font-bold ${
+            (indices.nifty50.changePercent ?? 0) >= 0 
+              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60' 
+              : 'bg-red-50 text-red-700 border border-red-200/60'
+          }`}>
+            {(indices.nifty50.changePercent ?? 0) >= 0 ? '+' : ''}{fmt(indices.nifty50.changePercent)}%
+          </span>
+        </div>
       )}
       {indices?.sensex && (
-        <span className="flex items-center gap-1">
-          {(indices.sensex.changePercent ?? 0) >= 0
-            ? <TrendingUp size={11} className="text-market-positive" />
-            : <TrendingDown size={11} className="text-market-negative" />
-          }
-          SENSEX:&nbsp;
-          <span className="text-text-primary">{fmt(indices.sensex.value, 2)}</span>
-          &nbsp;<ChangeLabel pct={indices.sensex.changePercent} />
-        </span>
+        <div className="flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl bg-slate-50 border border-slate-200/90 text-xs font-mono shadow-2xs">
+          <div className="flex items-center gap-1.5">
+            {(indices.sensex.changePercent ?? 0) >= 0
+              ? <TrendingUp size={13} className="text-emerald-600" />
+              : <TrendingDown size={13} className="text-red-600" />
+            }
+            <span className="font-bold text-slate-500 text-[11px]">SENSEX</span>
+          </div>
+          <span className="font-extrabold text-slate-950 text-xs tabular-nums">{fmt(indices.sensex.value, 2)}</span>
+          <span className={`px-1.5 py-0.5 rounded text-[10.5px] font-bold ${
+            (indices.sensex.changePercent ?? 0) >= 0 
+              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60' 
+              : 'bg-red-50 text-red-700 border border-red-200/60'
+          }`}>
+            {(indices.sensex.changePercent ?? 0) >= 0 ? '+' : ''}{fmt(indices.sensex.changePercent)}%
+          </span>
+        </div>
       )}
     </div>
   );
 }
+
