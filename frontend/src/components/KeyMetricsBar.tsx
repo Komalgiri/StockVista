@@ -33,42 +33,65 @@ export function KeyMetricsBar({
     return fallback;
   };
 
-  const displayMarketCap = marketCap || getVal('Market Cap', 'N/A');
-  const displayCurrentPrice = currentPrice ? `₹${currentPrice.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : getVal('Current Price', 'N/A');
+  const displayMarketCap = marketCap || getVal('Market Cap', '—');
+  const displayCurrentPrice = currentPrice ? `₹${currentPrice.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : getVal('Current Price', '—');
   
   const highLowStr = weekHigh52 && weekLow52 
     ? `₹${weekHigh52.toLocaleString('en-IN', { maximumFractionDigits: 0 })} / ₹${weekLow52.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`
-    : getVal('High / Low', 'N/A');
+    : getVal('High / Low', '—');
 
-  const displayPE = peRatio && peRatio > 0 ? peRatio.toFixed(1) : getVal('Stock P/E', 'N/A');
-  const displayBookValue = bookValue && bookValue > 0 ? `₹${bookValue.toFixed(1)}` : (getVal('Book Value', '') ? `₹${getVal('Book Value', '')}` : 'N/A');
-  const displayDivYield = dividendYield || (getVal('Dividend Yield', '') ? `${getVal('Dividend Yield', '')} %` : 'N/A');
-  const displayROCE = roce || (getVal('ROCE', '') ? `${getVal('ROCE', '')} %` : 'N/A');
-  const displayROE = roe || (getVal('ROE', '') ? `${getVal('ROE', '')} %` : 'N/A');
-  const displayFaceValue = faceValue && faceValue > 0 ? `₹${faceValue.toFixed(1)}` : (getVal('Face Value', '') ? `₹${getVal('Face Value', '')}` : 'N/A');
+  const displayPE = peRatio && peRatio > 0 ? peRatio.toFixed(1) : getVal('Stock P/E', '—');
+  const displayBookValue = bookValue && bookValue > 0 ? `₹${bookValue.toFixed(1)}` : (getVal('Book Value', '') ? `₹${getVal('Book Value', '')}` : '—');
+  const displayDivYield = dividendYield || (getVal('Dividend Yield', '') ? `${getVal('Dividend Yield', '')} %` : '—');
+  const displayROCE = roce || (getVal('ROCE', '') ? `${getVal('ROCE', '')} %` : '—');
+  const displayROE = roe || (getVal('ROE', '') ? `${getVal('ROE', '')} %` : '—');
+  const displayFaceValue = faceValue && faceValue > 0 ? `₹${faceValue.toFixed(1)}` : (getVal('Face Value', '') ? `₹${getVal('Face Value', '')}` : '—');
 
   return (
-    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-9 gap-4 py-5 border-y border-border-hairline mb-5 bg-surface-canvas/50 px-3 rounded-lg">
-      <MetricItem label="Market Cap" value={displayMarketCap} />
-      <MetricItem label="Current Price" value={displayCurrentPrice} isPrimary />
-      <MetricItem label="High / Low" value={highLowStr} />
-      <MetricItem label="Stock P/E" value={displayPE} />
-      <MetricItem label="Book Value" value={displayBookValue} />
-      <MetricItem label="Div Yield" value={displayDivYield} />
-      <MetricItem label="ROCE" value={displayROCE} />
-      <MetricItem label="ROE" value={displayROE} />
-      <MetricItem label="Face Value" value={displayFaceValue} />
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-9 gap-2.5 my-4">
+      <MetricItem label="Market Cap" value={displayMarketCap} hint="Total Equity" />
+      <MetricItem label="Current Price" value={displayCurrentPrice} isPrimary hint="LTP" />
+      <MetricItem label="52W High / Low" value={highLowStr} hint="Annual Range" />
+      <MetricItem label="Stock P/E" value={displayPE} hint="Trailing Multiple" />
+      <MetricItem label="Book Value" value={displayBookValue} hint="Per Share" />
+      <MetricItem label="Dividend Yield" value={displayDivYield} hint="Annual Return" />
+      <MetricItem label="ROCE" value={displayROCE} isAccent hint="EBIT / Capital" />
+      <MetricItem label="ROE" value={displayROE} isAccent hint="Net Return" />
+      <MetricItem label="Face Value" value={displayFaceValue} hint="Nominal" />
     </div>
   );
 }
 
-function MetricItem({ label, value, isPrimary = false }: { label: string; value: string; isPrimary?: boolean }) {
+function MetricItem({ 
+  label, 
+  value, 
+  isPrimary = false,
+  isAccent = false,
+  hint
+}: { 
+  label: string; 
+  value: string; 
+  isPrimary?: boolean;
+  isAccent?: boolean;
+  hint?: string;
+}) {
   return (
-    <div className="flex flex-col min-w-0">
-      <span className="text-[10px] text-text-tertiary uppercase tracking-wider font-semibold mb-1 truncate">{label}</span>
-      <span className={`font-geist text-[14px] md:text-[15px] font-semibold tabular-nums truncate ${isPrimary ? 'text-primary' : 'text-text-primary'}`} title={value}>
+    <div className={`flex flex-col justify-between p-3 rounded-xl border transition-all min-w-0 ${
+      isPrimary 
+        ? 'bg-blue-50/70 border-blue-200/80 shadow-xs' 
+        : 'bg-white border-slate-200/80 hover:border-slate-300 shadow-xs'
+    }`}>
+      <div className="flex items-center justify-between gap-1 mb-1">
+        <span className="text-[10px] text-slate-500 uppercase tracking-wider font-bold truncate">{label}</span>
+      </div>
+      <div className={`font-mono text-[14px] md:text-[15px] font-bold tabular-nums truncate ${
+        isPrimary ? 'text-blue-700' : isAccent ? 'text-slate-900 font-extrabold' : 'text-slate-900'
+      }`} title={value}>
         {value}
-      </span>
+      </div>
+      {hint && (
+        <span className="text-[9px] text-slate-400 font-sans mt-0.5 truncate">{hint}</span>
+      )}
     </div>
   );
 }

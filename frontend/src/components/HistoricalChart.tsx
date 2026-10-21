@@ -165,19 +165,19 @@ export function HistoricalChart({ data }: { data: PricePoint[] }) {
           <AreaChart data={chartData} margin={{ top: 5, right: 0, left: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#2563eb" stopOpacity={0.25}/>
-                <stop offset="95%" stopColor="#2563eb" stopOpacity={0.01}/>
+                <stop offset="5%" stopColor={isPositive ? '#16a34a' : '#2563eb'} stopOpacity={0.25}/>
+                <stop offset="95%" stopColor={isPositive ? '#16a34a' : '#2563eb'} stopOpacity={0.01}/>
               </linearGradient>
             </defs>
             <XAxis dataKey="date" hide />
             <YAxis domain={[minPrice, maxPrice]} hide />
             <Tooltip 
               contentStyle={{ 
-                backgroundColor: 'var(--color-surface-canvas)', 
-                borderColor: 'var(--color-border-strong)', 
-                borderRadius: '6px', 
+                backgroundColor: '#ffffff', 
+                borderColor: '#e2e8f0', 
+                borderRadius: '8px', 
                 fontSize: '12px',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)'
               }}
               formatter={(value: any, name: any) => [
                 `₹${Number(value).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`, 
@@ -188,7 +188,7 @@ export function HistoricalChart({ data }: { data: PricePoint[] }) {
             <Area 
               type="monotone" 
               dataKey="price" 
-              stroke="#2563eb" 
+              stroke={isPositive ? '#16a34a' : '#2563eb'} 
               strokeWidth={2} 
               fillOpacity={1} 
               fill="url(#colorPrice)" 
@@ -197,7 +197,7 @@ export function HistoricalChart({ data }: { data: PricePoint[] }) {
               <Area 
                 type="monotone" 
                 dataKey="sma" 
-                stroke="#60a5fa" 
+                stroke="#64748b" 
                 strokeWidth={1.5} 
                 strokeDasharray="4 4" 
                 fill="none" 

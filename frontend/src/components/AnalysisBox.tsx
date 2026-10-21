@@ -18,42 +18,42 @@ export function AnalysisBox({ analysis }: { analysis?: AnalysisData | null }) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Pros */}
-        <div className="border border-border-hairline rounded-md p-4 bg-market-positive-subtle/10 flex flex-col">
-          <div className="flex items-center gap-2 mb-3 text-market-positive font-geist font-bold text-[14px]">
-            <CheckCircle2 size={18} />
-            <span>Pros</span>
+        <div className="border border-emerald-200/70 rounded-xl p-4 sm:p-5 bg-emerald-50/40 flex flex-col shadow-xs">
+          <div className="flex items-center gap-2 mb-3.5 text-emerald-700 font-geist font-bold text-[14px]">
+            <CheckCircle2 size={18} className="text-emerald-600" />
+            <span>Investment Strengths</span>
           </div>
           {pros.length > 0 ? (
-            <ul className="flex flex-col gap-2.5 text-[12px] text-text-secondary leading-relaxed">
+            <ul className="flex flex-col gap-2.5 text-[12px] text-slate-700 leading-relaxed">
               {pros.map((pro, idx) => (
-                <li key={idx} className="flex items-start gap-2">
-                  <span className="text-market-positive mt-0.5">•</span>
+                <li key={idx} className="flex items-start gap-2.5">
+                  <span className="text-emerald-600 font-bold mt-0.5">•</span>
                   <span>{pro}</span>
                 </li>
               ))}
             </ul>
           ) : (
-            <div className="text-[12px] text-text-tertiary italic">No key automated strengths flagged.</div>
+            <div className="text-[12px] text-slate-400 italic">No key automated strengths flagged.</div>
           )}
         </div>
 
         {/* Cons */}
-        <div className="border border-border-hairline rounded-md p-4 bg-market-negative-subtle/10 flex flex-col">
-          <div className="flex items-center gap-2 mb-3 text-market-negative font-geist font-bold text-[14px]">
-            <AlertCircle size={18} />
-            <span>Cons</span>
+        <div className="border border-rose-200/70 rounded-xl p-4 sm:p-5 bg-rose-50/40 flex flex-col shadow-xs">
+          <div className="flex items-center gap-2 mb-3.5 text-rose-700 font-geist font-bold text-[14px]">
+            <AlertCircle size={18} className="text-rose-600" />
+            <span>Key Risk Factors</span>
           </div>
           {cons.length > 0 ? (
-            <ul className="flex flex-col gap-2.5 text-[12px] text-text-secondary leading-relaxed">
+            <ul className="flex flex-col gap-2.5 text-[12px] text-slate-700 leading-relaxed">
               {cons.map((con, idx) => (
-                <li key={idx} className="flex items-start gap-2">
-                  <span className="text-market-negative mt-0.5">•</span>
+                <li key={idx} className="flex items-start gap-2.5">
+                  <span className="text-rose-600 font-bold mt-0.5">•</span>
                   <span>{con}</span>
                 </li>
               ))}
             </ul>
           ) : (
-            <div className="text-[12px] text-text-tertiary italic">No key automated risk factors flagged.</div>
+            <div className="text-[12px] text-slate-400 italic">No key automated risk factors flagged.</div>
           )}
         </div>
       </div>

@@ -41,12 +41,12 @@
   --color-background: #ffffff;
   --color-on-background: #09090b;
   
-  --color-market-positive: #18181b;
-  --color-market-positive-subtle: #f4f4f5;
-  --color-market-negative: #71717a;
-  --color-market-negative-subtle: #f4f4f5;
-  --color-market-neutral: #a1a1aa;
-  --color-market-neutral-subtle: #fafafa;
+  --color-market-positive: #16a34a;
+  --color-market-positive-subtle: #dcfce7;
+  --color-market-negative: #dc2626;
+  --color-market-negative-subtle: #fee2e2;
+  --color-market-neutral: #eab308;
+  --color-market-neutral-subtle: #fef9c3;
   
   --color-border-hairline: #E2E8F0;
   --color-border-strong: #CBD5E1;

@@ -120,24 +120,31 @@ export function CompanyHeader({
         </div>
         
         {/* Right Side: Price */}
-        <div className="flex flex-col md:items-end bg-surface-subtle p-4 rounded-md border border-border-hairline min-w-[220px]">
-          <div className="text-[11px] font-semibold text-text-secondary uppercase tracking-widest mb-1">Current Market Price</div>
-          <div className="font-geist text-3xl md:text-[34px] font-bold text-text-primary tabular-nums tracking-tighter leading-none mb-1">
+        <div className="flex flex-col md:items-end bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-xs min-w-[240px]">
+          <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
+            <span>Last Traded Price</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+          </div>
+          <div className="font-mono text-3xl md:text-[36px] font-extrabold text-slate-900 tabular-nums tracking-tight leading-none mb-2">
             ₹{currentPrice.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </div>
-          <div className={`flex items-center justify-end gap-1 font-inter font-bold text-[14px] tabular-nums ${isPositive ? 'text-market-positive' : 'text-market-negative'}`}>
-            {isPositive ? <ArrowUpRight size={16} strokeWidth={3} /> : <ArrowDownRight size={16} strokeWidth={3} />}
+          <div className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full font-mono font-bold text-[13px] tabular-nums ${
+            isPositive 
+              ? 'text-emerald-700 bg-emerald-50 border border-emerald-200/70' 
+              : 'text-rose-700 bg-rose-50 border border-rose-200/70'
+          }`}>
+            {isPositive ? <ArrowUpRight size={15} strokeWidth={2.5} /> : <ArrowDownRight size={15} strokeWidth={2.5} />}
             <span>{isPositive ? '+' : '-'}{Math.abs(dayChange).toFixed(2)} ({Math.abs(dayChangePercent).toFixed(2)}%)</span>
           </div>
           
-          <div className="flex justify-between w-full mt-4 pt-3 border-t border-border-hairline text-[11px]">
+          <div className="flex justify-between w-full mt-4 pt-3 border-t border-slate-100 text-[11px]">
             <div>
-              <div className="text-text-tertiary mb-0.5">Prev. Close</div>
-              <div className="font-semibold text-text-primary tabular-nums">₹{prevClose.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+              <div className="text-slate-400 font-medium mb-0.5">Prev. Close</div>
+              <div className="font-mono font-bold text-slate-800 tabular-nums">₹{prevClose.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
             </div>
             <div className="text-right">
-              <div className="text-text-tertiary mb-0.5">Volume</div>
-              <div className="font-semibold text-text-primary tabular-nums">{(volume / 1000000).toFixed(2)}M shares</div>
+              <div className="text-slate-400 font-medium mb-0.5">Day Volume</div>
+              <div className="font-mono font-bold text-slate-800 tabular-nums">{(volume / 1000000).toFixed(2)}M</div>
             </div>
           </div>
         </div>
