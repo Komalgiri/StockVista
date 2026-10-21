@@ -488,14 +488,30 @@ npm run build
 1. **Why Screener Scraping over Brokerage APIs (e.g. Upstox/Zerodha)?**  
    Broker trading APIs (such as Upstox or Kite Connect) require mandatory daily user login via OAuth with a personal Demat account. Asking an assessment evaluator to log into their private trading account is poor UX. Furthermore, trading APIs only provide OHLC and order-book data—they do not provide audited balance sheets, cash flows, or concall transcripts. Scraping Screener.in via Cheerio delivers institutional fundamental data in a zero-config setup.
 
-2. **In-Memory Caching vs. Redis:**  
-   To preserve zero-configuration evaluation, `node-cache` was selected over external Redis instances. This eliminates Docker or external Redis dependencies while still protecting upstream providers from repeated reloads.
+2. **Persistent Two-Tier Caching (RAM + SQLite Disk):**  
+   To preserve zero-configuration evaluation without requiring external Redis or Docker containers, a two-tier caching architecture was implemented. Level 1 leverages high-speed in-memory RAM caching (`node-cache`), while Level 2 persists complete multi-category statements to disk (`better-sqlite3` in WAL mode). Even after backend restarts, queries for cached stocks resolve in 0–2ms.
 
-3. **CSV Exporting Client-Side:**  
+3. **Background Pre-Cache Ingestion Worker:**  
+   To prevent burst traffic and respect upstream rate limits, `npm run pre-cache` runs in the background with polite delays (1.5s between requests). It automatically pre-populates the top 50+ index and marquee stocks into the database cache so users experience instantaneous load times.
+
+4. **CSV Exporting Client-Side:**  
    The CSV export in `FinancialTables.tsx` constructs CSV MIME blobs directly in the browser from the typed JSON state, avoiding unnecessary round-trips to the backend.
 
-4. **Deterministic Moving Averages:**  
+5. **Deterministic Moving Averages:**  
    Rather than fetching external TA-Lib libraries, 50-day moving averages are computed directly in `HistoricalChart.tsx` using memoized sliding windows over actual daily closes.
+
+---
+
+## 🛡️ Known Limitations & Public Exchange Data Boundaries
+
+1. **Unannounced Micro-Cap & Suspended Listings:**  
+   India's exchanges list a number of legacy, suspended, or shell companies that have not filed financial results in several fiscal cycles. StockVista strictly refuses to fabricate or mock missing financial figures; for these securities, clear disclaimers ("Filings Pending / Exchange Data Unavailable") are presented.
+
+2. **Upstream Rate Limiting Safeguards:**  
+   Direct scraping of exchange pages is protected by an in-flight single-request bundle resolver and two-tier caching. The background worker throttles requests at 1,500ms intervals to prevent IP throttling or Captchas.
+
+3. **Corporate Actions & AGM Notices:**  
+   While Annual Reports, Earnings Presentations, and Credit Ratings are extracted and organized, live real-time AGM vote tallies and dividend payout date announcements require direct SEBI insider API subscriptions which are beyond public access.
 
 ---
 
