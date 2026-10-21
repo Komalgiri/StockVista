@@ -68,7 +68,7 @@ export function CompanyHeader({
                 href={nseUrl || `https://www.nseindia.com/get-quotes/equity?symbol=${ticker}`} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="font-mono text-[10px] font-semibold px-2 py-0.5 rounded bg-surface-container text-primary border border-primary-fixed hover:bg-primary/10 transition-colors inline-flex items-center gap-1"
+                className="font-mono text-[10px] font-bold px-2 py-0.5 rounded bg-orange-50 text-[#c2410c] border border-orange-200/80 hover:bg-orange-100 transition-colors inline-flex items-center gap-1"
               >
                 NSE: {ticker} <ExternalLink size={10} />
               </a>
@@ -77,7 +77,7 @@ export function CompanyHeader({
                   href={bseUrl || `https://www.bseindia.com/stock-share-price/equity/equity/${bseCode}/`} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="font-mono text-[10px] font-semibold px-2 py-0.5 rounded bg-surface-subtle text-text-secondary border border-border-hairline hover:text-text-primary transition-colors inline-flex items-center gap-1"
+                  className="font-mono text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-50 text-slate-700 border border-slate-200 hover:text-slate-950 transition-colors inline-flex items-center gap-1"
                 >
                   BSE: {bseCode} <ExternalLink size={10} />
                 </a>
@@ -87,7 +87,7 @@ export function CompanyHeader({
                   href={website} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="font-mono text-[10px] font-semibold px-2 py-0.5 rounded bg-surface-subtle text-primary border border-border-hairline hover:underline transition-colors inline-flex items-center gap-1"
+                  className="font-mono text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-50 text-slate-700 border border-slate-200 hover:text-[#c2410c] transition-colors inline-flex items-center gap-1"
                   title="Official Website"
                 >
                   <Globe size={11} /> Website
@@ -97,9 +97,9 @@ export function CompanyHeader({
           </div>
           
           <div className="text-[12px] text-text-secondary font-medium mb-3 flex items-center gap-1.5">
-            <span className="text-primary font-semibold">🏢 {sector}</span>
+            <span className="text-[#c2410c] font-bold">🏢 {sector}</span>
             <span className="text-text-tertiary">&gt;</span>
-            <span>{industry || 'Commercial Enterprise'}</span>
+            <span className="text-slate-700">{industry || 'Commercial Enterprise'}</span>
           </div>
 
           <p className="text-[13px] text-text-secondary leading-relaxed mb-4 max-w-3xl line-clamp-3" title={description}>
@@ -107,13 +107,13 @@ export function CompanyHeader({
           </p>
 
           <div className="flex flex-wrap gap-2 text-[12px] font-semibold">
-            <button className="flex items-center gap-1.5 bg-primary text-on-primary px-3 py-1.5 rounded-md hover:bg-primary-container transition-colors shadow-xs">
+            <button className="flex items-center gap-1.5 bg-[#c2410c] text-white px-3.5 py-1.5 rounded-lg hover:bg-[#9a3412] transition-colors shadow-xs cursor-pointer">
               <Plus size={14} /> Add to Watchlist
             </button>
-            <button className="flex items-center gap-1.5 bg-surface-canvas border border-border-strong text-text-primary px-3 py-1.5 rounded-md hover:bg-surface-subtle transition-colors">
+            <button className="flex items-center gap-1.5 bg-white border border-slate-200 text-slate-800 px-3.5 py-1.5 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer">
               <Download size={14} /> Export Overview
             </button>
-            <button className="flex items-center gap-1.5 bg-surface-canvas border border-border-strong text-text-primary px-3 py-1.5 rounded-md hover:bg-surface-subtle transition-colors">
+            <button className="flex items-center gap-1.5 bg-white border border-slate-200 text-slate-800 px-3.5 py-1.5 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer">
               <Bell size={14} /> Set Alert
             </button>
           </div>

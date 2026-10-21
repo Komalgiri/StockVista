@@ -78,14 +78,14 @@ function MetricItem({
   return (
     <div className={`flex flex-col justify-between p-3 rounded-xl border transition-all min-w-0 ${
       isPrimary 
-        ? 'bg-blue-50/70 border-blue-200/80 shadow-xs' 
+        ? 'bg-orange-50/80 border-orange-200/90 shadow-xs' 
         : 'bg-white border-slate-200/80 hover:border-slate-300 shadow-xs'
     }`}>
       <div className="flex items-center justify-between gap-1 mb-1">
         <span className="text-[10px] text-slate-500 uppercase tracking-wider font-bold truncate">{label}</span>
       </div>
       <div className={`font-mono text-[14px] md:text-[15px] font-bold tabular-nums truncate ${
-        isPrimary ? 'text-blue-700' : isAccent ? 'text-slate-900 font-extrabold' : 'text-slate-900'
+        isPrimary ? 'text-[#c2410c]' : isAccent ? 'text-slate-950 font-extrabold' : 'text-slate-900'
       }`} title={value}>
         {value}
       </div>

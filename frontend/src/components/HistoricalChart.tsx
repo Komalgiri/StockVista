@@ -165,8 +165,8 @@ export function HistoricalChart({ data }: { data: PricePoint[] }) {
           <AreaChart data={chartData} margin={{ top: 5, right: 0, left: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={isPositive ? '#16a34a' : '#2563eb'} stopOpacity={0.25}/>
-                <stop offset="95%" stopColor={isPositive ? '#16a34a' : '#2563eb'} stopOpacity={0.01}/>
+                <stop offset="5%" stopColor={isPositive ? '#16a34a' : '#c2410c'} stopOpacity={0.22}/>
+                <stop offset="95%" stopColor={isPositive ? '#16a34a' : '#c2410c'} stopOpacity={0.01}/>
               </linearGradient>
             </defs>
             <XAxis dataKey="date" hide />
@@ -188,7 +188,7 @@ export function HistoricalChart({ data }: { data: PricePoint[] }) {
             <Area 
               type="monotone" 
               dataKey="price" 
-              stroke={isPositive ? '#16a34a' : '#2563eb'} 
+              stroke={isPositive ? '#16a34a' : '#c2410c'} 
               strokeWidth={2} 
               fillOpacity={1} 
               fill="url(#colorPrice)" 
@@ -197,7 +197,7 @@ export function HistoricalChart({ data }: { data: PricePoint[] }) {
               <Area 
                 type="monotone" 
                 dataKey="sma" 
-                stroke="#64748b" 
+                stroke="#18181b" 
                 strokeWidth={1.5} 
                 strokeDasharray="4 4" 
                 fill="none" 
@@ -212,7 +212,7 @@ export function HistoricalChart({ data }: { data: PricePoint[] }) {
             {volumeBars.map((bar, i) => (
               <div 
                 key={i} 
-                className={`w-[2.5%] rounded-t-xs transition-all ${bar.isUp ? 'bg-market-positive' : 'bg-market-negative'}`} 
+                className={`w-[2.5%] rounded-t-xs transition-all ${bar.isUp ? 'bg-market-positive' : 'bg-[#c2410c]'}`} 
                 style={{ height: `${bar.heightPct}%` }}
               />
             ))}
@@ -242,12 +242,12 @@ export function HistoricalChart({ data }: { data: PricePoint[] }) {
       
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-3 pt-3 border-t border-border-hairline text-[10px] font-mono text-text-tertiary gap-2">
         <div className="flex items-center gap-4 flex-wrap">
-          <span className="flex items-center gap-1.5">
-            <span className="w-2.5 h-0.5 bg-[#2563eb]"></span> Price: ₹{lastPrice.toFixed(2)}
+          <span className="flex items-center gap-1.5 text-slate-700">
+            <span className={`w-2.5 h-0.5 ${isPositive ? 'bg-emerald-600' : 'bg-[#c2410c]'}`}></span> Price: ₹{lastPrice.toFixed(2)}
           </span>
           {showSMA && (
-            <span className="flex items-center gap-1.5">
-              <span className="w-2.5 h-0.5 bg-[#60a5fa]"></span> 50 DMA: ₹{latestSMA.toFixed(2)}
+            <span className="flex items-center gap-1.5 text-slate-700">
+              <span className="w-2.5 h-0.5 bg-slate-900"></span> 50 DMA: ₹{latestSMA.toFixed(2)}
             </span>
           )}
         </div>
