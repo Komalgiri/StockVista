@@ -92,9 +92,221 @@ const PRESET_SAMPLE_STOCKS = [
   'ZOMATO', 'ITC', '532628', '544500', 'CIPLA', 'BAJFINANCE'
 ];
 
+const FAMOUS_COMPANIES_DATA = [
+  {
+    ticker: 'TATAMOTORS',
+    name: 'Tata Motors',
+    sector: 'Automobile',
+    category: 'Auto',
+    cmp: '₹406.00',
+    change: '+1.85%',
+    isUp: true,
+    mcap: '₹1.50L Cr',
+    logo: '/logos/tatamotors.png',
+    bse: '500570',
+    pe: '10.2'
+  },
+  {
+    ticker: 'RELIANCE',
+    name: 'Reliance Industries',
+    sector: 'Energy & Power',
+    category: 'Energy & Infra',
+    cmp: '₹1,202.00',
+    change: '+0.45%',
+    isUp: true,
+    mcap: '₹19.7L Cr',
+    logo: '/logos/reliance.png',
+    bse: '500325',
+    pe: '24.6'
+  },
+  {
+    ticker: 'HDFCBANK',
+    name: 'HDFC Bank',
+    sector: 'Financial Services',
+    category: 'Banking',
+    cmp: '₹1,682.30',
+    change: '+0.75%',
+    isUp: true,
+    mcap: '₹12.8L Cr',
+    logo: '/logos/hdfcbank.png',
+    bse: '500180',
+    pe: '18.1'
+  },
+  {
+    ticker: 'TCS',
+    name: 'Tata Consultancy Services',
+    sector: 'Technology',
+    category: 'Tech',
+    cmp: '₹4,120.50',
+    change: '+1.12%',
+    isUp: true,
+    mcap: '₹14.2L Cr',
+    logo: '/logos/tcs.png',
+    bse: '532540',
+    pe: '27.4'
+  },
+  {
+    ticker: 'INFY',
+    name: 'Infosys',
+    sector: 'Technology',
+    category: 'Tech',
+    cmp: '₹1,854.00',
+    change: '+0.88%',
+    isUp: true,
+    mcap: '₹7.9L Cr',
+    logo: '/logos/infy.png',
+    bse: '500209',
+    pe: '25.8'
+  },
+  {
+    ticker: 'ICICIBANK',
+    name: 'ICICI Bank',
+    sector: 'Financial Services',
+    category: 'Banking',
+    cmp: '₹1,245.60',
+    change: '+1.05%',
+    isUp: true,
+    mcap: '₹8.9L Cr',
+    logo: '/logos/icicibank.png',
+    bse: '532174',
+    pe: '17.3'
+  },
+  {
+    ticker: 'BHARTIARTL',
+    name: 'Bharti Airtel',
+    sector: 'Telecommunication',
+    category: 'Energy & Infra',
+    cmp: '₹1,710.00',
+    change: '+1.40%',
+    isUp: true,
+    mcap: '₹9.8L Cr',
+    logo: '/logos/bhartiartl.png',
+    bse: '532454',
+    pe: '42.1'
+  },
+  {
+    ticker: 'SBIN',
+    name: 'State Bank of India',
+    sector: 'Financial Services',
+    category: 'Banking',
+    cmp: '₹810.00',
+    change: '+0.75%',
+    isUp: true,
+    mcap: '₹7.2L Cr',
+    logo: '/logos/sbin.png',
+    bse: '500112',
+    pe: '9.8'
+  },
+  {
+    ticker: 'LT',
+    name: 'Larsen & Toubro',
+    sector: 'Infrastructure',
+    category: 'Energy & Infra',
+    cmp: '₹3,450.00',
+    change: '+0.90%',
+    isUp: true,
+    mcap: '₹4.7L Cr',
+    logo: '/logos/lt.png',
+    bse: '500510',
+    pe: '33.2'
+  },
+  {
+    ticker: 'HINDUNILVR',
+    name: 'Hindustan Unilever',
+    sector: 'FMCG',
+    category: 'FMCG & Pharma',
+    cmp: '₹2,380.00',
+    change: '+0.30%',
+    isUp: true,
+    mcap: '₹5.6L Cr',
+    logo: '/logos/hindunilvr.png',
+    bse: '500696',
+    pe: '52.4'
+  },
+  {
+    ticker: 'ITC',
+    name: 'ITC Ltd',
+    sector: 'FMCG',
+    category: 'FMCG & Pharma',
+    cmp: '₹480.20',
+    change: '+0.45%',
+    isUp: true,
+    mcap: '₹6.0L Cr',
+    logo: '/logos/itc.png',
+    bse: '500875',
+    pe: '28.6'
+  },
+  {
+    ticker: 'BAJFINANCE',
+    name: 'Bajaj Finance',
+    sector: 'Financial Services',
+    category: 'Banking',
+    cmp: '₹6,920.00',
+    change: '+1.05%',
+    isUp: true,
+    mcap: '₹4.3L Cr',
+    logo: '/logos/bajfinance.png',
+    bse: '500034',
+    pe: '26.9'
+  },
+  {
+    ticker: 'MARUTI',
+    name: 'Maruti Suzuki',
+    sector: 'Automobile',
+    category: 'Auto',
+    cmp: '₹12,450.00',
+    change: '+1.65%',
+    isUp: true,
+    mcap: '₹3.9L Cr',
+    logo: '/logos/maruti.png',
+    bse: '532500',
+    pe: '24.1'
+  },
+  {
+    ticker: 'SUNPHARMA',
+    name: 'Sun Pharma',
+    sector: 'Healthcare',
+    category: 'FMCG & Pharma',
+    cmp: '₹1,890.00',
+    change: '+0.85%',
+    isUp: true,
+    mcap: '₹4.5L Cr',
+    logo: '/logos/sunpharma.png',
+    bse: '524715',
+    pe: '36.5'
+  },
+  {
+    ticker: 'TITAN',
+    name: 'Titan Company',
+    sector: 'Consumer Goods',
+    category: 'FMCG & Pharma',
+    cmp: '₹3,410.00',
+    change: '+0.50%',
+    isUp: true,
+    mcap: '₹3.0L Cr',
+    logo: '/logos/titan.png',
+    bse: '500114',
+    pe: '81.2'
+  },
+  {
+    ticker: 'WIPRO',
+    name: 'Wipro',
+    sector: 'Technology',
+    category: 'Tech',
+    cmp: '₹530.00',
+    change: '+0.65%',
+    isUp: true,
+    mcap: '₹2.8L Cr',
+    logo: '/logos/wipro.png',
+    bse: '507685',
+    pe: '22.0'
+  }
+];
+
 export function CoverageClient({ report }: { report: CoverageReport | null }) {
   const [syncing, setSyncing] = useState(false);
   const [syncResult, setSyncResult] = useState<string | null>(null);
+  const [selectedLeaderCategory, setSelectedLeaderCategory] = useState<string>('All');
 
   // Live Random Stock Smoke Tester State
   const [testingStock, setTestingStock] = useState<string>('RELIANCE');
@@ -216,6 +428,91 @@ export function CoverageClient({ report }: { report: CoverageReport | null }) {
               All financial statements parsed live from authentic public filings & Screener.in.
             </p>
           </div>
+        </div>
+      </div>
+
+      {/* ── Featured Spotlight: Famous Companies Tracked (Core Bluechips & Leaders) ── */}
+      <div className="border border-border-hairline rounded-2xl p-6 bg-surface space-y-6 shadow-2xs">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-orange-50 border border-orange-200/80 text-[10.5px] font-semibold text-orange-800 mb-1.5">
+              <Sparkles size={11} className="text-orange-600" />
+              <span>Core Bluechip Coverage Universe</span>
+            </div>
+            <h2 className="text-lg md:text-xl font-bold text-text-primary tracking-tight">
+              Famous Companies Tracked (Core Bluechips &amp; Leaders)
+            </h2>
+            <p className="text-xs text-text-secondary mt-0.5">
+              Industry leaders with complete audited 10-year financials, live market feeds, and verified filings.
+            </p>
+          </div>
+
+          {/* Category Filter Pills */}
+          <div className="flex flex-wrap items-center gap-1.5">
+            {['All', 'Banking', 'Tech', 'Auto', 'Energy & Infra', 'FMCG & Pharma'].map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setSelectedLeaderCategory(cat)}
+                className={`text-xs px-3 py-1.5 rounded-xl border transition-all cursor-pointer font-medium ${
+                  selectedLeaderCategory === cat
+                    ? 'bg-orange-50 border-orange-300 text-orange-800 font-semibold shadow-2xs'
+                    : 'bg-surface-subtle border-border-hairline text-text-secondary hover:text-text-primary hover:border-slate-300'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* 16 Bluechip Cards Grid with Real Logos */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+          {FAMOUS_COMPANIES_DATA.filter((c) => {
+            if (selectedLeaderCategory === 'All') return true;
+            return c.category === selectedLeaderCategory;
+          }).map((c) => (
+            <Link
+              key={c.ticker}
+              href={`/company/${c.ticker}`}
+              className="group flex flex-col justify-between p-4 rounded-xl bg-white border border-border-hairline hover:border-orange-300 hover:shadow-xs transition-all"
+            >
+              <div className="flex items-start gap-3">
+                <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-200/70 p-1.5 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 group-hover:bg-orange-50/20 group-hover:border-orange-300/80 transition-all">
+                  <img 
+                    src={c.logo} 
+                    alt={c.name} 
+                    className="w-full h-full object-contain" 
+                  />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-xs font-bold text-text-primary group-hover:text-orange-700 transition-colors">
+                      {c.ticker}
+                    </span>
+                    <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 border border-slate-200/60">
+                      BSE {c.bse}
+                    </span>
+                  </div>
+                  <h3 className="text-xs font-semibold text-text-primary truncate mt-0.5 group-hover:text-slate-950">
+                    {c.name}
+                  </h3>
+                  <div className="text-[10.5px] text-text-tertiary truncate mt-0.5">
+                    {c.sector}
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-3 mt-3 border-t border-border-hairline/80 flex items-center justify-between text-xs">
+                <div>
+                  <span className="font-mono font-bold text-text-primary">{c.cmp}</span>
+                  <span className="font-mono text-[10.5px] text-emerald-700 ml-1.5 font-semibold">{c.change}</span>
+                </div>
+                <div className="text-[10.5px] font-mono text-text-tertiary">
+                  MCap {c.mcap}
+                </div>
+              </div>
+            </Link>
+          ))}
         </div>
       </div>
 
