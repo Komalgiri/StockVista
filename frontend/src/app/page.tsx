@@ -28,16 +28,8 @@ export default function Home() {
           <div className="flex items-center gap-4 ml-auto">
             <MarketTicker />
             
-            {/* Expanded Institutional User Profile */}
-            <div className="flex items-center gap-3 pl-4 border-l border-slate-200">
-              <div className="w-10 h-10 rounded-xl bg-slate-950 text-white flex items-center justify-center text-xs font-bold tracking-tight shadow-sm font-mono shrink-0">
-                KG
-              </div>
-              <div className="hidden lg:flex flex-col text-left">
-                <span className="text-xs font-bold text-slate-950 leading-tight">Institutional Terminal</span>
-                <span className="text-[10.5px] text-slate-400 font-medium font-mono">NSE / BSE Integrated</span>
-              </div>
-            </div>
+    
+            
           </div>
         </header>
         
