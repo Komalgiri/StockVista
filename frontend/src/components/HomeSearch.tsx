@@ -123,10 +123,12 @@ export function HomeSearch() {
   const [query, setQuery] = useState('');
   const [selectedSector, setSelectedSector] = useState('');
   const [sectorDropdownOpen, setSectorDropdownOpen] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
   const sectorDropdownRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -136,15 +138,19 @@ export function HomeSearch() {
       if (e.key === '/' && document.activeElement !== inputRef.current) {
         e.preventDefault();
         inputRef.current?.focus();
+        setIsFocused(true);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Close sector dropdown on outside click
+  // Close dropdowns on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
+        setIsFocused(false);
+      }
       if (sectorDropdownRef.current && !sectorDropdownRef.current.contains(event.target as Node)) {
         setSectorDropdownOpen(false);
       }
@@ -169,11 +175,13 @@ export function HomeSearch() {
   };
 
   const handleSelect = (ticker: string) => {
+    setIsFocused(false);
     router.push(`/company/${ticker}`);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setIsFocused(false);
     if (results.length > 0) {
       handleSelect(results[0].ticker);
     } else if (query.trim()) {
@@ -183,7 +191,7 @@ export function HomeSearch() {
     }
   };
 
-  const showResults = query.trim().length > 0;
+  const showResults = isFocused && query.trim().length > 0 && results.length > 0;
 
   return (
     <div className="relative flex flex-col items-center justify-start min-h-[90vh] w-full overflow-hidden pt-16 sm:pt-20 lg:pt-24 pb-28">
@@ -223,19 +231,23 @@ export function HomeSearch() {
           Financial metrics, annual disclosures, and ten-year balance sheets across listed Indian companies.
         </p>
 
-        {/* Dual-Segment Floating Search Box Container - Increased Width & Breathing Room */}
-        <div className="relative w-full max-w-3xl mb-12 sm:mb-14 shadow-[0_12px_32px_-10px_rgba(0,0,0,0.08)] rounded-2xl bg-white border border-slate-200/90 transition-all focus-within:border-[#c2410c] focus-within:ring-4 focus-within:ring-orange-100">
+        {/* Dual-Segment Floating Search Box Container */}
+        <div 
+          ref={searchContainerRef}
+          className="relative w-full max-w-3xl mb-12 sm:mb-14 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.06)] rounded-2xl bg-white border border-slate-200/90 transition-all focus-within:border-slate-300 focus-within:shadow-md"
+        >
           <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row items-center w-full p-1.5 sm:p-2">
             
             {/* Left Segment: Company / Keyword input */}
             <div className="relative flex items-center flex-1 w-full px-3 py-2 sm:py-2.5">
-              <div className="text-slate-400 mr-3 shrink-0">
-                {loading ? <Loader2 className="h-5 w-5 text-[#c2410c] animate-spin" /> : <Search className="h-5 w-5" />}
+              <div className="text-slate-400 mr-2.5 shrink-0">
+                {loading ? <Loader2 className="h-4.5 w-4.5 text-[#c2410c] animate-spin" /> : <Search className="h-4.5 w-4.5" />}
               </div>
               <input
                 ref={inputRef}
                 type="text"
-                className="w-full border-0 focus:ring-0 p-0 text-base md:text-lg placeholder-slate-400 text-slate-950 bg-transparent font-medium"
+                onFocus={() => setIsFocused(true)}
+                className="w-full border-0 outline-none focus:outline-none ring-0 focus:ring-0 p-0 text-xs sm:text-sm placeholder:text-xs sm:placeholder:text-sm placeholder-slate-400 text-slate-900 bg-transparent font-normal"
                 placeholder="Company, NSE symbol, or BSE code..."
                 value={query}
                 onChange={handleChange}
