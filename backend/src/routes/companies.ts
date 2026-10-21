@@ -38,22 +38,30 @@ const respond = (res: Response, data: unknown, source: string = 'screener-cached
 
 // ── Persistent Multi-Category Financial Bundle Resolver ──────────────────────
 // Checks RAM cache -> checks SQLite disk cache -> scrapes once with full bundle -> saves to SQLite & RAM
-export async function resolveOrFetchFinancialBundle(isin: string) {
+export async function resolveOrFetchFinancialBundle(isin: string, forceRefresh = false) {
   const upper = isin.toUpperCase();
   const clean = upper.replace(/\.(NS|BO)$/i, '').trim();
 
-  // Level 1: In-Memory cache
-  const memCached = memoryCache.get<any>(`bundle:${upper}`) || memoryCache.get<any>(`bundle:${clean}`);
-  if (memCached) {
-    return { bundle: memCached, source: 'memory-cache' };
-  }
+  if (!forceRefresh) {
+    // Level 1: In-Memory cache
+    const memCached = memoryCache.get<any>(`bundle:${upper}`) || memoryCache.get<any>(`bundle:${clean}`);
+    if (memCached) {
+      return { bundle: memCached, source: 'memory-cache' };
+    }
 
-  // Level 2: Persistent SQLite Disk Cache
-  const diskCached = CompanyService.getFinancialCache(upper) || CompanyService.getFinancialCache(clean);
-  if (diskCached) {
-    memoryCache.set(`bundle:${upper}`, diskCached);
-    memoryCache.set(`bundle:${clean}`, diskCached);
-    return { bundle: diskCached, source: 'sqlite-disk-cache' };
+    // Level 2: Persistent SQLite Disk Cache
+    const diskCached = CompanyService.getFinancialCache(upper) || CompanyService.getFinancialCache(clean);
+    if (diskCached) {
+      memoryCache.set(`bundle:${upper}`, diskCached);
+      memoryCache.set(`bundle:${clean}`, diskCached);
+      return { bundle: diskCached, source: 'sqlite-disk-cache' };
+    }
+  } else {
+    // Bust caches for refresh
+    memoryCache.del(`bundle:${upper}`);
+    memoryCache.del(`bundle:${clean}`);
+    CompanyService.deleteFinancialCache(upper);
+    CompanyService.deleteFinancialCache(clean);
   }
 
   // Resolve DB company to get official ticker, company name, and BSE code
@@ -342,6 +350,17 @@ router.get('/:isin/analysis', asyncHandler(async (req: Request, res: Response) =
 
 router.get('/:isin/corporate-actions', asyncHandler(async (req: Request, res: Response) => { 
   respond(res, null, 'unavailable'); 
+}));
+
+// ── 5. Dynamic Cache Busting & Upstream Refresh ──────────────────────────────
+router.post('/:isin/refresh', asyncHandler(async (req: Request, res: Response) => {
+  const isin = req.params.isin as string;
+  const { bundle, source } = await resolveOrFetchFinancialBundle(isin, true);
+  respond(res, { 
+    refreshed: !!bundle, 
+    source, 
+    timestamp: new Date().toISOString() 
+  }, 'forced-upstream-sync');
 }));
 
 export default router;

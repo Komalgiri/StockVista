@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { ArrowUpRight, ArrowDownRight, Plus, Download, Bell, ExternalLink, Globe } from 'lucide-react';
+import { RefreshButton } from './RefreshButton';
 
 interface CompanyHeaderProps {
   name: string;
@@ -106,10 +107,11 @@ export function CompanyHeader({
             {description || `${name} is an active Indian security listed on the National Stock Exchange (NSE).`}
           </p>
 
-          <div className="flex flex-wrap gap-2 text-[12px] font-semibold">
+          <div className="flex flex-wrap gap-2 text-[12px] font-semibold items-center">
             <button className="flex items-center gap-1.5 bg-[#c2410c] text-white px-3.5 py-1.5 rounded-lg hover:bg-[#9a3412] transition-colors shadow-xs cursor-pointer">
               <Plus size={14} /> Add to Watchlist
             </button>
+            <RefreshButton ticker={ticker} />
             <button className="flex items-center gap-1.5 bg-white border border-slate-200 text-slate-800 px-3.5 py-1.5 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer">
               <Download size={14} /> Export Overview
             </button>

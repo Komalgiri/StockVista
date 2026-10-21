@@ -154,6 +154,10 @@ const stmts = {
     VALUES (?, ?, CURRENT_TIMESTAMP, ?)
   `),
 
+  deleteFinancialCache: db.prepare(`
+    DELETE FROM financial_cache WHERE UPPER(ticker) = UPPER(?)
+  `),
+
   // Market Quotes Cache
   getMarketQuoteCache: db.prepare<string, { quote_data: string; expires_at: string }>(`
     SELECT quote_data, expires_at FROM market_quotes_cache WHERE UPPER(ticker) = UPPER(?)
@@ -276,6 +280,12 @@ export const CompanyService = {
   setFinancialCache(ticker: string, data: any, ttlMinutes = 1440) { // 24 hours default
     const expiresAt = new Date(Date.now() + ttlMinutes * 60 * 1000).toISOString();
     stmts.setFinancialCache.run(ticker.toUpperCase(), JSON.stringify(data), expiresAt);
+  },
+
+  deleteFinancialCache(ticker: string) {
+    const clean = ticker.replace(/\.(NS|BO)$/i, '').trim().toUpperCase();
+    stmts.deleteFinancialCache.run(ticker.toUpperCase());
+    stmts.deleteFinancialCache.run(clean);
   },
 
   getMarketQuoteCache(ticker: string) {

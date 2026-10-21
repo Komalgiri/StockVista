@@ -158,3 +158,17 @@ export const getCompaniesBySector = async (
 export const getCoverageReport = async (): Promise<CoverageReport | null> => {
   return await fetchAPI('/coverage');
 };
+
+export const refreshCompanyData = async (ticker: string): Promise<{ refreshed: boolean; source: string; timestamp: string } | null> => {
+  try {
+    const res = await fetch(`${API_BASE}/companies/${ticker}/refresh`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    if (!res.ok) return null;
+    const json = await res.json();
+    return json.data || json;
+  } catch {
+    return null;
+  }
+};
