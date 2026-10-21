@@ -57,6 +57,7 @@
   --font-geist: var(--font-geist-sans);
   --font-inter: var(--font-inter);
   --font-mono: var(--font-jetbrains-mono);
+  --font-serif: var(--font-serif), ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
 }
 
 :root {

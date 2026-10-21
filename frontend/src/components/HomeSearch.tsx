@@ -57,51 +57,47 @@ const CAROUSEL_COMPANIES = [
 const CURATED_CARDS = [
   {
     ticker: 'TATAMOTORS',
-    name: 'Tata Motors Ltd',
-    role: 'Commercial & Passenger Mobility',
+    name: 'Tata Motors',
+    desc: 'Commercial & passenger mobility solutions',
     sector: 'Automobile',
     cmp: '₹406.00',
     change: '+1.85%',
     isUp: true,
     mcap: '₹1.50L Cr',
     image: '/logos/tatamotors.png',
-    location: 'Mumbai • NSE & BSE Listed'
   },
   {
     ticker: 'RELIANCE',
     name: 'Reliance Industries',
-    role: 'Energy, Retail & Digital Telecom',
+    desc: 'Energy, digital services & retail conglomerate',
     sector: 'Energy & Power',
     cmp: '₹1,202.00',
     change: '+0.45%',
     isUp: true,
     mcap: '₹19.7L Cr',
     image: '/logos/reliance.png',
-    location: 'Mumbai • NSE & BSE Listed'
   },
   {
     ticker: 'HDFCBANK',
-    name: 'HDFC Bank Ltd',
-    role: 'Private Banking & Credit Services',
+    name: 'HDFC Bank',
+    desc: 'Private sector banking & financial services',
     sector: 'Financial Services',
     cmp: '₹1,682.30',
     change: '+0.75%',
     isUp: true,
     mcap: '₹12.8L Cr',
     image: '/logos/hdfcbank.png',
-    location: 'Mumbai • NSE & BSE Listed'
   },
   {
     ticker: 'TCS',
     name: 'Tata Consultancy Services',
-    role: 'Global IT Consulting & Cloud',
+    desc: 'Global IT consulting, cloud & digital transformation',
     sector: 'Technology',
     cmp: '₹4,120.50',
     change: '+1.12%',
     isUp: true,
     mcap: '₹14.2L Cr',
     image: '/logos/tcs.png',
-    location: 'Mumbai • NSE & BSE Listed'
   }
 ];
 
@@ -190,9 +186,9 @@ export function HomeSearch() {
   const showResults = query.trim().length > 0;
 
   return (
-    <div className="relative flex flex-col items-center justify-start min-h-[90vh] w-full overflow-hidden pt-8 pb-20">
+    <div className="relative flex flex-col items-center justify-start min-h-[90vh] w-full overflow-hidden pt-16 sm:pt-20 lg:pt-24 pb-28">
       
-      {/* Ethereal Wavy Gradient Ribbon Background (Matching Reference) */}
+      {/* Ethereal Wavy Gradient Ribbon Background (Top) */}
       <div className="absolute top-0 left-0 right-0 w-full h-[650px] -z-10 pointer-events-none overflow-hidden">
         <div className="absolute -top-[20%] left-1/2 -translate-x-1/2 w-[140%] h-[120%] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-orange-100/40 via-rose-50/20 to-transparent blur-3xl opacity-70" />
         <svg className="absolute w-full h-full opacity-35" viewBox="0 0 1440 600" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -212,23 +208,23 @@ export function HomeSearch() {
       <div className="relative z-10 w-full max-w-6xl mx-auto px-4 flex flex-col items-center">
         
         {/* Live Universe Pill */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-950 text-white text-[11px] font-semibold tracking-wide uppercase shadow-sm mb-5 animate-in fade-in duration-500 border border-slate-800">
-          <span className="w-2 h-2 rounded-full bg-[#ea580c] animate-pulse" />
-          <span>Active Universe: 5,588 Equities Indexed</span>
-          <span className="text-slate-600">|</span>
-          <span className="text-slate-300">NSE &amp; BSE Integrated</span>
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-50 border border-slate-200/80 text-slate-600 text-xs font-normal mb-5">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          <span>5,588 Listed Equities</span>
+          <span className="text-slate-300">•</span>
+          <span className="text-slate-500 font-mono text-[11px]">NSE &amp; BSE</span>
         </div>
 
-        {/* Hero Title Matching Reference Styling */}
-        <h1 className="font-geist text-3xl sm:text-5xl md:text-6xl text-slate-950 mb-3.5 text-center tracking-tight font-extrabold max-w-3xl leading-[1.12]">
-          Find &amp; Analyze India’s Most <span className="text-[#c2410c]">Compelling Equities.</span>
+        {/* Hero Title: Half Bold + Editorial Serif Accent */}
+        <h1 className="text-2xl sm:text-3xl md:text-4xl text-slate-800 mb-3.5 text-center tracking-tight max-w-2xl leading-[1.25]">
+          <span className="font-semibold text-slate-950">Find &amp; analyze India’s</span> <span className="font-normal text-slate-600">most</span> <span className="font-serif italic font-normal text-[#c2410c] tracking-normal">compelling equities.</span>
         </h1>
-        <p className="text-slate-600 text-sm sm:text-base md:text-lg mb-8 text-center max-w-2xl font-normal leading-relaxed">
-          StockVista is your institutional gateway to 5,588+ NSE &amp; BSE listed companies — with 10-year audited accounts, Screener-grade metrics, and verified exchange filings.
+        <p className="text-slate-500 text-sm sm:text-base mb-8 text-center max-w-xl font-normal leading-relaxed">
+          Financial metrics, annual disclosures, and ten-year balance sheets across listed Indian companies.
         </p>
 
-        {/* Dual-Segment Floating Search Box Container - Increased Width */}
-        <div className="relative w-full max-w-4xl mb-8 shadow-[0_16px_40px_-12px_rgba(0,0,0,0.12)] rounded-2xl bg-white border border-slate-200/90 transition-all focus-within:border-[#c2410c] focus-within:ring-4 focus-within:ring-orange-100">
+        {/* Dual-Segment Floating Search Box Container - Increased Width & Breathing Room */}
+        <div className="relative w-full max-w-3xl mb-12 sm:mb-14 shadow-[0_12px_32px_-10px_rgba(0,0,0,0.08)] rounded-2xl bg-white border border-slate-200/90 transition-all focus-within:border-[#c2410c] focus-within:ring-4 focus-within:ring-orange-100">
           <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row items-center w-full p-1.5 sm:p-2">
             
             {/* Left Segment: Company / Keyword input */}
@@ -385,7 +381,7 @@ export function HomeSearch() {
         </div>
 
         {/* Real Company Logos Continuous Auto-Scrolling Strip (Pure Logos Only) */}
-        <div className="w-full max-w-5xl mb-12 relative overflow-hidden py-3">
+        <div className="w-full max-w-5xl pt-2 pb-2 mb-16 sm:mb-20 relative overflow-hidden">
           {/* Scoped CSS for Guaranteed Infinite Marquee & Soft Scrollbar */}
           <style dangerouslySetInnerHTML={{ __html: `
             @keyframes sv_marquee {
@@ -439,7 +435,7 @@ export function HomeSearch() {
                   <img 
                     src={item.logo} 
                     alt={item.name} 
-                    className="h-9 sm:h-11 w-auto max-w-[130px] object-contain"
+                    className="h-8 sm:h-9 w-auto max-w-[120px] object-contain opacity-70 hover:opacity-100 grayscale hover:grayscale-0 transition-all duration-200"
                   />
                 </div>
               ))}
@@ -457,7 +453,7 @@ export function HomeSearch() {
                   <img 
                     src={item.logo} 
                     alt={item.name} 
-                    className="h-9 sm:h-11 w-auto max-w-[130px] object-contain"
+                    className="h-8 sm:h-9 w-auto max-w-[120px] object-contain opacity-70 hover:opacity-100 grayscale hover:grayscale-0 transition-all duration-200"
                   />
                 </div>
               ))}
@@ -467,67 +463,73 @@ export function HomeSearch() {
 
         {/* Curated Market Leaders Section in 2-Grid Format */}
         {!showResults && (
-          <div className="w-full max-w-5xl flex flex-col gap-10">
+          <div className="w-full max-w-5xl flex flex-col gap-8">
             <div>
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between mb-3.5">
                 <div>
-                  <h2 className="font-geist text-xl sm:text-2xl font-bold text-slate-950 tracking-tight">
-                    Most Recent Searches &amp; Leaders
+                  <h2 className="text-base sm:text-lg font-medium text-slate-900 tracking-tight">
+                    Popular Equities &amp; Market Leaders
                   </h2>
-                  <p className="text-xs text-slate-500 mt-0.5">Core bluechip equities with verified 10-year audited financials</p>
+                  <p className="text-xs text-slate-500 mt-0.5 font-normal">Actively tracked companies with complete historical financials</p>
                 </div>
                 <Link 
                   href="/coverage" 
-                  className="text-xs font-bold text-[#c2410c] hover:text-[#9a3412] inline-flex items-center gap-1 group transition-colors"
+                  className="text-xs font-medium text-[#c2410c] hover:text-[#9a3412] inline-flex items-center gap-1 group transition-colors"
                 >
-                  View all 5,588+ <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
+                  View all 5,588+ <ArrowRight size={13} className="group-hover:translate-x-0.5 transition-transform" />
                 </Link>
               </div>
 
               {/* 4 Cards in 2-Grid Form */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                 {CURATED_CARDS.map(card => (
                   <div
                     key={card.ticker}
                     onClick={() => handleSelect(card.ticker)}
-                    className="flex flex-col sm:flex-row sm:items-center justify-between p-5 rounded-2xl bg-white border border-slate-200/90 hover:border-orange-300 hover:shadow-md transition-all cursor-pointer group gap-4"
+                    className="flex flex-col justify-between p-4 sm:p-5 rounded-xl bg-white border border-slate-200/80 hover:border-slate-300 hover:shadow-xs transition-all cursor-pointer group"
                   >
-                    <div className="flex items-start gap-3.5 min-w-0">
-                      <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-200/80 p-1.5 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs group-hover:scale-105 transition-transform">
-                        <img 
-                          src={card.image} 
-                          alt={card.name} 
-                          className="w-full h-full object-contain" 
-                        />
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-200/70 p-1 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs group-hover:scale-105 transition-transform">
+                          <img 
+                            src={card.image} 
+                            alt={card.name} 
+                            className="w-full h-full object-contain" 
+                          />
+                        </div>
+                        <div className="min-w-0">
+                          <h3 className="font-medium text-slate-900 text-sm truncate group-hover:text-[#c2410c] transition-colors">
+                            {card.name}
+                          </h3>
+                          <div className="flex items-center gap-1.5 mt-0.5 text-[11px] text-slate-500 font-normal">
+                            <span className="font-mono text-slate-400 text-[10.5px]">{card.ticker}</span>
+                            <span className="text-slate-300">•</span>
+                            <span>{card.sector}</span>
+                          </div>
+                        </div>
                       </div>
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-2 mb-0.5">
-                          <span className="font-mono text-sm font-bold text-slate-950 group-hover:text-[#c2410c] transition-colors">
-                            {card.ticker}
-                          </span>
-                          <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-orange-50 text-[#c2410c] border border-orange-200/80 font-bold shrink-0">
-                            {card.sector}
+
+                      <div className="text-right shrink-0">
+                        <div className="font-mono text-sm sm:text-base font-medium text-slate-900 tabular-nums">
+                          {card.cmp}
+                        </div>
+                        <div className="flex items-center justify-end gap-1 mt-0.5">
+                          <span className={`font-mono text-[10.5px] font-medium px-1.5 py-0.5 rounded ${
+                            card.isUp ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'
+                          }`}>
+                            {card.change}
                           </span>
                         </div>
-                        <h3 className="font-semibold text-slate-900 text-sm truncate group-hover:text-slate-950">
-                          {card.name}
-                        </h3>
-                        <p className="text-[11px] text-slate-500 truncate font-medium">
-                          {card.role}
-                        </p>
                       </div>
                     </div>
 
-                    <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center border-t sm:border-t-0 border-slate-100 pt-3 sm:pt-0 shrink-0">
-                      <div className="font-mono font-extrabold text-base sm:text-lg text-slate-950 tabular-nums">
-                        {card.cmp}
-                      </div>
-                      <div className="flex items-center gap-1.5 mt-0.5">
-                        <span className="font-mono font-bold text-[11px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/70">
-                          {card.change}
-                        </span>
-                        <span className="text-[10px] text-slate-400 font-mono hidden sm:inline">{card.mcap}</span>
-                      </div>
+                    <div className="flex items-center justify-between pt-3 mt-3 border-t border-slate-100 text-[11px]">
+                      <p className="text-slate-500 truncate mr-3 font-normal">
+                        {card.desc}
+                      </p>
+                      <span className="text-slate-400 font-mono text-[10.5px] shrink-0 font-normal">
+                        MCap {card.mcap}
+                      </span>
                     </div>
                   </div>
                 ))}
@@ -535,25 +537,25 @@ export function HomeSearch() {
             </div>
 
             {/* Market Leaders Institutional Data Table */}
-            <div className="border border-slate-200/90 rounded-2xl bg-white p-5 shadow-xs">
+            <div className="border border-slate-200/80 rounded-2xl bg-white p-5 shadow-2xs">
               <div className="flex items-center justify-between mb-3.5 pb-2.5 border-b border-slate-100">
-                <div className="flex items-center gap-2 text-slate-950 font-inter text-xs font-bold tracking-wider uppercase">
+                <div className="flex items-center gap-2 text-slate-800 text-xs font-medium">
                   <TrendingUp size={15} className="text-[#c2410c]" />
-                  <span>Market Leaders &amp; Core Bluechips</span>
+                  <span>Market Leaders &amp; Benchmark Equities</span>
                 </div>
-                <span className="text-[11px] text-slate-400 font-mono hidden sm:inline">NSE • Top Market Weight Index</span>
+                <span className="text-[11px] text-slate-400 font-mono hidden sm:inline">NSE • Key Market Weight Index</span>
               </div>
               
               <div className="overflow-x-auto">
                 <table className="w-full text-left font-sans">
-                  <thead className="text-[10px] uppercase tracking-wider font-bold text-slate-400 border-b border-slate-100">
+                  <thead className="text-[10.5px] uppercase tracking-wider font-medium text-slate-400 border-b border-slate-100">
                     <tr>
-                      <th className="py-2 px-3">Company</th>
-                      <th className="py-2 px-3">Sector</th>
-                      <th className="py-2 px-3 text-right">LTP (CMP)</th>
-                      <th className="py-2 px-3 text-right">Session Change</th>
-                      <th className="py-2 px-3 text-right">Market Cap</th>
-                      <th className="py-2 px-3 text-right">Action</th>
+                      <th className="py-2 px-3 font-medium">Company</th>
+                      <th className="py-2 px-3 font-medium">Sector</th>
+                      <th className="py-2 px-3 text-right font-medium">LTP (CMP)</th>
+                      <th className="py-2 px-3 text-right font-medium">Session Change</th>
+                      <th className="py-2 px-3 text-right font-medium">Market Cap</th>
+                      <th className="py-2 px-3 text-right font-medium">Action</th>
                     </tr>
                   </thead>
                   <tbody className="text-[12px] divide-y divide-slate-100">
@@ -565,25 +567,25 @@ export function HomeSearch() {
                       >
                         <td className="py-2.5 px-3">
                           <div className="flex items-center gap-2">
-                            <span className="font-mono font-bold text-slate-950 group-hover:text-[#c2410c] transition-colors">{stock.ticker}</span>
+                            <span className="font-mono font-medium text-slate-900 group-hover:text-[#c2410c] transition-colors">{stock.ticker}</span>
                             <span className="text-slate-500 text-xs hidden sm:inline truncate max-w-[200px]">{stock.name}</span>
                           </div>
                         </td>
                         <td className="py-2.5 px-3">
-                          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200/60">{stock.sector}</span>
+                          <span className="text-[10.5px] font-mono px-2 py-0.5 rounded bg-slate-50 text-slate-600 border border-slate-200/60">{stock.sector}</span>
                         </td>
-                        <td className="py-2.5 px-3 text-right font-mono font-bold text-slate-900">{stock.cmp}</td>
+                        <td className="py-2.5 px-3 text-right font-mono font-medium text-slate-900">{stock.cmp}</td>
                         <td className="py-2.5 px-3 text-right">
-                          <span className={`inline-block font-mono font-bold text-[11px] px-2 py-0.5 rounded-full ${
-                            stock.isUp ? 'text-emerald-700 bg-emerald-50 border border-emerald-200/70' : 'text-[#c2410c] bg-orange-50 border border-orange-200/70'
+                          <span className={`inline-block font-mono font-medium text-[11px] px-2 py-0.5 rounded ${
+                            stock.isUp ? 'text-emerald-700 bg-emerald-50' : 'text-[#c2410c] bg-orange-50'
                           }`}>
                             {stock.change}
                           </span>
                         </td>
-                        <td className="py-2.5 px-3 text-right font-mono text-slate-700 text-xs">{stock.mcap}</td>
+                        <td className="py-2.5 px-3 text-right font-mono text-slate-600 text-xs">{stock.mcap}</td>
                         <td className="py-2.5 px-3 text-right">
-                          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#c2410c] group-hover:translate-x-0.5 transition-transform">
-                            Analyze <ArrowRight size={12} />
+                          <span className="inline-flex items-center gap-1 text-[11px] font-medium text-[#c2410c] group-hover:translate-x-0.5 transition-transform">
+                            View <ArrowRight size={12} />
                           </span>
                         </td>
                       </tr>
@@ -595,12 +597,12 @@ export function HomeSearch() {
 
             {/* Quick Sector Exploration */}
             <div>
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2 text-slate-900 font-inter text-xs font-bold tracking-wider uppercase">
+              <div className="flex items-center justify-between mb-3.5">
+                <div className="flex items-center gap-2 text-slate-800 text-xs font-medium">
                   <Layers size={15} className="text-[#c2410c]" />
-                  <span>Explore by Economic Sector</span>
+                  <span>Explore by Sector</span>
                 </div>
-                <Link href="/sectors" className="text-xs text-[#c2410c] hover:text-[#9a3412] font-semibold flex items-center gap-1 group">
+                <Link href="/sectors" className="text-xs text-[#c2410c] hover:text-[#9a3412] font-medium flex items-center gap-1 group">
                   All 23 Sectors <ArrowRight size={13} className="group-hover:translate-x-0.5 transition-transform" />
                 </Link>
               </div>
@@ -610,9 +612,9 @@ export function HomeSearch() {
                   <Link
                     key={sec.name}
                     href={sec.href}
-                    className="flex flex-col p-3 border border-slate-200 rounded-xl bg-white hover:border-[#c2410c] hover:shadow-xs transition-all text-left group"
+                    className="flex flex-col p-3 border border-slate-200/80 rounded-xl bg-white hover:border-slate-300 hover:shadow-2xs transition-all text-left group"
                   >
-                    <span className="text-xs font-semibold text-slate-900 group-hover:text-[#c2410c] transition-colors line-clamp-1">
+                    <span className="text-xs font-medium text-slate-800 group-hover:text-[#c2410c] transition-colors line-clamp-1">
                       {sec.name}
                     </span>
                     <span className="text-[10px] font-mono text-slate-400 mt-1">{sec.count}</span>
@@ -622,44 +624,44 @@ export function HomeSearch() {
             </div>
 
             {/* Institutional Trust Badges */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-6 border-t border-slate-200">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-6 border-t border-slate-200/70">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-orange-50 text-[#c2410c] flex items-center justify-center shrink-0 border border-orange-200/60">
-                  <Database size={18} />
+                <div className="w-8 h-8 rounded-lg bg-orange-50 text-[#c2410c] flex items-center justify-center shrink-0 border border-orange-200/50">
+                  <Database size={16} />
                 </div>
                 <div>
-                  <div className="text-sm font-bold text-slate-950">5,588 Equities</div>
-                  <div className="text-[11px] text-slate-500">Indexed in SQLite</div>
+                  <div className="text-xs font-medium text-slate-900">5,588 Equities</div>
+                  <div className="text-[11px] text-slate-400">Indexed Universe</div>
                 </div>
               </div>
 
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-slate-100 text-slate-900 flex items-center justify-center shrink-0 border border-slate-200">
-                  <BarChart3 size={18} />
+                <div className="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center shrink-0 border border-slate-200">
+                  <BarChart3 size={16} />
                 </div>
                 <div>
-                  <div className="text-sm font-bold text-slate-950">10-Year Audited</div>
-                  <div className="text-[11px] text-slate-500">P&L, Balance Sheet, CF</div>
+                  <div className="text-xs font-medium text-slate-900">10-Year Audited</div>
+                  <div className="text-[11px] text-slate-400">Financial statements</div>
                 </div>
               </div>
 
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-orange-50 text-[#c2410c] flex items-center justify-center shrink-0 border border-orange-200/60">
-                  <Building2 size={18} />
+                <div className="w-8 h-8 rounded-lg bg-orange-50 text-[#c2410c] flex items-center justify-center shrink-0 border border-orange-200/50">
+                  <Building2 size={16} />
                 </div>
                 <div>
-                  <div className="text-sm font-bold text-slate-950">23 Macro Sectors</div>
-                  <div className="text-[11px] text-slate-500">Taxonomy Classifications</div>
+                  <div className="text-xs font-medium text-slate-900">23 Macro Sectors</div>
+                  <div className="text-[11px] text-slate-400">Industry taxonomy</div>
                 </div>
               </div>
 
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 border border-emerald-200/60">
-                  <ShieldCheck size={18} />
+                <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 border border-emerald-200/50">
+                  <ShieldCheck size={16} />
                 </div>
                 <div>
-                  <div className="text-sm font-bold text-slate-950">Zero Fabrication</div>
-                  <div className="text-[11px] text-slate-500">Authentic Public Data</div>
+                  <div className="text-xs font-medium text-slate-900">Verified Disclosures</div>
+                  <div className="text-[11px] text-slate-400">Exchange audited data</div>
                 </div>
               </div>
             </div>
@@ -667,6 +669,23 @@ export function HomeSearch() {
           </div>
         )}
 
+      </div>
+
+      {/* Bottom Ethereal Wavy Gradient Ribbon in Light Rust Orange */}
+      <div className="absolute bottom-0 left-0 right-0 w-full h-[380px] -z-10 pointer-events-none overflow-hidden">
+        <div className="absolute -bottom-[25%] left-1/2 -translate-x-1/2 w-[130%] h-[120%] bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-orange-100/35 via-amber-50/15 to-transparent blur-3xl opacity-60" />
+        <svg className="absolute bottom-0 w-full h-full opacity-35" viewBox="0 0 1440 380" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M-100 240 C 250 140, 650 340, 1050 180 C 1250 100, 1450 260, 1600 200" stroke="url(#paint_bottom_rust)" strokeWidth="1.5" />
+          <path d="M-100 280 C 250 180, 650 380, 1050 220 C 1250 140, 1450 300, 1600 240" stroke="url(#paint_bottom_rust)" strokeWidth="1" strokeDasharray="4 4" />
+          <path d="M-100 320 C 250 220, 650 420, 1050 260 C 1250 180, 1450 340, 1600 280" stroke="url(#paint_bottom_rust)" strokeWidth="0.8" opacity="0.6" />
+          <defs>
+            <linearGradient id="paint_bottom_rust" x1="0%" y1="100%" x2="100%" y2="0%">
+              <stop stopColor="#c2410c" stopOpacity="0.3" />
+              <stop offset="50%" stopColor="#ea580c" stopOpacity="0.18" />
+              <stop offset="100%" stopColor="#f97316" stopOpacity="0.04" />
+            </linearGradient>
+          </defs>
+        </svg>
       </div>
     </div>
   );
