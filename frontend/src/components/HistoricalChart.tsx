@@ -104,69 +104,82 @@ export function HistoricalChart({ data }: { data: PricePoint[] }) {
   const latestVol = chartData[chartData.length - 1]?.volume || 2500000;
 
   return (
-    <div className="w-full border border-border-hairline rounded-lg bg-surface-canvas p-5 shadow-sm">
+    <div className="w-full border border-slate-200/90 rounded-2xl bg-white p-5 md:p-6 shadow-xs">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <div>
-          <h3 className="text-[10px] uppercase tracking-widest font-semibold text-text-tertiary mb-1">Price & Volume Track</h3>
-          <h2 className="font-geist text-[18px] font-bold text-text-primary leading-tight">Historical Market Trajectory</h2>
+          <div className="flex items-center gap-1.5 mb-1">
+            <span className="text-[10px] uppercase tracking-widest font-bold text-[#c2410c]">Price & Volume Track</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#c2410c]" />
+          </div>
+          <h2 className="font-geist text-[18px] font-bold text-slate-900 leading-tight">Historical Market Trajectory</h2>
         </div>
         
         <div className="flex flex-col sm:items-end gap-2.5">
-          <div className="flex items-center gap-3 text-[12px]">
-            <span className="text-text-secondary font-medium">
-              <span className="font-semibold text-text-primary">{timeframe}</span> Return:
+          <div className="flex items-center gap-3 text-xs">
+            <span className="text-slate-500 font-medium">
+              <span className="font-bold text-slate-900">{timeframe}</span> Trajectory:
             </span>
-            <span className={`font-semibold px-2 py-0.5 rounded ${isPositive ? 'text-market-positive bg-market-positive-subtle' : 'text-market-negative bg-market-negative-subtle'}`}>
+            <span className={`font-mono font-bold px-2 py-0.5 rounded-full text-xs ${
+              isPositive 
+                ? 'text-emerald-700 bg-emerald-50 border border-emerald-200/80' 
+                : 'text-[#c2410c] bg-orange-50 border border-orange-200/80'
+            }`}>
               {isPositive ? '+' : ''}{returnPct.toFixed(2)}%
             </span>
           </div>
           
-          <div className="flex gap-1 bg-surface-subtle p-0.5 rounded-md border border-border-hairline">
-            {(['1M', '3M', '6M', '1Y', 'ALL'] as const).map(tf => (
-              <button 
-                key={tf} 
-                onClick={() => setTimeframe(tf)}
-                className={`text-[11px] px-2.5 py-1 rounded font-semibold transition-colors ${
-                  timeframe === tf 
-                    ? 'bg-primary text-on-primary shadow-sm' 
-                    : 'text-text-secondary hover:text-text-primary'
+          <div className="flex items-center gap-2">
+            {/* Timeframe Selectors */}
+            <div className="flex bg-slate-100 p-0.5 rounded-lg border border-slate-200/80">
+              {(['1M', '3M', '6M', '1Y', 'ALL'] as const).map(tf => (
+                <button 
+                  key={tf} 
+                  onClick={() => setTimeframe(tf)}
+                  className={`text-[11px] px-2.5 py-1 rounded-md font-semibold transition-all cursor-pointer ${
+                    timeframe === tf 
+                      ? 'bg-slate-950 text-white shadow-xs' 
+                      : 'text-slate-600 hover:text-slate-950 hover:bg-slate-200/50'
+                  }`}
+                >
+                  {tf}
+                </button>
+              ))}
+            </div>
+
+            {/* Feature Toggles (Replaces browser checkboxes) */}
+            <div className="flex items-center gap-1.5 pl-1.5 border-l border-slate-200">
+              <button
+                onClick={() => setShowVolume(!showVolume)}
+                className={`text-[11px] font-semibold px-2.5 py-1 rounded-lg border transition-all cursor-pointer ${
+                  showVolume
+                    ? 'bg-slate-900 text-white border-slate-900 shadow-2xs'
+                    : 'bg-white text-slate-500 border-slate-200 hover:text-slate-900'
                 }`}
               >
-                {tf}
+                Vol
               </button>
-            ))}
-          </div>
-          
-          <div className="flex items-center gap-3 text-[11px] font-medium text-text-secondary">
-            <label className="flex items-center gap-1 cursor-pointer">
-              <input 
-                type="checkbox" 
-                className="accent-primary" 
-                checked={showVolume} 
-                onChange={(e) => setShowVolume(e.target.checked)} 
-              /> 
-              Vol Bars
-            </label>
-            <label className="flex items-center gap-1 cursor-pointer">
-              <input 
-                type="checkbox" 
-                className="accent-primary" 
-                checked={showSMA} 
-                onChange={(e) => setShowSMA(e.target.checked)} 
-              /> 
-              50 DMA
-            </label>
+              <button
+                onClick={() => setShowSMA(!showSMA)}
+                className={`text-[11px] font-semibold px-2.5 py-1 rounded-lg border transition-all cursor-pointer ${
+                  showSMA
+                    ? 'bg-[#c2410c] text-white border-[#c2410c] shadow-2xs'
+                    : 'bg-white text-slate-500 border-slate-200 hover:text-slate-900'
+                }`}
+              >
+                50 DMA
+              </button>
+            </div>
           </div>
         </div>
       </div>
       
-      <div className="relative h-[250px] w-full mt-4 flex flex-col pr-12 pb-8">
+      <div className="relative h-[270px] w-full mt-2 flex flex-col pr-14 pb-8">
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={chartData} margin={{ top: 5, right: 0, left: 0, bottom: 0 }}>
+          <AreaChart data={chartData} margin={{ top: 8, right: 0, left: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={isPositive ? '#16a34a' : '#c2410c'} stopOpacity={0.22}/>
-                <stop offset="95%" stopColor={isPositive ? '#16a34a' : '#c2410c'} stopOpacity={0.01}/>
+                <stop offset="5%" stopColor={isPositive ? '#16a34a' : '#c2410c'} stopOpacity={0.20}/>
+                <stop offset="95%" stopColor={isPositive ? '#16a34a' : '#c2410c'} stopOpacity={0.00}/>
               </linearGradient>
             </defs>
             <XAxis dataKey="date" hide />
@@ -206,53 +219,56 @@ export function HistoricalChart({ data }: { data: PricePoint[] }) {
           </AreaChart>
         </ResponsiveContainer>
         
-        {/* Real Volume Bars */}
+        {/* Subtle, Professional Volume Histogram Bars */}
         {showVolume && (
-          <div className="absolute bottom-6 left-0 right-12 h-14 flex items-end justify-between px-1 pointer-events-none opacity-60">
+          <div className="absolute bottom-6 left-0 right-14 h-9 flex items-end justify-between px-2 pointer-events-none opacity-30">
             {volumeBars.map((bar, i) => (
               <div 
                 key={i} 
-                className={`w-[2.5%] rounded-t-xs transition-all ${bar.isUp ? 'bg-market-positive' : 'bg-[#c2410c]'}`} 
-                style={{ height: `${bar.heightPct}%` }}
+                className={`w-[1.2%] rounded-t-xs transition-all ${bar.isUp ? 'bg-emerald-600' : 'bg-[#c2410c]'}`} 
+                style={{ height: `${Math.max(10, bar.heightPct * 0.75)}%` }}
               />
             ))}
           </div>
         )}
 
-        {/* X Axis */}
-        <div className="absolute bottom-0 left-0 right-12 flex justify-between border-t border-border-hairline pt-2 text-[10px] text-text-tertiary font-mono">
+        {/* X Axis Date Labels */}
+        <div className="absolute bottom-0 left-0 right-14 flex justify-between border-t border-slate-200 pt-2 text-[10px] text-slate-400 font-mono">
           {dateLabels.map((lbl, idx) => (
             <span key={idx}>{lbl}</span>
           ))}
         </div>
 
         {/* Y Axis Guide Lines */}
-        <div className="absolute inset-0 pointer-events-none flex flex-col justify-between border-l border-border-hairline pl-2 pb-6 text-[10px] text-text-tertiary font-mono items-end right-0 w-full">
-          <div className="w-full border-b border-border-hairline/40 h-0 flex justify-end">
-            <span className="-mt-1.5 bg-surface-canvas pl-2 font-mono">₹{maxPrice.toFixed(0)}</span>
+        <div className="absolute inset-0 pointer-events-none flex flex-col justify-between border-l border-slate-200/80 pl-2.5 pb-6 text-[10px] text-slate-400 font-mono items-end right-0 w-full">
+          <div className="w-full border-b border-slate-100 h-0 flex justify-end">
+            <span className="-mt-1.5 bg-white pl-2 font-mono">₹{maxPrice.toFixed(0)}</span>
           </div>
-          <div className="w-full border-b border-border-hairline/40 border-dashed h-0 flex justify-end">
-            <span className="-mt-1.5 bg-surface-canvas pl-2 font-mono">₹{((maxPrice + minPrice) / 2).toFixed(0)}</span>
+          <div className="w-full border-b border-slate-100 border-dashed h-0 flex justify-end">
+            <span className="-mt-1.5 bg-white pl-2 font-mono">₹{((maxPrice + minPrice) / 2).toFixed(0)}</span>
           </div>
           <div className="w-full h-0 flex justify-end">
-            <span className="-mt-1.5 bg-surface-canvas pl-2 font-mono">₹{minPrice.toFixed(0)}</span>
+            <span className="-mt-1.5 bg-white pl-2 font-mono">₹{minPrice.toFixed(0)}</span>
           </div>
         </div>
       </div>
       
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-3 pt-3 border-t border-border-hairline text-[10px] font-mono text-text-tertiary gap-2">
+      {/* Chart Legend HUD */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-3 pt-3 border-t border-slate-100 text-[11px] font-mono text-slate-500 gap-2">
         <div className="flex items-center gap-4 flex-wrap">
-          <span className="flex items-center gap-1.5 text-slate-700">
-            <span className={`w-2.5 h-0.5 ${isPositive ? 'bg-emerald-600' : 'bg-[#c2410c]'}`}></span> Price: ₹{lastPrice.toFixed(2)}
+          <span className="flex items-center gap-1.5 font-medium text-slate-700">
+            <span className={`w-2.5 h-0.5 ${isPositive ? 'bg-emerald-600' : 'bg-[#c2410c]'}`} />
+            Price: ₹{lastPrice.toFixed(2)}
           </span>
           {showSMA && (
-            <span className="flex items-center gap-1.5 text-slate-700">
-              <span className="w-2.5 h-0.5 bg-slate-900"></span> 50 DMA: ₹{latestSMA.toFixed(2)}
+            <span className="flex items-center gap-1.5 font-medium text-slate-700">
+              <span className="w-2.5 h-0.5 bg-slate-900" />
+              50 DMA: ₹{latestSMA.toFixed(2)}
             </span>
           )}
         </div>
-        <div>
-          Latest Vol: {(latestVol / 1000000).toFixed(2)}M shares
+        <div className="text-slate-400">
+          Day Vol: {(latestVol / 1000000).toFixed(2)}M shares
         </div>
       </div>
     </div>

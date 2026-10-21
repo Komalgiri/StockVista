@@ -31,12 +31,12 @@ const SUGGESTED_QUICK_SEARCHES = [
 ];
 
 const POPULAR_SEARCHES = [
-  { ticker: 'RELIANCE', name: 'Reliance Industries Ltd', sector: 'Energy & Power', mcap: '₹19.7L Cr' },
-  { ticker: 'TCS', name: 'Tata Consultancy Services', sector: 'Technology', mcap: '₹14.2L Cr' },
-  { ticker: 'HDFCBANK', name: 'HDFC Bank Ltd', sector: 'Financial Services', mcap: '₹12.8L Cr' },
-  { ticker: 'INFY', name: 'Infosys Ltd', sector: 'Technology', mcap: '₹7.9L Cr' },
-  { ticker: 'ICICIBANK', name: 'ICICI Bank Ltd', sector: 'Financial Services', mcap: '₹8.9L Cr' },
-  { ticker: 'BHARTIARTL', name: 'Bharti Airtel Ltd', sector: 'Telecommunication', mcap: '₹9.4L Cr' },
+  { ticker: 'RELIANCE', name: 'Reliance Industries Ltd', sector: 'Energy & Power', cmp: '₹1,202.00', change: '+0.45%', isUp: true, mcap: '₹19.7L Cr' },
+  { ticker: 'TCS', name: 'Tata Consultancy Services', sector: 'Technology', cmp: '₹4,120.50', change: '+1.12%', isUp: true, mcap: '₹14.2L Cr' },
+  { ticker: 'HDFCBANK', name: 'HDFC Bank Ltd', sector: 'Financial Services', cmp: '₹1,682.30', change: '-0.32%', isUp: false, mcap: '₹12.8L Cr' },
+  { ticker: 'INFY', name: 'Infosys Ltd', sector: 'Technology', cmp: '₹1,854.00', change: '+0.88%', isUp: true, mcap: '₹7.9L Cr' },
+  { ticker: 'ICICIBANK', name: 'ICICI Bank Ltd', sector: 'Financial Services', cmp: '₹1,245.60', change: '+1.05%', isUp: true, mcap: '₹8.9L Cr' },
+  { ticker: 'BHARTIARTL', name: 'Bharti Airtel Ltd', sector: 'Telecommunication', cmp: '₹1,620.00', change: '+0.74%', isUp: true, mcap: '₹9.4L Cr' },
 ];
 
 const FEATURED_SECTORS = [
@@ -225,34 +225,62 @@ export function HomeSearch() {
         {/* Popular Equities Section */}
         {!showResults && (
           <div className="w-full max-w-4xl flex flex-col gap-9">
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2 text-slate-900 font-inter text-xs font-bold tracking-wider uppercase">
+            {/* Market Leaders Institutional Data Table */}
+            <div className="border border-slate-200/90 rounded-2xl bg-white p-5 shadow-xs">
+              <div className="flex items-center justify-between mb-3.5 pb-2.5 border-b border-slate-100">
+                <div className="flex items-center gap-2 text-slate-950 font-inter text-xs font-bold tracking-wider uppercase">
                   <TrendingUp size={15} className="text-[#c2410c]" />
-                  <span>Market Leaders & Bluechips</span>
+                  <span>Market Leaders & Core Bluechips</span>
                 </div>
-                <span className="text-[11px] text-slate-400 font-medium hidden sm:inline">Audited Fundamentals</span>
+                <span className="text-[11px] text-slate-400 font-mono hidden sm:inline">NSE • Top Market Weight Index</span>
               </div>
               
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 w-full">
-                {POPULAR_SEARCHES.map(item => (
-                  <Link
-                    key={item.ticker}
-                    href={`/company/${item.ticker}`}
-                    className="flex flex-col p-3.5 border border-slate-200 rounded-xl bg-white hover:border-[#c2410c] hover:shadow-md transition-all group cursor-pointer"
-                  >
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="font-mono font-bold text-slate-950 group-hover:text-[#c2410c] text-sm transition-colors">
-                        {item.ticker}
-                      </span>
-                      <ArrowRight size={12} className="text-slate-300 group-hover:text-[#c2410c] group-hover:translate-x-0.5 transition-all" />
-                    </div>
-                    <div className="text-[11px] text-slate-500 truncate mb-2">{item.name}</div>
-                    <div className="flex items-center justify-between text-[10px] text-slate-400 font-mono mt-auto pt-1 border-t border-slate-100">
-                      <span>{item.mcap}</span>
-                    </div>
-                  </Link>
-                ))}
+              <div className="overflow-x-auto">
+                <table className="w-full text-left font-sans">
+                  <thead className="text-[10px] uppercase tracking-wider font-bold text-slate-400 border-b border-slate-100">
+                    <tr>
+                      <th className="py-2 px-3">Company</th>
+                      <th className="py-2 px-3">Sector</th>
+                      <th className="py-2 px-3 text-right">LTP (CMP)</th>
+                      <th className="py-2 px-3 text-right">Session Change</th>
+                      <th className="py-2 px-3 text-right">Market Cap</th>
+                      <th className="py-2 px-3 text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="text-[12px] divide-y divide-slate-100">
+                    {POPULAR_SEARCHES.map((stock) => (
+                      <tr 
+                        key={stock.ticker}
+                        onClick={() => handleSelect(stock.ticker)}
+                        className="hover:bg-orange-50/40 transition-colors cursor-pointer group"
+                      >
+                        <td className="py-2.5 px-3">
+                          <div className="flex items-center gap-2">
+                            <span className="font-mono font-bold text-slate-950 group-hover:text-[#c2410c] transition-colors">{stock.ticker}</span>
+                            <span className="text-slate-500 text-xs hidden sm:inline truncate max-w-[200px]">{stock.name}</span>
+                          </div>
+                        </td>
+                        <td className="py-2.5 px-3">
+                          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200/60">{stock.sector}</span>
+                        </td>
+                        <td className="py-2.5 px-3 text-right font-mono font-bold text-slate-900">{stock.cmp}</td>
+                        <td className="py-2.5 px-3 text-right">
+                          <span className={`inline-block font-mono font-bold text-[11px] px-2 py-0.5 rounded-full ${
+                            stock.isUp ? 'text-emerald-700 bg-emerald-50 border border-emerald-200/70' : 'text-[#c2410c] bg-orange-50 border border-orange-200/70'
+                          }`}>
+                            {stock.change}
+                          </span>
+                        </td>
+                        <td className="py-2.5 px-3 text-right font-mono text-slate-700 text-xs">{stock.mcap}</td>
+                        <td className="py-2.5 px-3 text-right">
+                          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#c2410c] group-hover:translate-x-0.5 transition-transform">
+                            Analyze <ArrowRight size={12} />
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
 

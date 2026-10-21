@@ -115,17 +115,19 @@ async function DashboardData({ ticker }: { ticker: string }) {
         />
       </div>
 
-      <div className="flex gap-4 sm:gap-6 mb-6 font-geist font-semibold text-[13px] overflow-x-auto pb-2 border-b border-border-hairline scrollbar-none">
-        <a href="#overview" className="flex items-center gap-1.5 pb-2 text-primary border-b-2 border-primary whitespace-nowrap">Overview</a>
-        <a href="#chart" className="flex items-center gap-1.5 pb-2 text-text-secondary hover:text-text-primary transition-colors whitespace-nowrap">Chart</a>
+      <div className="sticky top-14 bg-white/95 backdrop-blur-md z-10 flex gap-2 sm:gap-4 mb-6 font-geist font-semibold text-[13px] overflow-x-auto pt-2 pb-1 border-b border-slate-200 scrollbar-none">
+        <a href="#overview" className="flex items-center gap-1.5 pb-2.5 px-1 text-slate-950 border-b-2 border-[#c2410c] font-bold whitespace-nowrap">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#c2410c]" /> Overview
+        </a>
+        <a href="#chart" className="flex items-center gap-1.5 pb-2.5 px-1 text-slate-500 hover:text-slate-950 transition-colors whitespace-nowrap">Chart</a>
         {analysis && (analysis.pros.length > 0 || analysis.cons.length > 0) && (
-          <a href="#analysis" className="flex items-center gap-1.5 pb-2 text-text-secondary hover:text-text-primary transition-colors whitespace-nowrap">Pros &amp; Cons</a>
+          <a href="#analysis" className="flex items-center gap-1.5 pb-2.5 px-1 text-slate-500 hover:text-slate-950 transition-colors whitespace-nowrap">Pros &amp; Cons</a>
         )}
-        <a href="#valuation" className="flex items-center gap-1.5 pb-2 text-text-secondary hover:text-text-primary transition-colors whitespace-nowrap">Valuation</a>
-        <a href="#financials" className="flex items-center gap-1.5 pb-2 text-text-secondary hover:text-text-primary transition-colors whitespace-nowrap">Financials</a>
-        <a href="#peers" className="flex items-center gap-1.5 pb-2 text-text-secondary hover:text-text-primary transition-colors whitespace-nowrap">Peers</a>
-        <a href="#shareholding" className="flex items-center gap-1.5 pb-2 text-text-secondary hover:text-text-primary transition-colors whitespace-nowrap">Shareholding</a>
-        <a href="#documents" className="flex items-center gap-1.5 pb-2 text-text-secondary hover:text-text-primary transition-colors whitespace-nowrap">Documents</a>
+        <a href="#valuation" className="flex items-center gap-1.5 pb-2.5 px-1 text-slate-500 hover:text-slate-950 transition-colors whitespace-nowrap">Valuation</a>
+        <a href="#financials" className="flex items-center gap-1.5 pb-2.5 px-1 text-slate-500 hover:text-slate-950 transition-colors whitespace-nowrap">Financials</a>
+        <a href="#peers" className="flex items-center gap-1.5 pb-2.5 px-1 text-slate-500 hover:text-slate-950 transition-colors whitespace-nowrap">Peers</a>
+        <a href="#shareholding" className="flex items-center gap-1.5 pb-2.5 px-1 text-slate-500 hover:text-slate-950 transition-colors whitespace-nowrap">Shareholding</a>
+        <a href="#documents" className="flex items-center gap-1.5 pb-2.5 px-1 text-slate-500 hover:text-slate-950 transition-colors whitespace-nowrap">Documents</a>
       </div>
       
       <div className="flex flex-col gap-6 pb-12">
