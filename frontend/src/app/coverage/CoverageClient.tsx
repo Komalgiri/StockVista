@@ -96,6 +96,7 @@ const FAMOUS_COMPANIES_DATA = [
   {
     ticker: 'TATAMOTORS',
     name: 'Tata Motors',
+    desc: 'Commercial, passenger & EV mobility solutions across global markets.',
     sector: 'Automobile',
     category: 'Auto',
     cmp: '₹406.00',
@@ -109,6 +110,7 @@ const FAMOUS_COMPANIES_DATA = [
   {
     ticker: 'RELIANCE',
     name: 'Reliance Industries',
+    desc: 'Diversified energy, petrochemicals, retail & digital telecom conglomerate.',
     sector: 'Energy & Power',
     category: 'Energy & Infra',
     cmp: '₹1,202.00',
@@ -122,6 +124,7 @@ const FAMOUS_COMPANIES_DATA = [
   {
     ticker: 'HDFCBANK',
     name: 'HDFC Bank',
+    desc: 'Premier private sector banking institution & consumer retail credit leader.',
     sector: 'Financial Services',
     category: 'Banking',
     cmp: '₹1,682.30',
@@ -135,6 +138,7 @@ const FAMOUS_COMPANIES_DATA = [
   {
     ticker: 'TCS',
     name: 'Tata Consultancy Services',
+    desc: 'Global technology consulting, cloud engineering & cognitive solutions.',
     sector: 'Technology',
     category: 'Tech',
     cmp: '₹4,120.50',
@@ -148,6 +152,7 @@ const FAMOUS_COMPANIES_DATA = [
   {
     ticker: 'INFY',
     name: 'Infosys',
+    desc: 'Next-generation digital services, enterprise cloud & AI business platforms.',
     sector: 'Technology',
     category: 'Tech',
     cmp: '₹1,854.00',
@@ -161,6 +166,7 @@ const FAMOUS_COMPANIES_DATA = [
   {
     ticker: 'ICICIBANK',
     name: 'ICICI Bank',
+    desc: 'Full-service universal banking network, SME financing & wealth advisory.',
     sector: 'Financial Services',
     category: 'Banking',
     cmp: '₹1,245.60',
@@ -174,6 +180,7 @@ const FAMOUS_COMPANIES_DATA = [
   {
     ticker: 'BHARTIARTL',
     name: 'Bharti Airtel',
+    desc: 'Leading wireless broadband, 5G networks & digital telecom infrastructure.',
     sector: 'Telecommunication',
     category: 'Energy & Infra',
     cmp: '₹1,710.00',
@@ -187,6 +194,7 @@ const FAMOUS_COMPANIES_DATA = [
   {
     ticker: 'SBIN',
     name: 'State Bank of India',
+    desc: 'Fortune 500 public banking giant powering India’s financial backbone.',
     sector: 'Financial Services',
     category: 'Banking',
     cmp: '₹810.00',
@@ -200,6 +208,7 @@ const FAMOUS_COMPANIES_DATA = [
   {
     ticker: 'LT',
     name: 'Larsen & Toubro',
+    desc: 'High-tech engineering, global EPC projects & capital goods manufacturing.',
     sector: 'Infrastructure',
     category: 'Energy & Infra',
     cmp: '₹3,450.00',
@@ -213,6 +222,7 @@ const FAMOUS_COMPANIES_DATA = [
   {
     ticker: 'HINDUNILVR',
     name: 'Hindustan Unilever',
+    desc: 'India’s largest FMCG company touching 9 out of 10 consumer households.',
     sector: 'FMCG',
     category: 'FMCG & Pharma',
     cmp: '₹2,380.00',
@@ -226,6 +236,7 @@ const FAMOUS_COMPANIES_DATA = [
   {
     ticker: 'ITC',
     name: 'ITC Ltd',
+    desc: 'Multi-business enterprise spanning FMCG, hospitality, paper & agri-business.',
     sector: 'FMCG',
     category: 'FMCG & Pharma',
     cmp: '₹480.20',
@@ -239,6 +250,7 @@ const FAMOUS_COMPANIES_DATA = [
   {
     ticker: 'BAJFINANCE',
     name: 'Bajaj Finance',
+    desc: 'Diversified NBFC powerhouse specialized in consumer lending & payments.',
     sector: 'Financial Services',
     category: 'Banking',
     cmp: '₹6,920.00',
@@ -252,6 +264,7 @@ const FAMOUS_COMPANIES_DATA = [
   {
     ticker: 'MARUTI',
     name: 'Maruti Suzuki',
+    desc: 'India’s dominant passenger automaker with extensive manufacturing scale.',
     sector: 'Automobile',
     category: 'Auto',
     cmp: '₹12,450.00',
@@ -265,6 +278,7 @@ const FAMOUS_COMPANIES_DATA = [
   {
     ticker: 'SUNPHARMA',
     name: 'Sun Pharma',
+    desc: 'Global specialty generics pharmaceutical innovator with worldwide reach.',
     sector: 'Healthcare',
     category: 'FMCG & Pharma',
     cmp: '₹1,890.00',
@@ -278,6 +292,7 @@ const FAMOUS_COMPANIES_DATA = [
   {
     ticker: 'TITAN',
     name: 'Titan Company',
+    desc: 'India’s celebrated leader in jewelry, precision watches & lifestyle brands.',
     sector: 'Consumer Goods',
     category: 'FMCG & Pharma',
     cmp: '₹3,410.00',
@@ -291,6 +306,7 @@ const FAMOUS_COMPANIES_DATA = [
   {
     ticker: 'WIPRO',
     name: 'Wipro',
+    desc: 'Leading global technology services, digital strategy & cloud consulting.',
     sector: 'Technology',
     category: 'Tech',
     cmp: '₹530.00',
@@ -465,8 +481,8 @@ export function CoverageClient({ report }: { report: CoverageReport | null }) {
           </div>
         </div>
 
-        {/* 16 Bluechip Cards Grid with Real Logos */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+        {/* 16 Bluechip Cards Grid - Matching Reference Style with Floating Hero Asset & Dark Action Pill */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
           {FAMOUS_COMPANIES_DATA.filter((c) => {
             if (selectedLeaderCategory === 'All') return true;
             return c.category === selectedLeaderCategory;
@@ -474,41 +490,47 @@ export function CoverageClient({ report }: { report: CoverageReport | null }) {
             <Link
               key={c.ticker}
               href={`/company/${c.ticker}`}
-              className="group flex flex-col justify-between p-4 rounded-xl bg-white border border-border-hairline hover:border-orange-300 hover:shadow-xs transition-all"
+              className="group relative flex items-center justify-between p-5 sm:p-6 rounded-3xl bg-white border border-slate-100/90 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-[0_12px_28px_-4px_rgba(0,0,0,0.09)] hover:-translate-y-0.5 transition-all duration-200 cursor-pointer gap-4 sm:gap-6"
             >
-              <div className="flex items-start gap-3">
-                <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-200/70 p-1.5 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 group-hover:bg-orange-50/20 group-hover:border-orange-300/80 transition-all">
-                  <img 
-                    src={c.logo} 
-                    alt={c.name} 
-                    className="w-full h-full object-contain" 
-                  />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono text-xs font-bold text-text-primary group-hover:text-orange-700 transition-colors">
-                      {c.ticker}
-                    </span>
-                    <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 border border-slate-200/60">
-                      BSE {c.bse}
-                    </span>
-                  </div>
-                  <h3 className="text-xs font-semibold text-text-primary truncate mt-0.5 group-hover:text-slate-950">
-                    {c.name}
-                  </h3>
-                  <div className="text-[10.5px] text-text-tertiary truncate mt-0.5">
-                    {c.sector}
-                  </div>
-                </div>
+              {/* Floating Hero Brand Asset on Left with Realistic Soft Drop Shadow */}
+              <div className="w-20 h-20 sm:w-24 sm:h-24 shrink-0 flex items-center justify-center p-2 relative">
+                <img 
+                  src={c.logo} 
+                  alt={c.name} 
+                  className="w-full h-full object-contain filter drop-shadow-[0_8px_16px_rgba(0,0,0,0.12)] group-hover:scale-110 transition-transform duration-300" 
+                />
               </div>
 
-              <div className="pt-3 mt-3 border-t border-border-hairline/80 flex items-center justify-between text-xs">
-                <div>
-                  <span className="font-mono font-bold text-text-primary">{c.cmp}</span>
-                  <span className="font-mono text-[10.5px] text-emerald-700 ml-1.5 font-semibold">{c.change}</span>
+              {/* Middle & Right Content: Title, 2-line Description, Price & Action Pill */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between gap-2 mb-1">
+                  <h3 className="font-bold text-slate-900 text-base sm:text-lg tracking-tight group-hover:text-orange-700 transition-colors leading-tight truncate">
+                    {c.name}
+                  </h3>
+                  <span className="font-mono text-[10.5px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200/60 font-semibold shrink-0">
+                    NSE: {c.ticker}
+                  </span>
                 </div>
-                <div className="text-[10.5px] font-mono text-text-tertiary">
-                  MCap {c.mcap}
+
+                <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed mb-3.5 font-normal">
+                  {c.desc}
+                </p>
+
+                <div className="flex items-center justify-between gap-2 pt-1 border-t border-slate-50">
+                  <div className="flex items-baseline gap-1.5 font-mono">
+                    <span className="font-bold text-slate-900 text-base sm:text-lg tabular-nums">
+                      {c.cmp}
+                    </span>
+                    <span className="text-xs font-semibold text-emerald-600 font-mono">
+                      {c.change}
+                    </span>
+                  </div>
+
+                  {/* Dark Pill Action Button matching the reference image */}
+                  <div className="px-3.5 py-1.5 rounded-full bg-slate-950 text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm group-hover:bg-orange-700 transition-all shrink-0">
+                    <span>View</span>
+                    <ArrowRight size={13} className="group-hover:translate-x-0.5 transition-transform" />
+                  </div>
                 </div>
               </div>
             </Link>
