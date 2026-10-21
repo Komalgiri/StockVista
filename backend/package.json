@@ -4,6 +4,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
+    "build": "tsc",
     "start": "tsx src/index.ts",
     "sync-catalog": "tsx src/scripts/sync-catalog.ts",
     "pre-cache": "tsx src/scripts/pre-cache.ts",

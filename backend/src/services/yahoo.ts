@@ -1,5 +1,40 @@
 const yahooFinance = require('yahoo-finance2').default;
 
+// Suppress known noisy notices from yahoo-finance2
+try {
+  if (typeof yahooFinance.suppressNotices === 'function') {
+    yahooFinance.suppressNotices(['yahooSurvey']);
+  }
+  if (typeof yahooFinance.setGlobalConfig === 'function') {
+    yahooFinance.setGlobalConfig({
+      validation: { logErrors: false }
+    });
+  }
+} catch (_) {}
+
+// Circuit breaker state: suppress external calls when rate-limited (HTTP 429)
+let circuitBreakerUntil = 0;
+const COOLDOWN_DURATION_MS = 15 * 60 * 1000; // 15-minute cooldown
+
+export function isYahooRateLimited(): boolean {
+  return Date.now() < circuitBreakerUntil;
+}
+
+function handleYahooFailure(error: any, context: string) {
+  const errMsg = (error?.message || '') + ' ' + (error?.toString() || '');
+  const is429 = error?.code === 429 || 
+                error?.status === 429 || 
+                errMsg.includes('429') || 
+                errMsg.includes('Too Many Requests');
+
+  if (is429) {
+    circuitBreakerUntil = Date.now() + COOLDOWN_DURATION_MS;
+    console.warn(`⚠️ [YahooFinance] Rate limit (429 Too Many Requests) hit during ${context}. Pausing Yahoo requests for 15 minutes; automatically serving local/Screener fallbacks.`);
+  } else if (!isYahooRateLimited()) {
+    console.warn(`⚠️ [YahooFinance ${context}] Fetch failed: ${error?.message || error}`);
+  }
+}
+
 // Helper to format Indian symbols for Yahoo Finance.
 // e.g. RELIANCE → RELIANCE.NS, ^NSEI → ^NSEI (index, no suffix needed)
 const getYahooSymbol = (isinOrTicker: string) => {
@@ -16,6 +51,8 @@ const getYahooSymbol = (isinOrTicker: string) => {
 };
 
 export async function getCompanyProfile(isin: string) {
+  if (isYahooRateLimited()) return null;
+
   try {
     const symbol = getYahooSymbol(isin);
     const profile: any = await yahooFinance.quoteSummary(symbol, { modules: ['summaryProfile', 'price'] });
@@ -31,12 +68,14 @@ export async function getCompanyProfile(isin: string) {
       industry: profile.summaryProfile?.industry || "Unknown"
     };
   } catch (error) {
-    console.error("Yahoo Finance Profile Error:", error);
+    handleYahooFailure(error, `Profile(${isin})`);
     return null;
   }
 }
 
 export async function getMarketQuote(isin: string) {
+  if (isYahooRateLimited()) return null;
+
   try {
     const symbol = getYahooSymbol(isin);
     const quote: any = await yahooFinance.quote(symbol);
@@ -57,12 +96,14 @@ export async function getMarketQuote(isin: string) {
       marketCap: quote.marketCap,
     };
   } catch (error) {
-    console.error("Yahoo Finance Quote Error:", error);
+    handleYahooFailure(error, `Quote(${isin})`);
     return null;
   }
 }
 
 export async function getHistoricalData(isin: string, range: string = '1y') {
+  if (isYahooRateLimited()) return null;
+
   try {
     const symbol = getYahooSymbol(isin);
     const period1 = new Date();
@@ -86,7 +127,8 @@ export async function getHistoricalData(isin: string, range: string = '1y') {
       volume: day.volume
     }));
   } catch (error) {
-    console.error("Yahoo Finance Historical Error:", error);
+    handleYahooFailure(error, `Historical(${isin})`);
     return null;
   }
 }
+
