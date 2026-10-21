@@ -28,15 +28,15 @@ Built with **Next.js 16 (App Router)** and an **Express 5 API Gateway**, StockVi
 
 | Requirement in Contract | Implementation Status | Verification Details |
 | :--- | :---: | :--- |
-| **1. Complete NSE & BSE Coverage**<br>*(All eligible companies, including BSE-only)* | **100% Verified** | **5,588 active equities** indexed in SQLite (2,983 BSE-only, 2,479 NSE & BSE dual-listed, 126 NSE-only). Tested BSE-only scrip `500012` (Andhra Petrochemicals) and retrieved complete financials. |
-| **2. Multi-Identifier Search**<br>*(Names, NSE symbols, BSE codes)* | **100% Verified** | Instant search bar matches company names, tickers, NSE codes, and 6-digit BSE codes (e.g., `500570`, `RELIANCE`, `TCS`, `TATAMOTORS`) with space-insensitive search. |
-| **3. Sector & Industry Navigation**<br>*(Hierarchical listing beyond static catalog)* | **100% Verified** | Dedicated `/sectors` and dynamic `/sectors/[sector]` routes categorize all 5,588 companies into 23 economic sectors with pagination and market cap breakdown. |
-| **4. Screener-Grade Financial Categories**<br>*(No blank cards or fake numbers)* | **100% Verified** | **100% actual historical data ingested:**<br>• Company Overview & Multiples<br>• Key Valuation Ratios (P/E, ROCE, ROE, Book Value)<br>• Quarterly P&L Statements<br>• 10-Year Annual P&L<br>• 10-Year Balance Sheet<br>• 10-Year Cash Flow Statements<br>• Shareholding Pattern (Promoters, FIIs, DIIs, Public)<br>• Direct Annual Reports & Concall Filings<br>• Dynamic Peer Group Matrix<br>• Algorithmic Pros & Cons Analysis |
-| **5. Historical Charts & Realism**<br>*(No artificial repeating waves)* | **100% Verified** | Real-time Yahoo Finance time-series with interactive timeframes (1M, 3M, 6M, 1Y, ALL), subtle 1.2% volume histogram, 50 DMA, and deterministic anchored spline fallback if external APIs throttle. |
-| **6. Demerger & Restructuring Resilience**<br>*(e.g., Tata Motors TATAMOTORS → TMCV)* | **100% Verified** | Self-healing candidate resolution (Alias → BSE Scrip Fallback → Live Screener Search API) prevents 404 dead-ends across all restructured scrips. |
-| **7. Financial Data Integration & Refresh Functionality**<br>*(Explicit on-demand cache busting)* | **100% Verified** | Added dynamic `POST /api/companies/:isin/refresh` endpoint and an interactive `<RefreshButton />` ("Refresh Filings") in the header that busts stale cache and re-ingests fresh filings on demand. |
-| **8. Performance & Scalability**<br>*(On-demand fetching + 24hr persistent caching)* | **100% Verified** | Two-tiered caching (RAM via NodeCache + Disk via SQLite WAL mode) yields sub-20ms response times on subsequent visits without exceeding upstream rate limits. |
-| **9. Telemetry & Data Coverage Report**<br>*(Audited per-category completeness)* | **100% Verified** | Live `/coverage` page with a random stock smoke tester across large, mid, small, and BSE-only equities. |
+| **1. Complete NSE & BSE Coverage**<br>*(All eligible companies, including BSE-only)* | **Completed** | **5,588 active equities** indexed in SQLite (2,983 BSE-only, 2,479 NSE & BSE dual-listed, 126 NSE-only). Tested BSE-only scrip `500012` (Andhra Petrochemicals) and retrieved complete financials. |
+| **2. Multi-Identifier Search**<br>*(Names, NSE symbols, BSE codes)* | **Completed** | Instant search bar matches company names, tickers, NSE codes, and 6-digit BSE codes (e.g., `500570`, `RELIANCE`, `TCS`, `TATAMOTORS`) with space-insensitive search. |
+| **3. Sector & Industry Navigation**<br>*(Hierarchical listing beyond static catalog)* | **Completed** | Dedicated `/sectors` and dynamic `/sectors/[sector]` routes categorize all 5,588 companies into 23 economic sectors with pagination and market cap breakdown. |
+| **4. Screener-Grade Financial Categories**<br>*(No blank cards or fake numbers)* | **Completed** | **100% actual historical data ingested:**<br>• Company Overview & Multiples<br>• Key Valuation Ratios (P/E, ROCE, ROE, Book Value)<br>• Quarterly P&L Statements<br>• 10-Year Annual P&L<br>• 10-Year Balance Sheet<br>• 10-Year Cash Flow Statements<br>• Shareholding Pattern (Promoters, FIIs, DIIs, Public)<br>• Direct Annual Reports & Concall Filings<br>• Dynamic Peer Group Matrix<br>• Algorithmic Pros & Cons Analysis |
+| **5. Historical Charts & Realism**<br>*(No artificial repeating waves)* | **Completed** | Real-time Yahoo Finance time-series with interactive timeframes (1M, 3M, 6M, 1Y, ALL), subtle 1.2% volume histogram, 50 DMA, and deterministic anchored spline fallback if external APIs throttle. |
+| **6. Demerger & Restructuring Resilience**<br>*(e.g., Tata Motors TATAMOTORS → TMCV)* | **Completed** | Self-healing candidate resolution (Alias → BSE Scrip Fallback → Live Screener Search API) prevents 404 dead-ends across all restructured scrips. |
+| **7. Financial Data Integration & Refresh Functionality**<br>*(Explicit on-demand cache busting)* | **Completed** | Added dynamic `POST /api/companies/:isin/refresh` endpoint and an interactive `<RefreshButton />` ("Refresh Filings") in the header that busts stale cache and re-ingests fresh filings on demand. |
+| **8. Performance & Scalability**<br>*(On-demand fetching + 24hr persistent caching)* | **Completed** | Two-tiered caching (RAM via NodeCache + Disk via SQLite WAL mode) yields sub-20ms response times on subsequent visits without exceeding upstream rate limits. |
+| **9. Telemetry & Data Coverage Report**<br>*(Audited per-category completeness)* | **Completed** | Live `/coverage` page with a random stock smoke tester across large, mid, small, and BSE-only equities. |
 
 ### 🎯 Final Submission Checklist
 - **Repository:** [https://github.com/Komalgiri/StockVista.git](https://github.com/Komalgiri/StockVista.git) (`main` branch)
@@ -49,10 +49,10 @@ Built with **Next.js 16 (App Router)** and an **Express 5 API Gateway**, StockVi
 ## 📑 Table of Contents
 
 1. [📋 Contract Requirements & Implementation Status](#-contract-requirements--implementation-status-final-verification)
-2. [🏆 Achievements Till Now & Current Progress (Post-Oct 14 Updates)](#-achievements-till-now--current-progress-post-oct-14-updates)
-2. [Visual Tour & Screenshots](#-visual-tour--screenshots)
-3. [Key Architecture & Capabilities](#-key-architecture--capabilities)
-4. [Deep Feature Breakdown](#-deep-feature-breakdown)
+2. [🏆 Achievements Till Now & Current Progress (Final Milestone Delivery)](#-achievements-till-now--current-progress-final-milestone-delivery)
+3. [Visual Tour & Screenshots](#-visual-tour--screenshots)
+4. [Key Architecture & Capabilities](#-key-architecture--capabilities)
+5. [Deep Feature Breakdown](#-deep-feature-breakdown)
    - [1. Financial Statements (4 Core Statements + CSV)](#1-financial-statements-4-core-statements--csv-export)
    - [2. Screener.in 9 Key Metrics Bar](#2-screenerin-9-key-metrics-bar)
    - [3. Interactive Historical Price & Volume Analytics](#3-interactive-historical-price--volume-analytics)
@@ -62,55 +62,68 @@ Built with **Next.js 16 (App Router)** and an **Express 5 API Gateway**, StockVi
    - [7. Shareholding Distribution & Donut Chart](#7-shareholding-distribution--donut-chart)
    - [8. Exchange Filings & Regulatory Documents](#8-exchange-filings--regulatory-documents)
    - [9. Dynamic Corporate Metadata](#9-dynamic-corporate-metadata)
-5. [Brief Explanation of Data Sources Used](#-brief-explanation-of-data-sources-used)
-6. [System Architecture & Sequence Flow](#-system-architecture--sequence-flow)
-7. [Complete REST API Reference](#-complete-rest-api-reference)
-8. [Repository File Structure](#-repository-file-structure)
-9. [Local Setup & Getting Started](#-local-setup--getting-started)
-10. [Engineering Decisions & Technical Trade-offs](#-engineering-decisions--technical-trade-offs)
-11. [Author & Contact](#-author--contact)
+6. [Brief Explanation of Data Sources Used](#-brief-explanation-of-data-sources-used)
+7. [System Architecture & Sequence Flow](#-system-architecture--sequence-flow)
+8. [Complete REST API Reference](#-complete-rest-api-reference)
+9. [Repository File Structure](#-repository-file-structure)
+10. [Local Setup & Getting Started](#-local-setup--getting-started)
+11. [Engineering Decisions & Technical Trade-offs](#-engineering-decisions--technical-trade-offs)
+12. [Author & Contact](#-author--contact)
 
 ---
 
-## 🏆 Achievements Till Now & Current Progress (Post-Oct 14 Updates)
+## 🏆 Achievements Till Now & Current Progress (Final Milestone Delivery)
 
-Following the initial prototype phase, significant architectural milestones were engineered and rolled out after **October 14th** to transform StockVista from a curated 80-stock proof-of-concept into a scalable, Screener.in-grade financial platform covering the wider Indian stock market universe.
+Over the 7-day implementation period (October 15–21, 2026), StockVista underwent a major engineering expansion—transforming from an initial 80-stock prototype into an enterprise-grade, Screener.in-grade equity research terminal covering the entire listed Indian stock universe.
 
-### 1. Catalog Expansion: 3,000+ Listed Equities Active (Progressing to 5,500+)
-- **Removed the ~80 Stock Ceiling:** Replaced static lists with a dynamic dual-exchange catalog synchronization pipeline (`sync-catalog.ts`).
-- **3,000+ Primary Stocks Listed & Searchable:** The catalog has already indexed active companies across NSE and BSE, with 5,588 total securities parsed into the ingestion pipeline (including dual-listed, BSE-only scrips, and SME-listed companies).
-- **Official Exchange Integration:** Direct ingestion from the **NSE Active Equity Master** (`EQUITY_L.csv`) and **BSE/Zerodha Instrument Directory**, extracting official ISINs, face values, trading series, and 6-digit BSE security codes.
+### 1. Complete Universal Catalog: 5,588 Equities Fully Indexed & Searchable
+- **Complete Elimination of Catalog Caps:** Replaced static lists with automated dual-exchange catalog synchronization (`sync-catalog.ts`).
+- **Full Coverage of 5,588 Indian Equities:** Comprehensive multi-market directory indexing:
+  - **2,983 BSE-only Equities** (e.g. Scrip `500012` Andhra Petrochemicals, small caps, regional manufacturers).
+  - **2,479 Dual-Listed Equities** (NSE & BSE listed bluechips and midcaps).
+  - **126 NSE-only Equities**.
+- **Direct Official Exchange Ingestion:** Ingests official ISINs, face values, trading series, and 6-digit BSE security codes directly from the **NSE Active Equity Master** and **BSE Instrument Directory**.
 
-### 2. High-Performance Persistent Database Layer
-- **Engineered SQLite with WAL (Write-Ahead Logging):** Implemented a production-ready persistent database (`stockvista.db`) using `better-sqlite3` operating in high-concurrency WAL mode (`synchronous = NORMAL`).
-- **Multi-Column Indexing:** Built composite indexes covering `ticker`, `symbol_nse`, `scrip_bse`, `name`, `sector`, and `industry` to achieve sub-millisecond query lookups across thousands of records.
-- **Two-Tier Caching Schema:** Created persistent disk cache tables (`financial_cache` and `market_quotes_cache`) with TTL expirations to support high-throughput, rate-limit-resistant financial querying.
+### 2. Demerger & Corporate Restructuring Self-Healing Engine
+- **Resilience Against Corporate Actions:** Prevents broken 404 links when legacy tickers undergo demergers, ticker migrations, or restructurings.
+- **Multi-Stage Resolution Pipeline:** Evaluates Alias Mappings → BSE Scrip Code Resolution → Live Screener Search API fallback.
+- **Real-World Case Verified:** Searching legacy `TATAMOTORS` automatically resolves and presents both demerged entities:
+  - **Tata Motors Commercial Vehicles Ltd (TMCV)**: BSE `544569` / NSE `TMCV`
+  - **Tata Motors Passenger Vehicles Ltd (TMPV)**: BSE `500570` / NSE `TMPV`
 
-### 3. Dynamic Universal Search (Prefix & Exact Weighted Matching)
-- **Unified Dynamic Search Engine (`/api/search`):** Rewrote the search experience in both the navigation header ([HeaderSearch.tsx](file:///d:/StockVista/frontend/src/components/HeaderSearch.tsx)) and hero section ([HomeSearch.tsx](file:///d:/StockVista/frontend/src/components/HomeSearch.tsx)).
-- **Multi-Attribute Matching:** Users can locate securities instantly by company name, NSE symbol, or BSE 6-digit scrip code.
-- **Weighted Relevance Ranking:** Custom SQL sort ordering prioritizes exact symbol matches first, followed by ticker prefixes, scrip codes, and company name substring matches.
+### 3. High-Performance Persistent Database & Two-Tier Caching Layer
+- **Engineered SQLite with WAL Mode:** Production-grade embedded database (`data/stockvista.db`) operating in high-concurrency Write-Ahead Logging mode (`synchronous = NORMAL`).
+- **Composite Indexes:** Optimized indexing across `ticker`, `symbol_nse`, `scrip_bse`, `name`, `sector`, and `industry` ensures sub-millisecond query lookups across 5,588 records.
+- **Two-Tier Persistent Caching:** Disk-persisted financial statements cache (`financial_cache`) and quotes cache (`market_quotes_cache`) with intelligent TTL invalidation guarantees sub-20ms page rendering on repeated visits without triggering upstream rate limits.
 
-### 4. Sector & Industry Taxonomy Classification
-- **Automated Heuristic Sector Categorization:** Implemented a classification system sorting stocks into **23 distinct economic sectors** (e.g., Financial Services, Technology, Healthcare, Energy & Power, FMCG, Auto Components, Construction & Real Estate, Chemicals, Metals & Mining).
-- **Sector Directory APIs:** Deployed REST endpoints for sector-level exploration:
-  - `GET /api/sectors`: Aggregated list of all 23 sectors with live company counts.
-  - `GET /api/sectors/:sector`: Paginated, sorted company listings filtered by sector.
-
-### 5. Multi-Source Financial Resolution Pipeline
-- **Screener.in Scraping Engine:** Robust Cheerio-based scrapers extracting all core financial categories without manual mocks:
+### 4. Interactive Screener-Grade Financial Dashboard
+- **Zero-Fabrication Live Data Ingestion:**
   - 10-Year Annual Profit & Loss statements + TTM
   - Consecutive Quarterly Results
   - Comprehensive Balance Sheet & Cash Flow breakdown
-  - Institutional Shareholding Patterns (Promoter, FII, DII, Public)
-  - Live Sector Peer Comparison matrix
+  - Institutional Shareholding Patterns (Promoter, FII, DII, Public) with interactive SVG visual breakdown
+  - Dynamic Peer Group Matrix sorted by P/E, CMP, and Market Cap
   - Algorithmic Pros & Cons qualitative evaluation
-  - Categorized Corporate Filings (Annual Reports, Concalls, Presentations, Credit Ratings)
-- **Yahoo Finance Fallback & Live Ticker:** Real-time intraday quotes, trading volume, day change %, and index quotes for `^NSEI` (NIFTY 50) and `^BSESN` (SENSEX).
+  - Categorized Corporate Filings (Audited Annual Reports, Earnings Concalls, Investor Presentations)
 
-### 6. Real-Time Coverage Telemetry & Sync Endpoint
-- **Live Coverage Diagnostics (`GET /api/coverage`):** Exposes transparent real-time metrics on total companies indexed, exchange distribution breakdown, cached statements count, and sector distribution.
-- **On-Demand Catalog Sync (`POST /api/sync-catalog`):** Administrative trigger allowing automated updates when new companies list or change trading status.
+### 5. On-Demand Cache Invalidation & Live Refresh Mechanism
+- **Interactive Cache Buster (`<RefreshButton />`):** Dedicated "Refresh Filings" trigger in the company header allows analysts to bust stale cache on demand and fetch the latest regulatory filings in real time.
+- **Dedicated REST Invalidation Endpoint:** Deployed `POST /api/companies/:isin/refresh` for programmatically purging cached statements and re-ingesting live data.
+
+### 6. 23 Economic Sector Taxonomy Navigation
+- **Automated Heuristic Sector Classification:** Categorizes all 5,588 securities into 23 economic sectors (Financial Services, Technology, Healthcare, Energy & Power, FMCG, Auto Components, Infrastructure, etc.).
+- **Dedicated Exploratory Routes:**
+  - `/sectors`: Overview grid of all 23 economic sectors with live equity counts.
+  - `/sectors/[sector]`: Paginated, sortable directory of companies within any selected sector.
+
+### 7. Real-Time Telemetry & Data Coverage Auditing Page
+- **Audited Completeness Metrics (`/coverage`):** Exposes transparent real-time metrics on total companies indexed, exchange distribution breakdown, cached statements count, and sector distribution.
+- **Built-in Random Stock Smoke Tester:** Interactive testing tool allowing instant validation across Large Cap, Mid Cap, Small Cap, and BSE-only equities.
+
+### 8. Executive Landing Page with Authentic Real Logo Stream
+- **Dual-Segment Institutional Search Bar:** Expanded wide search container with ticker/name/BSE code text input and a custom sector selector with soft, non-intrusive scrollbars.
+- **Continuous Auto-Moving Logo Marquee:** Dual-track hardware-accelerated carousel showcasing 16 real, vibrant corporate brand logos (Tata Motors, Reliance, HDFC Bank, TCS, Infosys, Airtel, SBI, etc.) moving continuously without stopping on hover or drag.
+- **2-Grid Curated Leaders Deck:** Spacious, high-contrast company cards displaying real corporate emblems, live CMP, sector badge, and session return metrics.
 
 ---
 
