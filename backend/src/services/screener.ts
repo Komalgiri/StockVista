@@ -3,27 +3,80 @@ import * as cheerio from 'cheerio';
 
 const BROWSER_USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36';
 
-// Helper to fetch and parse HTML
-export async function fetchScreenerData(ticker: string) {
+const SCREENER_ALIASES: Record<string, string[]> = {
+  'TATAMOTORS': ['TMCV', '500570', '544569', 'TMPV'],
+  'TATA MOTORS': ['TMCV', '500570', '544569'],
+  'TATAMOTOR': ['TMCV', '500570'],
+  'ZOMATO': ['ETERNAL'],
+  'M&M': ['M&M', '500520'],
+  'LT': ['LT', '500510'],
+};
+
+// Helper to fetch and parse HTML with resilient multi-tier resolution
+export async function fetchScreenerData(ticker: string, companyName?: string, bseCode?: string) {
   try {
-    // Attempt to get consolidated data first, fallback to standalone
-    let url = `https://www.screener.in/company/${ticker}/consolidated/`;
-    let res = await axios.get(url, {
-      headers: { 'User-Agent': BROWSER_USER_AGENT },
-      timeout: 15000
-    }).catch(() => null);
-    
-    if (!res || res.status !== 200) {
-      url = `https://www.screener.in/company/${ticker}/`;
-      res = await axios.get(url, {
+    const cleanTicker = ticker.replace(/\.(NS|BO)$/i, '').trim().toUpperCase();
+    const candidates: string[] = [];
+
+    // 1. Known alias candidates
+    if (SCREENER_ALIASES[cleanTicker]) {
+      candidates.push(...SCREENER_ALIASES[cleanTicker]);
+    }
+    candidates.push(cleanTicker);
+
+    // 2. Direct BSE scrip code (Screener retains numeric codes permanently)
+    if (bseCode) {
+      candidates.push(bseCode);
+    }
+
+    // Try each candidate URL sequentially
+    const uniqueCandidates = Array.from(new Set(candidates.filter(Boolean)));
+    for (const cand of uniqueCandidates) {
+      let url = `https://www.screener.in/company/${encodeURIComponent(cand)}/consolidated/`;
+      let res = await axios.get(url, {
         headers: { 'User-Agent': BROWSER_USER_AGENT },
         timeout: 15000
       }).catch(() => null);
+      
+      if (!res || res.status !== 200) {
+        url = `https://www.screener.in/company/${encodeURIComponent(cand)}/`;
+        res = await axios.get(url, {
+          headers: { 'User-Agent': BROWSER_USER_AGENT },
+          timeout: 15000
+        }).catch(() => null);
+      }
+      
+      if (res && res.status === 200) {
+        return cheerio.load(res.data);
+      }
+    }
+
+    // 3. Fallback: Search Screener API by company name or clean ticker
+    const searchQueries = [companyName, cleanTicker].filter(Boolean) as string[];
+    for (const q of searchQueries) {
+      try {
+        const searchRes = await axios.get(`https://www.screener.in/api/company/search/?q=${encodeURIComponent(q)}`, {
+          headers: { 'User-Agent': BROWSER_USER_AGENT },
+          timeout: 10000
+        });
+        if (Array.isArray(searchRes.data) && searchRes.data.length > 0) {
+          const matchUrl = searchRes.data[0].url; // e.g. "/company/TMCV/consolidated/"
+          if (matchUrl) {
+            const pageRes = await axios.get(`https://www.screener.in${matchUrl}`, {
+              headers: { 'User-Agent': BROWSER_USER_AGENT },
+              timeout: 15000
+            });
+            if (pageRes && pageRes.status === 200) {
+              return cheerio.load(pageRes.data);
+            }
+          }
+        }
+      } catch {
+        // continue
+      }
     }
     
-    if (!res || res.status !== 200) return null;
-    
-    return cheerio.load(res.data);
+    return null;
   } catch (error) {
     console.error(`Error fetching screener data for ${ticker}:`, error);
     return null;
@@ -156,8 +209,8 @@ export function extractDetails($: cheerio.CheerioAPI) {
 }
 
 // ── Complete Single-Request Bundle Parser ─────────────────────────────────────
-export async function getCompleteScreenerBundle(ticker: string) {
-  const $ = await fetchScreenerData(ticker);
+export async function getCompleteScreenerBundle(ticker: string, companyName?: string, bseCode?: string) {
+  const $ = await fetchScreenerData(ticker, companyName, bseCode);
   if (!$) return null;
 
   const ratios = extractRatios($);

@@ -40,28 +40,42 @@ const respond = (res: Response, data: unknown, source: string = 'screener-cached
 // Checks RAM cache -> checks SQLite disk cache -> scrapes once with full bundle -> saves to SQLite & RAM
 export async function resolveOrFetchFinancialBundle(isin: string) {
   const upper = isin.toUpperCase();
+  const clean = upper.replace(/\.(NS|BO)$/i, '').trim();
 
   // Level 1: In-Memory cache
-  const memCached = memoryCache.get<any>(`bundle:${upper}`);
+  const memCached = memoryCache.get<any>(`bundle:${upper}`) || memoryCache.get<any>(`bundle:${clean}`);
   if (memCached) {
     return { bundle: memCached, source: 'memory-cache' };
   }
 
   // Level 2: Persistent SQLite Disk Cache
-  const diskCached = CompanyService.getFinancialCache(upper);
+  const diskCached = CompanyService.getFinancialCache(upper) || CompanyService.getFinancialCache(clean);
   if (diskCached) {
     memoryCache.set(`bundle:${upper}`, diskCached);
+    memoryCache.set(`bundle:${clean}`, diskCached);
     return { bundle: diskCached, source: 'sqlite-disk-cache' };
   }
 
+  // Resolve DB company to get official ticker, company name, and BSE code
+  const dbCompany = CompanyService.getCompany(isin);
+  const targetTicker = dbCompany?.symbol_nse || dbCompany?.ticker || clean;
+  const companyName = dbCompany?.name;
+  const bseCode = dbCompany?.scrip_bse || undefined;
+
   // Level 3: Upstream Extraction (Single HTTP request for ALL categories)
   try {
-    const freshBundle = await getCompleteScreenerBundle(isin);
+    const freshBundle = await getCompleteScreenerBundle(targetTicker, companyName, bseCode);
     if (freshBundle) {
       // Save to SQLite disk cache (24 hours TTL)
       CompanyService.setFinancialCache(upper, freshBundle, 1440);
+      CompanyService.setFinancialCache(clean, freshBundle, 1440);
+      if (targetTicker !== clean) {
+        CompanyService.setFinancialCache(targetTicker, freshBundle, 1440);
+      }
       // Save to fast in-memory cache
       memoryCache.set(`bundle:${upper}`, freshBundle);
+      memoryCache.set(`bundle:${clean}`, freshBundle);
+      memoryCache.set(`bundle:${targetTicker}`, freshBundle);
       return { bundle: freshBundle, source: 'screener-live-ingested' };
     }
   } catch (err) {

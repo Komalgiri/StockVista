@@ -83,7 +83,7 @@ const stmts = {
     LIMIT 1
   `),
   
-  searchCompanies: db.prepare<{ exact: string; prefix: string; query: string; limit: number }, CompanyRecord>(`
+  searchCompanies: db.prepare<{ exact: string; prefix: string; query: string; noSpace: string; limit: number }, CompanyRecord>(`
     SELECT * FROM companies 
     WHERE UPPER(ticker) = @exact 
        OR UPPER(symbol_nse) = @exact 
@@ -92,6 +92,7 @@ const stmts = {
        OR UPPER(symbol_nse) LIKE @prefix 
        OR scrip_bse LIKE @prefix 
        OR UPPER(name) LIKE @query
+       OR REPLACE(UPPER(name), ' ', '') LIKE @noSpace
     ORDER BY 
       CASE 
         WHEN UPPER(ticker) = @exact THEN 1
@@ -177,23 +178,55 @@ const stmts = {
   `)
 };
 
+// Known symbol and restructuring aliases
+const KNOWN_TICKER_ALIASES: Record<string, string> = {
+  'TATAMOTORS': 'TMCV',
+  'TATA MOTORS': 'TMCV',
+  'TATAMOTOR': 'TMCV',
+  '500570': 'TMCV',
+  'ZOMATO': 'ETERNAL',
+  'ZOMATO.NS': 'ETERNAL',
+  'M&M': 'M&M',
+  'LT': 'LT',
+};
+
 export const CompanyService = {
   getCompany(tickerOrCode: string): CompanyRecord | null {
     if (!tickerOrCode) return null;
-    return stmts.getCompanyByTicker.get({ val: tickerOrCode.trim() }) || null;
+    const clean = tickerOrCode.replace(/\.(NS|BO)$/i, '').trim().toUpperCase();
+    const target = KNOWN_TICKER_ALIASES[clean] || clean;
+
+    let res = stmts.getCompanyByTicker.get({ val: target }) || null;
+    if (!res && clean !== target) {
+      res = stmts.getCompanyByTicker.get({ val: clean }) || null;
+    }
+    if (!res) {
+      // Fallback: match company name ignoring spaces and punctuation
+      const normalizedAlpha = clean.replace(/[^A-Z0-9]/g, '');
+      if (normalizedAlpha.length >= 3) {
+        res = db.prepare<string, CompanyRecord>(`
+          SELECT * FROM companies 
+          WHERE REPLACE(REPLACE(UPPER(name), ' ', ''), '.', '') LIKE ? 
+          LIMIT 1
+        `).get(`%${normalizedAlpha}%`) || null;
+      }
+    }
+    return res;
   },
 
   search(query: string, limit = 15): CompanyRecord[] {
     const trimmed = query.trim().toUpperCase();
     if (!trimmed) return [];
 
-    let target = trimmed;
-    if (trimmed === 'ZOMATO') target = 'ETERNAL';
+    const clean = trimmed.replace(/\.(NS|BO)$/i, '').trim();
+    let target = KNOWN_TICKER_ALIASES[clean] || clean;
+    const noSpace = `%${clean.replace(/[\s\.\-]+/g, '')}%`;
 
     return stmts.searchCompanies.all({
       exact: target,
       prefix: `${target}%`,
-      query: `%${target}%`,
+      query: `%${clean}%`,
+      noSpace,
       limit
     });
   },

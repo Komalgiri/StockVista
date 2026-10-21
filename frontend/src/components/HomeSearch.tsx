@@ -20,23 +20,23 @@ import bgImage from '@/assets/serach_bg.png';
 
 // Pre-screened & suggested quick searches for Indian equities
 const SUGGESTED_QUICK_SEARCHES = [
-  { ticker: 'RELIANCE', name: 'Reliance Industries', tag: 'Energy', code: '500325' },
-  { ticker: 'TCS', name: 'Tata Consultancy', tag: 'IT Services', code: '532540' },
-  { ticker: 'HDFCBANK', name: 'HDFC Bank', tag: 'Private Bank', code: '500180' },
-  { ticker: 'INFY', name: 'Infosys', tag: 'Technology', code: '500209' },
-  { ticker: 'ICICIBANK', name: 'ICICI Bank', tag: 'Banking', code: '532174' },
-  { ticker: 'TATAMOTORS', name: 'Tata Motors', tag: 'Auto', code: '500570' },
-  { ticker: 'ITC', name: 'ITC Ltd', tag: 'FMCG', code: '500875' },
-  { ticker: 'BHARTIARTL', name: 'Bharti Airtel', tag: 'Telecom', code: '532454' },
+  { ticker: 'TATAMOTORS', name: 'Tata Motors', sector: 'Auto', code: '500570', tag: 'Demerged' },
+  { ticker: 'RELIANCE', name: 'Reliance Industries', sector: 'Energy', code: '500325', tag: 'Mega Cap' },
+  { ticker: 'HDFCBANK', name: 'HDFC Bank', sector: 'Banking', code: '500180', tag: 'Nifty Top' },
+  { ticker: 'TCS', name: 'Tata Consultancy', sector: 'IT Services', code: '532540', tag: 'Tech' },
+  { ticker: 'INFY', name: 'Infosys', sector: 'IT Services', code: '500209', tag: 'Tech' },
+  { ticker: 'ITC', name: 'ITC Ltd', sector: 'FMCG', code: '500875', tag: 'FMCG' },
+  { ticker: 'LT', name: 'Larsen & Toubro', sector: 'Infrastructure', code: '500510', tag: 'Cap Goods' },
+  { ticker: 'ICICIBANK', name: 'ICICI Bank', sector: 'Banking', code: '532174', tag: 'Banking' },
 ];
 
 const POPULAR_SEARCHES = [
+  { ticker: 'TATAMOTORS', name: 'Tata Motors Ltd', sector: 'Automobile', cmp: '₹985.40', change: '+1.45%', isUp: true, mcap: '₹3.6L Cr' },
   { ticker: 'RELIANCE', name: 'Reliance Industries Ltd', sector: 'Energy & Power', cmp: '₹1,202.00', change: '+0.45%', isUp: true, mcap: '₹19.7L Cr' },
   { ticker: 'TCS', name: 'Tata Consultancy Services', sector: 'Technology', cmp: '₹4,120.50', change: '+1.12%', isUp: true, mcap: '₹14.2L Cr' },
   { ticker: 'HDFCBANK', name: 'HDFC Bank Ltd', sector: 'Financial Services', cmp: '₹1,682.30', change: '-0.32%', isUp: false, mcap: '₹12.8L Cr' },
   { ticker: 'INFY', name: 'Infosys Ltd', sector: 'Technology', cmp: '₹1,854.00', change: '+0.88%', isUp: true, mcap: '₹7.9L Cr' },
   { ticker: 'ICICIBANK', name: 'ICICI Bank Ltd', sector: 'Financial Services', cmp: '₹1,245.60', change: '+1.05%', isUp: true, mcap: '₹8.9L Cr' },
-  { ticker: 'BHARTIARTL', name: 'Bharti Airtel Ltd', sector: 'Telecommunication', cmp: '₹1,620.00', change: '+0.74%', isUp: true, mcap: '₹9.4L Cr' },
 ];
 
 const FEATURED_SECTORS = [
@@ -141,7 +141,7 @@ export function HomeSearch() {
               ref={inputRef}
               type="text"
               className="block w-full pl-15 pr-36 py-5 rounded-full border-0 focus:ring-0 text-base md:text-lg placeholder-slate-400 text-slate-950 bg-transparent font-medium"
-              placeholder="Search by company name, NSE symbol (RELIANCE), or BSE code (500325)..."
+              placeholder="Search 5,500+ NSE & BSE stocks (e.g. TATAMOTORS, RELIANCE, HDFCBANK, 500570)..."
               value={query}
               onChange={handleChange}
               autoComplete="off"
@@ -207,17 +207,18 @@ export function HomeSearch() {
         {/* Pre-Searched Suggested Scrips Under Search Box */}
         <div className="w-full max-w-3xl mb-12 flex items-center gap-2 flex-wrap justify-center sm:justify-start">
           <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-400 uppercase tracking-wider shrink-0 mr-1">
-            <History size={13} className="text-[#c2410c]" />
+            <Sparkles size={13} className="text-[#c2410c]" />
             <span>Suggested:</span>
           </div>
           {SUGGESTED_QUICK_SEARCHES.map(item => (
             <button
               key={item.ticker}
               onClick={() => handleSelect(item.ticker)}
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white hover:bg-orange-50 text-slate-700 hover:text-[#c2410c] border border-slate-200 hover:border-orange-300 transition-all text-xs font-semibold shadow-2xs group cursor-pointer"
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white hover:bg-orange-50 text-slate-700 hover:text-[#c2410c] border border-slate-200 hover:border-orange-300 transition-all text-xs font-semibold shadow-2xs group cursor-pointer"
             >
-              <span className="font-mono font-bold group-hover:text-[#c2410c]">{item.ticker}</span>
-              <span className="text-[10px] text-slate-400 font-normal">({item.tag})</span>
+              <span className="font-mono font-bold text-slate-950 group-hover:text-[#c2410c]">{item.ticker}</span>
+              <span className="text-[10px] text-slate-400 font-normal border-l border-slate-200 pl-1.5">{item.name}</span>
+              <span className="text-[9px] font-mono text-[#c2410c] bg-orange-50/80 px-1 py-0.5 rounded border border-orange-200/60 font-semibold">{item.sector}</span>
             </button>
           ))}
         </div>
