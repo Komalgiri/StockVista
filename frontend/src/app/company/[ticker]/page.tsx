@@ -27,7 +27,6 @@ import {
   getDocuments,
   getAnalysis
 } from '@/services/api';
-
 export const instant = false;
 
 async function DashboardData({ ticker }: { ticker: string }) {

@@ -205,14 +205,15 @@ export const CompanyService = {
       res = stmts.getCompanyByTicker.get({ val: clean }) || null;
     }
     if (!res) {
-      // Fallback: match company name ignoring spaces and punctuation
+      // Fallback: match full company name ignoring spaces and punctuation (exact match only, never loose substring)
       const normalizedAlpha = clean.replace(/[^A-Z0-9]/g, '');
-      if (normalizedAlpha.length >= 3) {
-        res = db.prepare<string, CompanyRecord>(`
+      if (normalizedAlpha.length >= 4) {
+        res = (db.prepare(`
           SELECT * FROM companies 
-          WHERE REPLACE(REPLACE(UPPER(name), ' ', ''), '.', '') LIKE ? 
+          WHERE REPLACE(REPLACE(REPLACE(UPPER(name), ' ', ''), '.', ''), 'LIMITED', '') = ?
+             OR REPLACE(REPLACE(UPPER(name), ' ', ''), '.', '') = ?
           LIMIT 1
-        `).get(`%${normalizedAlpha}%`) || null;
+        `).get(normalizedAlpha.replace(/LIMITED$/, ''), normalizedAlpha) as CompanyRecord) || null;
       }
     }
     return res;
