@@ -480,54 +480,51 @@ export function HomeSearch() {
                 </Link>
               </div>
 
-              {/* 4 Cards in 2-Grid Form */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+              {/* 4 Cards in 2-Grid Form with Logo as Main Highlight */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {CURATED_CARDS.map(card => (
                   <div
                     key={card.ticker}
                     onClick={() => handleSelect(card.ticker)}
-                    className="flex flex-col justify-between p-4 sm:p-5 rounded-xl bg-white border border-slate-200/80 hover:border-slate-300 hover:shadow-xs transition-all cursor-pointer group"
+                    className="flex items-center justify-between p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/80 hover:border-orange-200 hover:shadow-sm transition-all cursor-pointer group gap-4 sm:gap-5"
                   >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-200/70 p-1 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs group-hover:scale-105 transition-transform">
-                          <img 
-                            src={card.image} 
-                            alt={card.name} 
-                            className="w-full h-full object-contain" 
-                          />
-                        </div>
-                        <div className="min-w-0">
-                          <h3 className="font-medium text-slate-900 text-sm truncate group-hover:text-[#c2410c] transition-colors">
-                            {card.name}
-                          </h3>
-                          <div className="flex items-center gap-1.5 mt-0.5 text-[11px] text-slate-500 font-normal">
-                            <span className="font-mono text-slate-400 text-[10.5px]">{card.ticker}</span>
-                            <span className="text-slate-300">•</span>
-                            <span>{card.sector}</span>
-                          </div>
-                        </div>
+                    <div className="flex items-center gap-3.5 sm:gap-4.5 min-w-0 flex-1">
+                      {/* Hero / Main Highlight: Large Brand Logo Showcase Tile */}
+                      <div className="w-14 h-14 sm:w-18 sm:h-18 rounded-2xl bg-slate-50/90 border border-slate-200/70 p-2.5 sm:p-3 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 group-hover:bg-orange-50/30 group-hover:border-orange-300/80 transition-all duration-200">
+                        <img 
+                          src={card.image} 
+                          alt={card.name} 
+                          className="w-full h-full object-contain drop-shadow-2xs" 
+                        />
                       </div>
 
-                      <div className="text-right shrink-0">
-                        <div className="font-mono text-sm sm:text-base font-medium text-slate-900 tabular-nums">
-                          {card.cmp}
+                      <div className="min-w-0 flex-1">
+                        <h3 className="font-medium text-slate-900 text-sm sm:text-base truncate group-hover:text-[#c2410c] transition-colors">
+                          {card.name}
+                        </h3>
+                        <div className="flex items-center gap-1.5 mt-0.5 text-xs text-slate-500 font-normal">
+                          <span className="font-mono text-slate-400 text-[11px]">{card.ticker}</span>
+                          <span className="text-slate-300">•</span>
+                          <span className="truncate">{card.sector}</span>
                         </div>
-                        <div className="flex items-center justify-end gap-1 mt-0.5">
-                          <span className={`font-mono text-[10.5px] font-medium px-1.5 py-0.5 rounded ${
-                            card.isUp ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'
-                          }`}>
-                            {card.change}
-                          </span>
-                        </div>
+                        <p className="text-[11px] text-slate-400 truncate mt-1.5 font-normal">
+                          {card.desc}
+                        </p>
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between pt-3 mt-3 border-t border-slate-100 text-[11px]">
-                      <p className="text-slate-500 truncate mr-3 font-normal">
-                        {card.desc}
-                      </p>
-                      <span className="text-slate-400 font-mono text-[10.5px] shrink-0 font-normal">
+                    <div className="text-right shrink-0 flex flex-col items-end justify-center">
+                      <div className="font-mono text-base sm:text-lg font-medium text-slate-900 tabular-nums">
+                        {card.cmp}
+                      </div>
+                      <div className="flex items-center justify-end gap-1 mt-1">
+                        <span className={`font-mono text-[11px] font-medium px-2 py-0.5 rounded ${
+                          card.isUp ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'
+                        }`}>
+                          {card.change}
+                        </span>
+                      </div>
+                      <span className="text-slate-400 font-mono text-[10.5px] mt-1 hidden sm:inline-block font-normal">
                         MCap {card.mcap}
                       </span>
                     </div>
