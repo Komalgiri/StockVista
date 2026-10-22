@@ -75,43 +75,50 @@ Built with **Next.js 16 (App Router)** and an **Express 5 API Gateway**, StockVi
 
 ## 📑 Technical Evaluation & Handover Audit Response (OPP Code Vision)
 
-### 1. Actual Data Coverage & Universe Telemetry
-* **Indexed Securities Catalog:** **5,588 active equities** indexed in SQLite WAL mode (`companies` table):
-  * **2,983 BSE-only Equities** (e.g. Scrip `500012` Andhra Petrochemicals, small caps, regional manufacturers).
-  * **2,479 Dual-Listed Equities** (NSE & BSE listed large-caps and mid-caps).
-  * **126 NSE-only Equities**.
-* **Pre-Caching vs. On-Demand JIT Ingestion:**
-  * **Committed Snapshot:** **54 marquee index equities** (NIFTY 50 + leaders) are pre-cached in `backend/data/stockvista.db`, providing sub-5ms responses out of the box.
-  * **Just-In-Time (JIT) Resolution:** When an analyst queries any of the remaining **5,534 equities**, the backend resolves the security via a single HTTP bundle fetch to Screener.in and Yahoo Finance, permanently writing the full statements into `financial_cache` with a 24-hour TTL.
-* **Public Data Availability Across the 5,588 Universe:**
-  * **Quarterly Results & Annual P&L (+ TTM):** ~4,100–4,400 companies (~75%–80%) have available filings on public repositories (active operating companies compliant with SEBI filing schedules).
-  * **Balance Sheets:** ~4,100–4,400 companies (~75%–80%).
-  * **Cash Flows:** ~3,800–4,100 companies (~70%–74%) (certain NBFCs/small finance companies omit cash flows under Ind AS).
-  * **Shareholding Distribution:** ~3,900–4,200 companies (~70%–75%).
-  * **9 Key Ratios:** ~4,200–4,500 companies (~76%–81%).
-  * **Historical 1Y OHLCV Daily Prices:** ~3,900+ actively traded securities via Yahoo Finance (`.NS` / `.BO`); illiquid/suspended scrips use anchored spline fallback.
-* **Discrepancy Clarification:**
-  * **Data Unavailable at Source (~20%–25% / ~1,200–1,400 scrips):** Official exchange master files include delisted/suspended scrips, shell entities, and **non-equity instruments** (e.g. BSE-listed Fixed Maturity Plans / FMPs such as `543423 SFMP57GD` and `533526 KTKFMP55G`, capital protection schemes, and debentures). These entities do not file corporate P&L or balance sheets with exchanges, and Screener.in returns HTTP 404 for them. StockVista displays an authentic `"Filings Pending / Exchange Data Unavailable"` card rather than fake data.
-  * **Extraction Failures (< 1%):** Rate limits (Yahoo HTTP 429) or transient timeouts, handled by the multi-tier candidate resolver and Yahoo circuit breaker.
-  * **Incomplete Features:** Sell-side broker consensus forecast estimates and live AGM voting tallies require paid institutional subscriptions (e.g. Bloomberg, Refinitiv, FactSet) and are not accessible on public exchange interfaces.
+### 1. Actual Data Coverage Telemetry (Measured Sample vs. Catalog-Level Estimates)
+* **Master Catalog Universe in SQLite (`companies` table):** **5,588 active equities**
+  * **2,983 BSE-only Equities**
+  * **2,479 Dual-Listed Equities** (NSE & BSE)
+  * **126 NSE-only Equities**
+* **Pre-Cached in SQLite Disk Storage (`financial_cache`):** **54 marquee equities** (NIFTY 50 + high-liquidity market leaders) providing sub-5ms responses.
+* **Measured Telemetry from 100-Stock Audit Sample:**
+  Rather than claiming universal verified coverage, we executed a test across a sample cohort of **100 securities** (50 BSE-only + 50 Small-Cap NSE/BSE dual-listed equities). The complete raw data is committed and verifiable at [`test_results_100_stocks.csv`](test_results_100_stocks.csv) and [`backend/test_results_100_stocks.csv`](backend/test_results_100_stocks.csv).
+  * **Total Securities Tested:** 100
+  * **Fully Available (All 6 Financial Categories Extracted):** **92 (92.0%)**
+    * Quarters: 92/100
+    * Annual P&L: 92/100
+    * Balance Sheet: 92/100
+    * Cash Flow: 92/100
+    * Shareholding: 92/100
+    * Key Ratios: 92/100
+  * **Unavailable at Upstream Source (HTTP 404 / Nil Records on Screener):** **8 (8.0%)**
+    * All 8 cases occurred in legacy/suspended BSE-only scrips:
+      * `500399` (*Steelco Gujarat* — suspended)
+      * `500421` (*TPI India* — suspended)
+      * `500422` (*Transchem* — suspended)
+      * `500426` (*UTL Industries* — suspended)
+      * `500449` (*Hindustan Organic Chemicals* — nil records on public aggregator)
+      * `500450` (*MPIL Corporation* — suspended)
+      * `500458` (*Team24 Consumer Products* — suspended)
+      * `500500` (*Hindustan Motors* — suspended)
+  * **Extraction Failures / Unhandled Parser Crashes:** **0 (0.0%)**
+* **Distinction: Sampled Telemetry vs. Full-Catalog Extrapolation:**
+  The 92% availability applies to the measured 100-stock sample. Across the wider 5,588 securities, we estimate that roughly 20%–25% (~1,200–1,400 scrips) lack public financial statements because raw exchange masters include non-equity debt instruments (e.g. BSE Fixed Maturity Plans / FMPs), capital protection funds, shell entities, and long-suspended microcaps. This is an unverified catalog-level estimate based on exchange listing characteristics, not a claim of complete 5,588-company verification.
 
 ---
 
 ### 2. Completion of Planned Work
-* **Background Ingestion & Pre-Caching for Top 1,000 Companies:**
-  * The background worker script is available at `backend/src/scripts/pre-cache.ts` and run via `npm run pre-cache`.
-  * The script executes with polite throttling (`1,500ms` delay between requests) to protect against IP rate-limiting. In the release build, 54 core marquee index stocks are pre-seeded in `backend/data/stockvista.db` to keep repo clone size lightweight (~1.8 MB). Running `npm run pre-cache` incrementally scales the cache to 1,000+ companies.
-* **Secondary-Source Fallback Matrix:**
+* **Top-1,000 Pre-Caching:** **Partial**
+  * The background worker script is built ([`backend/src/scripts/pre-cache.ts`](backend/src/scripts/pre-cache.ts)) and run via `npm run pre-cache`.
+  * In the committed repository build, **54 core marquee index stocks** are pre-seeded in `backend/data/stockvista.db` (~1.8 MB) to prevent IP rate-limiting from Screener.in and Yahoo Finance during automated evaluations. Expanding the cache to all 1,000 stocks locally requires running the worker script with polite throttling or a residential proxy pool.
+* **Secondary-Source Fallback Matrix:** **Complete**
   * *Profile / Metadata:* Screener.in $\rightarrow$ Yahoo Finance `summaryProfile` $\rightarrow$ SQLite Master Catalog.
   * *Live Quotes:* Yahoo Finance (`.NS` / `.BO`) $\rightarrow$ Screener.in Top Ratios (`Current Price`, `High/Low`, `Market Cap`) $\rightarrow$ SQLite Catalog anchored quote.
   * *Historical Chart:* Yahoo Finance 1y daily OHLCV $\rightarrow$ Deterministic anchored spline walk bounded within 52W High/Low.
   * *Indices:* Yahoo Finance (`^NSEI`, `^BSESN`) $\rightarrow$ In-memory verified snapshot.
   * *Corporate Demergers:* Alias dictionary (e.g., `TATAMOTORS` $\rightarrow$ `TMCV`, `500570`, `544569`, `TMPV`) $\rightarrow$ 6-digit BSE Scrip fallback $\rightarrow$ Screener Search API fallback.
-* **Randomized Testing Across 100 Small-Cap & BSE-Only Stocks:**
-  * Tested cohort: 100 randomly sampled Small-Cap and BSE-only equities.
-  * **Available & Extracted Cleanly:** **66 (66.0%)** (all 4 financial tables, shareholding, ratios, and filings extracted).
-  * **Unavailable at Source:** **34 (34.0%)** (BSE-listed FMPs/debt schemes like `543423`, `533526`, `538428` and suspended microcaps).
-  * **Unhandled Extraction Crashes:** **0 (0.0%)**.
+* **Candid Correction on Chart Fallback:**
+  Genuine historical daily OHLCV prices are fetched from Yahoo Finance. When Yahoo Finance returns HTTP 429 (rate-limiting) or has no historical records for an illiquid scrip, the backend generates an anchored spline curve bounded by 52-week High/Low. We acknowledge this is a **synthetic simulation fallback**, not genuine exchange trades. In production, this should either display an explicit "Simulated Price Action" label or show "Historical Chart Unavailable".
 * **Feature Scope Verification:**
   * *CSV Export:* **Complete** (`FinancialTables.tsx` exports active statements directly to `.csv`).
   * *Analyst Summary / Pros & Cons:* **Complete** (`AnalysisBox.tsx` extracts Screener.in's algorithmic Strengths & Risks).
@@ -122,11 +129,10 @@ Built with **Next.js 16 (App Router)** and an **Express 5 API Gateway**, StockVi
 ---
 
 ### 3. Sector Classification & Accuracy
-* **Why ~65% Defaults to "Diversified Business / Conglomerates":**
-  * Official exchange master files (`EQUITY_L.csv`) provide administrative fields (`Symbol`, `Name`, `Series`, `ISIN`, `Face Value`), but omit official sector or industry taxonomy.
-  * StockVista implemented a heuristic regex classifier (`classifySectorAndIndustry` in `sync-catalog.ts`) that matches industry keywords (e.g., `BANK`, `PHARMA`, `MOTORS`, `SOFTWARE`, `ENERGY`, `CEMENT`, `FOODS`), categorizing ~35% (1,943 securities) across 22 economic sectors.
-  * Equities whose registered names lack explicit industry keywords (e.g., holding entities, promoter vehicles, regional manufacturing names like *"Abhishek Corporation"*) safely default to **"Diversified"**.
-  * *Improvement Path:* Ingesting BSE’s dedicated Industry Classification Master file (which maps all 6-digit scrips to 40+ granular industries) or caching sector breadcrumbs directly from Screener.in on first JIT ingestion.
+* **Current Status:** **Partial**
+* **Limitation:** ~65% of the catalog defaults to `"Diversified Business Conglomerates"`.
+* **Root Cause:** Official exchange master files (`EQUITY_L.csv`) omit sector taxonomy. StockVista’s regex heuristic classifier (`classifySectorAndIndustry` in `sync-catalog.ts`) categorized ~35% (1,943 securities) across 22 economic sectors based on company name keywords. Equities with generic names (e.g. holding companies, promoter vehicles) default to "Diversified".
+* **Resolution Path:** Ingesting BSE’s dedicated Industry Classification Master file (which maps all 6-digit scrips to 40+ granular industries) or caching sector breadcrumbs directly from Screener.in on first JIT ingestion.
 * **Validation Mechanics:**
   * *Units:* Standardized to ₹ Crores for statement line items, ₹ per share for EPS/Book Value/CMP, and % for margins/ratios.
   * *Periods:* Table headers parsed directly from official filings (`Mar 2024`, `Dec 2024`, `TTM`).
@@ -136,7 +142,7 @@ Built with **Next.js 16 (App Router)** and an **Express 5 API Gateway**, StockVi
 
 ---
 
-### 4. Local Testing & Handover Instructions
+### 4. Local Setup and Handover Instructions
 * **Environment Configuration Files:**
   * `backend/.env.example` $\rightarrow$ `PORT=8080`
   * `frontend/.env.example` $\rightarrow$ `NEXT_PUBLIC_API_BASE_URL=http://localhost:8080/api`
@@ -149,19 +155,27 @@ Built with **Next.js 16 (App Router)** and an **Express 5 API Gateway**, StockVi
   # Terminal 2: Frontend Dashboard
   cd frontend && npm install && npm run dev
   ```
-* **Utility Commands:**
+* **Database Initialization:**
+  * The pre-seeded database snapshot is committed in the repository at `backend/data/stockvista.db`.
+  * To re-sync the catalog from official exchange master CSVs from scratch:
+    ```bash
+    cd backend && npm run sync-catalog
+    ```
+* **Verification & Testing Commands:**
   ```bash
-  # Re-sync official NSE & BSE master catalogs (5,588 equities)
-  cd backend && npm run sync-catalog
-  
-  # Run background ingestion and pre-caching worker
-  cd backend && npm run pre-cache
+  # Type-check validation
+  cd backend && npx tsc --noEmit
+  cd frontend && npm run build
   ```
 * **External Services & Costs:** **$0 / month, zero API keys required**.
   * Screener.in (Public fundamental statements via Cheerio parser)
   * Yahoo Finance (`yahoo-finance2` engine for live quotes and 1y historical daily OHLCV)
   * No paid subscriptions, no Demat/trading account login required.
-* **Local Run Confirmation:** A fresh clone runs immediately out of the box using `stockvista.db`. Catalog search, sector navigation, and pre-cached marquee stocks operate offline. Fetching un-cached equities or live market feeds requires standard outbound internet access.
+* **Offline vs. Online Scope:**
+  * **Offline Capability:** Catalog search (across all 5,588 equities by ticker, name, or BSE code) and sector directory navigation query the local embedded SQLite database and operate offline without internet.
+  * **Online Required:** Fetching uncached financial statements JIT, peer tables, and live Yahoo Finance quotes/charts require outbound internet connectivity.
+* **Hosting Persistence Risk:**
+  On Render's free tier, the filesystem is ephemeral; backend container restarts revert the SQLite database to the committed repository snapshot. Persistent disk storage or migration to managed PostgreSQL is required for multi-instance production persistence.
 
 ---
 
@@ -177,11 +191,13 @@ Built with **Next.js 16 (App Router)** and an **Express 5 API Gateway**, StockVi
 
 ---
 
-### 6. Final Commit Hash & Sign-Off
-* **Final Verified Commit:** `0db747afe0a70123f71ef4c874323865fa7307ed`
-* **Live App URLs:**
-  * Frontend: [https://stock-vista-one.vercel.app/](https://stock-vista-one.vercel.app/)
-  * Backend API: [https://stockvista-7kk1.onrender.com/](https://stockvista-7kk1.onrender.com/)
+### 6. Deliverables, Git Commit & Deployment Verification
+* **Final Verified Git Commit:** [`754b7deea70eaba2d1d1cd6259a0b697e9b51ced`](https://github.com/Komalgiri/StockVista/commit/754b7deea70eaba2d1d1cd6259a0b697e9b51ced) (pushed to `origin/main`)
+* **Authoritative Audit Dataset:** Committed at [`test_results_100_stocks.csv`](test_results_100_stocks.csv) and [`backend/test_results_100_stocks.csv`](backend/test_results_100_stocks.csv)
+* **Authoritative Documentation:** Section 2 of [`README.md`](README.md)
+* **Live Deployments:**
+  * Frontend: [https://stock-vista-one.vercel.app/](https://stock-vista-one.vercel.app/) (Automated CI/CD via Vercel)
+  * Backend API: [https://stockvista-7kk1.onrender.com/](https://stockvista-7kk1.onrender.com/) (Automated CI/CD via Render)
 
 ---
 
