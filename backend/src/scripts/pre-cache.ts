@@ -66,10 +66,13 @@ export async function runPreCacheWorker(maxCount = 50, delayMs = 1500) {
     try {
       const bundle = await getCompleteScreenerBundle(ticker);
       if (bundle && bundle.income) {
-        // Persist to SQLite (24 hours TTL)
-        CompanyService.setFinancialCache(ticker, bundle, 1440);
+        if (bundle.details?.sector && bundle.details?.industry) {
+          CompanyService.updateSectorIndustry(ticker, bundle.details.sector, bundle.details.industry);
+        }
+        // Persist to SQLite (90 days quarterly persistence)
+        CompanyService.setFinancialCache(ticker, bundle, 129600);
         const duration = Date.now() - startTime;
-        console.log(`${prefix} ✅ ${ticker}: Successfully cached in SQLite (${duration}ms).`);
+        console.log(`${prefix} ✅ ${ticker}: Successfully cached in SQLite (${duration}ms). Sector: ${bundle.details?.sector || 'Unclassified'}`);
         newlyCached++;
       } else {
         console.log(`${prefix} ⚠️  ${ticker}: Genuinely unannounced / not available on exchange.`);

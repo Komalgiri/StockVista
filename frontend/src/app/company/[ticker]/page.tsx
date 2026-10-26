@@ -130,11 +130,9 @@ async function DashboardData({ ticker }: { ticker: string }) {
       </div>
       
       <div className="flex flex-col gap-6 pb-12">
-        {historicalPrices && historicalPrices.length > 0 && (
-          <section id="chart">
-            <HistoricalChart data={historicalPrices} />
-          </section>
-        )}
+        <section id="chart">
+          <HistoricalChart data={historicalPrices || []} />
+        </section>
 
         {analysis && (analysis.pros.length > 0 || analysis.cons.length > 0) && (
           <section id="analysis">

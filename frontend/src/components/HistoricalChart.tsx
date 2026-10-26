@@ -19,8 +19,16 @@ export function HistoricalChart({ data }: { data: PricePoint[] }) {
 
   if (!data || data.length === 0) {
     return (
-      <div className="w-full border border-border-hairline rounded-lg bg-surface-canvas p-6 text-center text-text-secondary text-[13px]">
-        Historical price chart data unavailable.
+      <div className="w-full border border-border-hairline rounded-xl bg-surface-canvas p-10 text-center shadow-xs">
+        <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-slate-100 text-slate-400 mb-3">
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <h3 className="font-geist font-bold text-text-primary text-[15px] mb-1">Historical Trading Data Unavailable</h3>
+        <p className="text-[12px] text-text-tertiary max-w-md mx-auto">
+          No genuine exchange daily OHLCV trading records available for this security on public market feeds.
+        </p>
       </div>
     );
   }

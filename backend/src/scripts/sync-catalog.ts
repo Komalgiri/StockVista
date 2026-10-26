@@ -82,7 +82,7 @@ function classifySectorAndIndustry(name: string, symbol: string): { sector: stri
     return { sector: 'Logistics & Transport', industry: 'Freight & Logistics Services' };
   }
 
-  return { sector: 'Diversified', industry: 'Diversified Business' };
+  return { sector: 'Unclassified', industry: 'Unclassified' };
 }
 
 export async function syncMasterCatalog() {

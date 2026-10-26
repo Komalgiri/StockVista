@@ -199,12 +199,31 @@ export function extractDetails($: cheerio.CheerioAPI) {
     }
   });
 
+  // Extract genuine BSE 4-tier Industry Classification from #peers breadcrumb
+  let sector: string | null = null;
+  let industry: string | null = null;
+  const peerBreadcrumbs: string[] = [];
+  $('#peers a[href*="/market/"]').each((i, el) => {
+    const text = $(el).text().trim();
+    if (text) peerBreadcrumbs.push(text);
+  });
+  if (peerBreadcrumbs.length >= 1) {
+    // [0] = Macro Economic Sector (e.g. "Energy", "Financial Services", "Healthcare")
+    // [1] = Sector (e.g. "Oil, Gas & Consumable Fuels", "Banks")
+    // [2] = Industry (e.g. "Petroleum Products", "Private Sector Bank")
+    // [3] = Basic Industry (e.g. "Refineries & Marketing")
+    sector = peerBreadcrumbs[0] || null;
+    industry = peerBreadcrumbs[1] || peerBreadcrumbs[2] || peerBreadcrumbs[3] || sector || null;
+  }
+
   return {
     about: about || null,
     website: website || null,
     bseCode: bseCode || null,
     bseUrl: bseUrl || null,
     nseUrl: nseUrl || null,
+    sector: sector || null,
+    industry: industry || null,
   };
 }
 

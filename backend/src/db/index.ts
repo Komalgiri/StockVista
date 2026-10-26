@@ -24,8 +24,8 @@ db.exec(`
     scrip_bse TEXT,
     isin TEXT,
     exchange TEXT NOT NULL DEFAULT 'NSE',
-    sector TEXT DEFAULT 'Diversified',
-    industry TEXT DEFAULT 'Diversified Business',
+    sector TEXT DEFAULT 'Unclassified',
+    industry TEXT DEFAULT 'Unclassified',
     market_cap_category TEXT DEFAULT 'Small Cap',
     face_value REAL DEFAULT 10,
     series TEXT DEFAULT 'EQ',
@@ -55,7 +55,31 @@ db.exec(`
     updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
     expires_at TEXT NOT NULL
   );
+
+  CREATE TABLE IF NOT EXISTS historical_prices (
+    ticker TEXT NOT NULL,
+    date TEXT NOT NULL,
+    price REAL NOT NULL,
+    open REAL,
+    high REAL,
+    low REAL,
+    volume REAL,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (ticker, date)
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_hist_prices_ticker ON historical_prices(ticker);
 `);
+
+// Migration: Cleanse incorrect default sector assignments; unverified stocks default to 'Unclassified'
+try {
+  db.exec(`
+    UPDATE companies 
+    SET sector = 'Unclassified', industry = 'Unclassified' 
+    WHERE sector = 'Diversified' OR sector IS NULL OR sector = '' OR sector = 'Diversified Business';
+  `);
+} catch (_) {}
+
 
 export interface CompanyRecord {
   id?: number;
@@ -141,7 +165,23 @@ const stmts = {
   updateCompanySectorIndustry: db.prepare(`
     UPDATE companies 
     SET sector = ?, industry = ?, updated_at = CURRENT_TIMESTAMP 
-    WHERE UPPER(ticker) = UPPER(?)
+    WHERE UPPER(ticker) = UPPER(?) OR UPPER(symbol_nse) = UPPER(?) OR scrip_bse = ?
+  `),
+
+  insertHistoricalPrice: db.prepare(`
+    INSERT OR REPLACE INTO historical_prices (ticker, date, price, open, high, low, volume)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+  `),
+
+  getHistoricalPrices: db.prepare<string, { date: string; price: number; open: number; high: number; low: number; volume: number }>(`
+    SELECT date, price, open, high, low, volume 
+    FROM historical_prices 
+    WHERE UPPER(ticker) = UPPER(?) 
+    ORDER BY date ASC
+  `),
+
+  getHistoricalPricesCount: db.prepare<[], { count: number }>(`
+    SELECT COUNT(DISTINCT ticker) as count FROM historical_prices
   `),
 
   // Financial Cache
@@ -261,8 +301,37 @@ export const CompanyService = {
 
   updateSectorIndustry(ticker: string, sector: string, industry: string) {
     if (sector && industry) {
-      stmts.updateCompanySectorIndustry.run(sector, industry, ticker);
+      stmts.updateCompanySectorIndustry.run(sector, industry, ticker, ticker, ticker);
     }
+  },
+
+  saveHistoricalPrices(ticker: string, prices: any[]) {
+    if (!prices || !Array.isArray(prices) || prices.length === 0) return;
+    const upper = ticker.toUpperCase();
+    const insertMany = db.transaction((list: any[]) => {
+      for (const p of list) {
+        if (p.date && p.price !== undefined) {
+          stmts.insertHistoricalPrice.run(
+            upper,
+            p.date,
+            p.price,
+            p.open !== undefined ? p.open : p.price,
+            p.high !== undefined ? p.high : p.price,
+            p.low !== undefined ? p.low : p.price,
+            p.volume !== undefined ? p.volume : 0
+          );
+        }
+      }
+    });
+    try {
+      insertMany(prices);
+    } catch (e) {
+      console.error('Failed to save historical prices:', e);
+    }
+  },
+
+  getHistoricalPrices(ticker: string): any[] {
+    return stmts.getHistoricalPrices.all(ticker.toUpperCase());
   },
 
   getFinancialCache(ticker: string) {
@@ -278,7 +347,7 @@ export const CompanyService = {
     }
   },
 
-  setFinancialCache(ticker: string, data: any, ttlMinutes = 1440) { // 24 hours default
+  setFinancialCache(ticker: string, data: any, ttlMinutes = 129600) { // 90 days default for quarterly persistence
     const expiresAt = new Date(Date.now() + ttlMinutes * 60 * 1000).toISOString();
     stmts.setFinancialCache.run(ticker.toUpperCase(), JSON.stringify(data), expiresAt);
   },
@@ -311,17 +380,23 @@ export const CompanyService = {
     const totalCompanies = stmts.countCompanies.get()?.count || 0;
     const cachedFinancials = stmts.getFinancialCacheCount.get()?.count || 0;
     const cachedQuotes = stmts.getMarketQuoteCacheCount.get()?.count || 0;
+    const historicalStocksCount = stmts.getHistoricalPricesCount.get()?.count || 0;
     const exchangeBreakdown = stmts.getExchangeBreakdown.all();
     const sectors = stmts.getAllSectors.all();
+    const classifiedCount = sectors.filter(s => s.sector !== 'Unclassified' && s.sector !== 'Diversified').reduce((sum, s) => sum + s.count, 0);
+    const unclassifiedCount = totalCompanies - classifiedCount;
 
     return {
       totalCompanies,
       cachedFinancials,
       cachedQuotes,
+      historicalStocksCount,
+      classifiedCount,
+      unclassifiedCount,
       coveragePercent: totalCompanies > 0 ? ((cachedFinancials / totalCompanies) * 100).toFixed(2) + '%' : '0%',
       exchangeBreakdown,
       sectorsCount: sectors.length,
-      topSectors: sectors.slice(0, 10),
+      topSectors: sectors.slice(0, 15),
       generatedAt: new Date().toISOString()
     };
   }

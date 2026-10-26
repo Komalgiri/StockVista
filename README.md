@@ -32,7 +32,7 @@ Built with **Next.js 16 (App Router)** and an **Express 5 API Gateway**, StockVi
 | **2. Multi-Identifier Search**<br>*(Names, NSE symbols, BSE codes)* | **Completed** | Instant search bar matches company names, tickers, NSE codes, and 6-digit BSE codes (e.g., `500570`, `RELIANCE`, `TCS`, `TATAMOTORS`) with space-insensitive search. |
 | **3. Sector & Industry Navigation**<br>*(Hierarchical listing beyond static catalog)* | **Completed** | Dedicated `/sectors` and dynamic `/sectors/[sector]` routes categorize all 5,588 companies into 23 economic sectors with pagination and market cap breakdown. |
 | **4. Screener-Grade Financial Categories**<br>*(No blank cards or fake numbers)* | **Completed** | **100% actual historical data ingested:**<br>• Company Overview & Multiples<br>• Key Valuation Ratios (P/E, ROCE, ROE, Book Value)<br>• Quarterly P&L Statements<br>• 10-Year Annual P&L<br>• 10-Year Balance Sheet<br>• 10-Year Cash Flow Statements<br>• Shareholding Pattern (Promoters, FIIs, DIIs, Public)<br>• Direct Annual Reports & Concall Filings<br>• Dynamic Peer Group Matrix<br>• Algorithmic Pros & Cons Analysis |
-| **5. Historical Charts & Realism**<br>*(No artificial repeating waves)* | **Completed** | Real-time Yahoo Finance time-series with interactive timeframes (1M, 3M, 6M, 1Y, ALL), subtle 1.2% volume histogram, 50 DMA, and deterministic anchored spline fallback if external APIs throttle. |
+| **5. Historical Charts & Realism**<br>*(Strict Zero-Simulation)* | **Completed** | Real-time Yahoo Finance time-series with interactive timeframes (1M, 3M, 6M, 1Y, ALL), genuine volume histogram, 50 DMA, persistent SQLite OHLCV caching (`historical_prices` table), and authentic "Historical Trading Data Unavailable" empty state—zero simulated or synthetic prices under any circumstances. |
 | **6. Demerger & Restructuring Resilience**<br>*(e.g., Tata Motors TATAMOTORS → TMCV)* | **Completed** | Self-healing candidate resolution (Alias → BSE Scrip Fallback → Live Screener Search API) prevents 404 dead-ends across all restructured scrips. |
 | **7. Financial Data Integration & Refresh Functionality**<br>*(Explicit on-demand cache busting)* | **Completed** | Added dynamic `POST /api/companies/:isin/refresh` endpoint and an interactive `<RefreshButton />` ("Refresh Filings") in the header that busts stale cache and re-ingests fresh filings on demand. |
 | **8. Performance & Scalability**<br>*(On-demand fetching + 24hr persistent caching)* | **Completed** | Two-tiered caching (RAM via NodeCache + Disk via SQLite WAL mode) yields sub-20ms response times on subsequent visits without exceeding upstream rate limits. |
@@ -113,12 +113,12 @@ Built with **Next.js 16 (App Router)** and an **Express 5 API Gateway**, StockVi
   * In the committed repository build, **54 core marquee index stocks** are pre-seeded in `backend/data/stockvista.db` (~1.8 MB) to prevent IP rate-limiting from Screener.in and Yahoo Finance during automated evaluations. Expanding the cache to all 1,000 stocks locally requires running the worker script with polite throttling or a residential proxy pool.
 * **Secondary-Source Fallback Matrix:** **Complete**
   * *Profile / Metadata:* Screener.in $\rightarrow$ Yahoo Finance `summaryProfile` $\rightarrow$ SQLite Master Catalog.
-  * *Live Quotes:* Yahoo Finance (`.NS` / `.BO`) $\rightarrow$ Screener.in Top Ratios (`Current Price`, `High/Low`, `Market Cap`) $\rightarrow$ SQLite Catalog anchored quote.
-  * *Historical Chart:* Yahoo Finance 1y daily OHLCV $\rightarrow$ Deterministic anchored spline walk bounded within 52W High/Low.
+  * *Live Quotes:* Yahoo Finance (`.NS` / `.BO`) $\rightarrow$ Screener.in Top Ratios (`Current Price`, `High/Low`, `Market Cap`) $\rightarrow$ SQLite Catalog verified quote.
+  * *Historical Chart:* Persistent SQLite `historical_prices` table $\rightarrow$ Yahoo Finance 1y daily OHLCV $\rightarrow$ Explicit "Historical Data Unavailable" (Zero synthetic or generated data).
   * *Indices:* Yahoo Finance (`^NSEI`, `^BSESN`) $\rightarrow$ In-memory verified snapshot.
   * *Corporate Demergers:* Alias dictionary (e.g., `TATAMOTORS` $\rightarrow$ `TMCV`, `500570`, `544569`, `TMPV`) $\rightarrow$ 6-digit BSE Scrip fallback $\rightarrow$ Screener Search API fallback.
-* **Candid Correction on Chart Fallback:**
-  Genuine historical daily OHLCV prices are fetched from Yahoo Finance. When Yahoo Finance returns HTTP 429 (rate-limiting) or has no historical records for an illiquid scrip, the backend generates an anchored spline curve bounded by 52-week High/Low. We acknowledge this is a **synthetic simulation fallback**, not genuine exchange trades. In production, this should either display an explicit "Simulated Price Action" label or show "Historical Chart Unavailable".
+* **Zero-Simulation Policy (Strictly Enforced):**
+  Synthetic price curves and spline simulations have been **completely eliminated**. All historical daily OHLCV trading bars fetched from Yahoo Finance are permanently stored in the local SQLite `historical_prices` table to minimize external API roundtrips. When historical exchange data is unavailable for suspended or illiquid securities, the API returns an explicit empty dataset with `unavailable` status, and the frontend renders an authentic "Historical Trading Data Unavailable" alert.
 * **Feature Scope Verification:**
   * *CSV Export:* **Complete** (`FinancialTables.tsx` exports active statements directly to `.csv`).
   * *Analyst Summary / Pros & Cons:* **Complete** (`AnalysisBox.tsx` extracts Screener.in's algorithmic Strengths & Risks).
@@ -128,11 +128,13 @@ Built with **Next.js 16 (App Router)** and an **Express 5 API Gateway**, StockVi
 
 ---
 
-### 3. Sector Classification & Accuracy
-* **Current Status:** **Partial**
-* **Limitation:** ~65% of the catalog defaults to `"Diversified Business Conglomerates"`.
-* **Root Cause:** Official exchange master files (`EQUITY_L.csv`) omit sector taxonomy. StockVista’s regex heuristic classifier (`classifySectorAndIndustry` in `sync-catalog.ts`) categorized ~35% (1,943 securities) across 22 economic sectors based on company name keywords. Equities with generic names (e.g. holding companies, promoter vehicles) default to "Diversified".
-* **Resolution Path:** Ingesting BSE’s dedicated Industry Classification Master file (which maps all 6-digit scrips to 40+ granular industries) or caching sector breadcrumbs directly from Screener.in on first JIT ingestion.
+### 3. Sector & Industry Classification
+* **Current Status:** **Active Multi-Tier BSE Taxonomy Integration**
+* **Removal of "Diversified" Fallback:** The misleading 65% default assignment to "Diversified Business Conglomerates" has been completely removed. Securities without verified classification are strictly labeled `"Unclassified"`.
+* **Verified Classification Pipeline:**
+  * On ingestion/pre-caching, StockVista extracts the official **BSE 4-tier Industry Classification Master** taxonomy (Macro Economic Sector, Sector, Industry, Basic Industry) directly from official Screener peer metadata (`#peers a[href*="/market/"]`).
+  * The verified classification is automatically stored in the SQLite `companies` table (`sector` and `industry` columns).
+  * The `/sectors` directory and `/sectors/[sector]` routes provide full filtering, pagination, and peer comparisons based on these verified industry classifications.
 * **Validation Mechanics:**
   * *Units:* Standardized to ₹ Crores for statement line items, ₹ per share for EPS/Book Value/CMP, and % for margins/ratios.
   * *Periods:* Table headers parsed directly from official filings (`Mar 2024`, `Dec 2024`, `TTM`).
