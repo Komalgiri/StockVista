@@ -1,6 +1,6 @@
-# 📈 StockVista — Institutional Equity Research Dashboard
+# 📈 Opp Code Stock Vision — Institutional Equity Research Dashboard
 
-[![Next.js](https://img.shields.io/badge/Next.js-16.4-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-16.4.3-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19.0-blue?style=for-the-badge&logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.0-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
@@ -8,9 +8,10 @@
 [![Express.js](https://img.shields.io/badge/Express.js-5.0-lightgrey?style=for-the-badge&logo=express)](https://expressjs.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
-**StockVista** is a production-grade, full-stack equity research and fundamental analysis platform designed for Indian capital markets (NSE & BSE), inspired by the information architecture and depth of **Screener.in**.
+**Opp Code Stock Vision** (Compact: **OppCode StockVision**) is a production-grade, full-stack equity research and fundamental analysis platform designed for Indian capital markets (NSE & BSE), inspired by the information architecture and depth of **Screener.in**.  
+*Powered by OPP Code Vision Technology*
 
-Built with **Next.js 16 (App Router)** and an **Express 5 API Gateway**, StockVista orchestrates a multi-source data ingestion pipeline—combining real-time web scraping from Screener.in, live market data from Yahoo Finance, and an active indexed universe of **3,000+ Indian equities (scaling to 5,500+ across NSE & BSE)** backed by persistent SQLite storage—to deliver an authentic, zero-fabrication research experience.
+Built with **Next.js 16 (App Router)** and an **Express 5 API Gateway**, Opp Code Stock Vision orchestrates a multi-source data ingestion pipeline—combining real-time web scraping from Screener.in, live market data from Yahoo Finance, and an active indexed universe of **5,588 Indian equities across NSE & BSE** backed by persistent SQLite storage—to deliver an authentic, zero-fabrication research experience.
 
 ---
 
@@ -20,7 +21,8 @@ Built with **Next.js 16 (App Router)** and an **Express 5 API Gateway**, StockVi
 | :--- | :--- | :---: | :--- |
 | **Frontend Application** | [https://stock-vista-one.vercel.app/](https://stock-vista-one.vercel.app/) | ![Vercel](https://img.shields.io/badge/Vercel-Deployed-success?style=flat-square) | Hosted Next.js 16 App Router UI |
 | **Backend API Gateway** | [https://stockvista-7kk1.onrender.com/](https://stockvista-7kk1.onrender.com/) | ![Render](https://img.shields.io/badge/Render-Active-success?style=flat-square) | Node.js Express 5 REST Gateway |
-| **GitHub Repository** | [https://github.com/Komalgiri/StockVista](https://github.com/Komalgiri/StockVista) | ![GitHub](https://img.shields.io/badge/GitHub-Public-blue?style=flat-square) | Monorepo containing `/frontend` and `/backend` |
+| **Target Repository Identifier** | `opp-code-stock-vision` | ![Target Repo](https://img.shields.io/badge/Repo-opp--code--stock--vision-blue?style=flat-square) | Handover target repository |
+| **Current Repository** | [https://github.com/Komalgiri/StockVista](https://github.com/Komalgiri/StockVista) | ![GitHub](https://img.shields.io/badge/GitHub-Public-blue?style=flat-square) | Active source repository |
 
 ---
 
@@ -132,7 +134,7 @@ Built with **Next.js 16 (App Router)** and an **Express 5 API Gateway**, StockVi
 * **Current Status:** **Active Multi-Tier BSE Taxonomy Integration**
 * **Removal of "Diversified" Fallback:** The misleading 65% default assignment to "Diversified Business Conglomerates" has been completely removed. Securities without verified classification are strictly labeled `"Unclassified"`.
 * **Verified Classification Pipeline:**
-  * On ingestion/pre-caching, StockVista extracts the official **BSE 4-tier Industry Classification Master** taxonomy (Macro Economic Sector, Sector, Industry, Basic Industry) directly from official Screener peer metadata (`#peers a[href*="/market/"]`).
+  * On ingestion/pre-caching, Opp Code Stock Vision extracts the official **BSE 4-tier Industry Classification Master** taxonomy (Macro Economic Sector, Sector, Industry, Basic Industry) directly from official Screener peer metadata (`#peers a[href*="/market/"]`).
   * The verified classification is automatically stored in the SQLite `companies` table (`sector` and `industry` columns).
   * The `/sectors` directory and `/sectors/[sector]` routes provide full filtering, pagination, and peer comparisons based on these verified industry classifications.
 * **Validation Mechanics:**
@@ -205,7 +207,7 @@ Built with **Next.js 16 (App Router)** and an **Express 5 API Gateway**, StockVi
 
 ## 🏆 Achievements Till Now & Current Progress (Final Milestone Delivery)
 
-Over the 7-day implementation period (October 15–21, 2026), StockVista underwent a major engineering expansion—transforming from an initial 80-stock prototype into an enterprise-grade, Screener.in-grade equity research terminal covering the entire listed Indian stock universe.
+Over the 7-day implementation period (October 15–21, 2026), Opp Code Stock Vision underwent a major engineering expansion—transforming from an initial 80-stock prototype into an enterprise-grade, Screener.in-grade equity research terminal covering the entire listed Indian stock universe.
 
 ### 1. Complete Universal Catalog: 5,588 Equities Fully Indexed & Searchable
 - **Complete Elimination of Catalog Caps:** Replaced static lists with automated dual-exchange catalog synchronization (`sync-catalog.ts`).
@@ -306,7 +308,7 @@ Over the 7-day implementation period (October 15–21, 2026), StockVista underwe
 
 ## ⚡ Key Architecture & Capabilities
 
-- **Zero-Fabrication Guarantee:** When a metric or broker forecast is genuinely unavailable on public feeds, StockVista displays clear, transparent disclaimers rather than mock numbers.
+- **Zero-Fabrication Guarantee:** When a metric or broker forecast is genuinely unavailable on public feeds, Opp Code Stock Vision displays clear, transparent disclaimers rather than mock numbers.
 - **Dynamic Multi-Company Support:** Fully eliminates hardcoded mocks; every security (e.g. `RELIANCE`, `TCS`, `INFY`, `HDFCBANK`) retrieves its real description, official domain, BSE scrip, and audited financials.
 - **Screener.in Layout Alignment:** Information hierarchy mirrors Screener.in: `Header & Ratios` → `Chart` → `Pros & Cons` → `Valuation` → `Financials` → `Peers` → `Shareholding` → `Documents`.
 - **In-Memory Caching:** Node-Cache TTL layer (5 minutes for fundamental statements, 1 minute for market indices) prevents upstream rate-limiting and ensures sub-100ms response times for repeated requests.
@@ -317,7 +319,7 @@ Over the 7-day implementation period (October 15–21, 2026), StockVista underwe
 ## 🔬 Deep Feature Breakdown
 
 ### 1. Financial Statements (4 Core Statements + CSV Export)
-StockVista displays all four essential statements required for institutional equity analysis:
+Opp Code Stock Vision displays all four essential statements required for institutional equity analysis:
 - **Quarterly Results (`section#quarters`):** Consecutive quarterly revenues, operating expenses, operating profit, Operating Margin (OPM %), other income, depreciation, tax rate, net profit, and EPS.
 - **Profit & Loss (`section#profit-loss`):** Multi-year audited annual financial results covering past 10+ fiscal years, culminating in Trailing Twelve Month (TTM) annualized performance.
 - **Balance Sheet (`section#balance-sheet`):** Comprehensive breakdown of Equity Capital, Reserves, Borrowings, Other Liabilities, Total Liabilities, Fixed Assets, Capital Work-in-Progress (CWIP), Investments, and Other Assets.
@@ -391,7 +393,7 @@ A portal for regulatory disclosures, concalls, and reports:
 
 ## 🌐 Brief Explanation of Data Sources Used
 
-To provide a complete, institutional company analysis experience without requiring evaluators to configure Demat accounts or paid API keys, StockVista combines **three distinct data sources**, each selected for its specific strengths:
+To provide a complete, institutional company analysis experience without requiring evaluators to configure Demat accounts or paid API keys, Opp Code Stock Vision combines **three distinct data sources**, each selected for its specific strengths:
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────┐
@@ -461,11 +463,11 @@ During early architecture evaluation, the **Upstox Developer API v2** was built 
 ---
 
 ### 5. Multi-Source Combining & Fallback Mechanics
-StockVista employs a resilient gateway strategy to combine these sources:
+Opp Code Stock Vision employs a resilient gateway strategy to combine these sources:
 1. **Parallel Ingestion (`Promise.allSettled`):** Market quotes and fundamental statements resolve concurrently to minimize latency.
 2. **Yahoo 429 Throttle Defense:** If Yahoo Finance returns HTTP 429 (Too Many Requests), the gateway automatically falls back to Screener.in's real scraped CMP, 52W range, and market cap. The application **never** serves hardcoded placeholder quotes for different tickers.
 3. **In-Memory TTL Caching (`node-cache`):** Fundamental statements are cached for 5 minutes, while market index quotes are cached for 1 minute, preventing repeated page reloads from triggering upstream rate limits.
-4. **Zero-Fabrication Disclaimers:** Where sell-side consensus estimates or corporate action calendars require paid enterprise feeds, StockVista renders clear institutional disclaimers rather than hallucinated numbers.
+4. **Zero-Fabrication Disclaimers:** Where sell-side consensus estimates or corporate action calendars require paid enterprise feeds, Opp Code Stock Vision renders clear institutional disclaimers rather than hallucinated numbers.
 
 ---
 
@@ -512,7 +514,7 @@ Base URL: `http://localhost:8080/api` (Local) / `https://stockvista-7kk1.onrende
 | `/indices` | GET | None | Yahoo Finance | Cache (60s) | Live quotes for NIFTY 50 (`^NSEI`) and SENSEX (`^BSESN`) |
 | `/companies/:ticker` | GET | `:ticker` | Screener.in | NSE Catalog | Company profile, about commentary, website, BSE code, sector |
 | `/companies/:ticker/quote` | GET | `:ticker` | Yahoo Finance | Screener.in | Live price, day change, % change, volume, 52W high/low, market cap |
-| `/companies/:ticker/history` | GET | `:ticker` | Yahoo Finance | Synthesized | Daily OHLCV series for 1-year historical area chart |
+| `/companies/:ticker/history` | GET | `:ticker` | Yahoo Finance | SQLite Cache / Unavailable | Daily OHLCV series for 1-year historical area chart (Zero synthetic generation) |
 | `/companies/:ticker/ratios` | GET | `:ticker` | Screener.in | — | Screener's 9 top valuation and return ratios |
 | `/companies/:ticker/income` | GET | `:ticker` | Screener.in | — | Quarterly results and multi-year audited annual P&L statement |
 | `/companies/:ticker/balance-sheet` | GET | `:ticker` | Screener.in | — | Audited Balance Sheet (Liabilities, Equity, Fixed Assets, CWIP) |
@@ -528,7 +530,7 @@ Base URL: `http://localhost:8080/api` (Local) / `https://stockvista-7kk1.onrende
 ## 📁 Repository File Structure
 
 ```text
-StockVista/
+opp-code-stock-vision/
 ├── backend/                              # Express.js REST Gateway
 │   ├── src/
 │   │   ├── data/
@@ -594,8 +596,8 @@ StockVista/
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/Komalgiri/StockVista.git
-cd StockVista
+git clone https://github.com/Komalgiri/StockVista.git opp-code-stock-vision
+cd opp-code-stock-vision
 ```
 
 ### 2. Configure Environment Variables
@@ -672,7 +674,7 @@ npm run build
 ## 🛡️ Known Limitations & Public Exchange Data Boundaries
 
 1. **Unannounced Micro-Cap & Suspended Listings:**  
-   India's exchanges list a number of legacy, suspended, or shell companies that have not filed financial results in several fiscal cycles. StockVista strictly refuses to fabricate or mock missing financial figures; for these securities, clear disclaimers ("Filings Pending / Exchange Data Unavailable") are presented.
+   India's exchanges list a number of legacy, suspended, or shell companies that have not filed financial results in several fiscal cycles. Opp Code Stock Vision strictly refuses to fabricate or mock missing financial figures; for these securities, clear disclaimers ("Filings Pending / Exchange Data Unavailable") are presented.
 
 2. **Upstream Rate Limiting Safeguards:**  
    Direct scraping of exchange pages is protected by an in-flight single-request bundle resolver and two-tier caching. The background worker throttles requests at 1,500ms intervals to prevent IP throttling or Captchas.

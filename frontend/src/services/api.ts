@@ -30,12 +30,25 @@ export interface SectorCompaniesResponse {
 
 export interface CoverageReport {
   totalCompanies: number;
+  nseOnlyCount?: number;
+  bseOnlyCount?: number;
+  dualListedCount?: number;
   cachedFinancials: number;
   cachedQuotes: number;
+  historicalStocksCount?: number;
+  classifiedCount?: number;
+  unclassifiedCount?: number;
   coveragePercent: string;
   exchangeBreakdown: { exchange: string; count: number }[];
   sectorsCount: number;
   topSectors: SectorItem[];
+  categoryCounts?: Record<string, number>;
+  definitions?: {
+    available: string;
+    partial: string;
+    unavailable: string;
+  };
+  providerLimitations?: string[];
   generatedAt: string;
 }
 

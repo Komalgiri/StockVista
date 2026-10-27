@@ -17,7 +17,7 @@ function sleep(ms: number) {
 }
 
 export async function runPreCacheWorker(maxCount = 50, delayMs = 1500) {
-  console.log('🚀 Starting StockVista Background Financial Pre-Cache Worker...');
+  console.log('🚀 Starting Opp Code Stock Vision Background Financial Pre-Cache Worker...');
   console.log(`🎯 Target: Up to ${maxCount} prominent equities (Interval: ${delayMs}ms)`);
 
   const initialReport = CompanyService.getCoverageReport();

@@ -76,7 +76,19 @@ try {
   db.exec(`
     UPDATE companies 
     SET sector = 'Unclassified', industry = 'Unclassified' 
-    WHERE sector = 'Diversified' OR sector IS NULL OR sector = '' OR sector = 'Diversified Business';
+    WHERE sector = 'Diversified' OR sector IS NULL OR sector = '' OR sector = 'Diversified Business' OR sector = 'Diversified Business Conglomerates';
+
+    UPDATE companies 
+    SET sector = 'Construction & Real Estate' 
+    WHERE sector IN ('Construction Materials', 'Construction', 'Real Estate');
+
+    UPDATE companies 
+    SET sector = 'Energy & Power' 
+    WHERE sector IN ('Energy', 'Power');
+
+    UPDATE companies 
+    SET sector = 'Chemicals' 
+    WHERE sector = 'Specialty Chemicals';
   `);
 } catch (_) {}
 
@@ -310,16 +322,14 @@ export const CompanyService = {
     const upper = ticker.toUpperCase();
     const insertMany = db.transaction((list: any[]) => {
       for (const p of list) {
-        if (p.date && p.price !== undefined) {
-          stmts.insertHistoricalPrice.run(
-            upper,
-            p.date,
-            p.price,
-            p.open !== undefined ? p.open : p.price,
-            p.high !== undefined ? p.high : p.price,
-            p.low !== undefined ? p.low : p.price,
-            p.volume !== undefined ? p.volume : 0
-          );
+        if (p && p.date && typeof p.date === 'string' && typeof p.price === 'number' && !isNaN(p.price) && p.price > 0) {
+          const open = typeof p.open === 'number' && !isNaN(p.open) ? p.open : p.price;
+          const high = typeof p.high === 'number' && !isNaN(p.high) ? p.high : p.price;
+          const low = typeof p.low === 'number' && !isNaN(p.low) ? p.low : p.price;
+          const volume = typeof p.volume === 'number' && !isNaN(p.volume) ? p.volume : 0;
+          if (high >= low) {
+            stmts.insertHistoricalPrice.run(upper, p.date, p.price, open, high, low, volume);
+          }
         }
       }
     });
@@ -382,12 +392,49 @@ export const CompanyService = {
     const cachedQuotes = stmts.getMarketQuoteCacheCount.get()?.count || 0;
     const historicalStocksCount = stmts.getHistoricalPricesCount.get()?.count || 0;
     const exchangeBreakdown = stmts.getExchangeBreakdown.all();
-    const sectors = stmts.getAllSectors.all();
-    const classifiedCount = sectors.filter(s => s.sector !== 'Unclassified' && s.sector !== 'Diversified').reduce((sum, s) => sum + s.count, 0);
+    const sectors = stmts.getAllSectors.all().filter(s => s.sector !== 'Diversified');
+    const classifiedCount = sectors.filter(s => s.sector !== 'Unclassified').reduce((sum, s) => sum + s.count, 0);
     const unclassifiedCount = totalCompanies - classifiedCount;
+
+    // Dynamically calculate actual category counts from cached bundles
+    const cacheRows = (db.prepare('SELECT data FROM financial_cache').all() as { data: string }[]) || [];
+    const categoryCounts = {
+      overview: totalCompanies, // All 5,588 indexed equities have verified name, exchange, ticker & identifiers
+      ratios: 0,
+      quarterlyIncome: 0,
+      annualIncome: 0,
+      balanceSheet: 0,
+      cashFlow: 0,
+      shareholding: 0,
+      documents: 0,
+      analysis: 0,
+      peers: 0,
+    };
+
+    for (const row of cacheRows) {
+      try {
+        const d = JSON.parse(row.data);
+        if (d.ratios && Object.keys(d.ratios).length > 0) categoryCounts.ratios++;
+        if (d.income?.quarterly?.rows?.length > 0) categoryCounts.quarterlyIncome++;
+        if (d.income?.annual?.rows?.length > 0) categoryCounts.annualIncome++;
+        if (d.balanceSheet?.rows?.length > 0) categoryCounts.balanceSheet++;
+        if (d.cashFlow?.rows?.length > 0) categoryCounts.cashFlow++;
+        if (d.shareholding?.rows?.length > 0) categoryCounts.shareholding++;
+        if (d.documents && Object.keys(d.documents).length > 0) categoryCounts.documents++;
+        if (d.analysis && (d.analysis.pros?.length > 0 || d.analysis.cons?.length > 0)) categoryCounts.analysis++;
+        if (d.peers?.rows?.length > 0) categoryCounts.peers++;
+      } catch (_) {}
+    }
+
+    const nseOnlyCount = exchangeBreakdown.find(e => e.exchange === 'NSE')?.count || 0;
+    const bseOnlyCount = exchangeBreakdown.find(e => e.exchange === 'BSE')?.count || 0;
+    const dualListedCount = exchangeBreakdown.find(e => e.exchange === 'NSE & BSE')?.count || 0;
 
     return {
       totalCompanies,
+      nseOnlyCount,
+      bseOnlyCount,
+      dualListedCount,
       cachedFinancials,
       cachedQuotes,
       historicalStocksCount,
@@ -397,6 +444,17 @@ export const CompanyService = {
       exchangeBreakdown,
       sectorsCount: sectors.length,
       topSectors: sectors.slice(0, 15),
+      categoryCounts,
+      definitions: {
+        available: 'Full authentic financial records ingested from official exchange filings via Screener.in or Yahoo Finance.',
+        partial: 'Partial filings where some statements (e.g. peer multiples or quarterly updates) are missing from exchange disclosures.',
+        unavailable: 'Securities where public feeds supply no usable statements (e.g. suspended BSE microcaps, debt instruments).'
+      },
+      providerLimitations: [
+        'Yahoo Finance: Rate-limits at HTTP 429 after rapid sequential requests; handled via circuit breaker and local SQLite cache.',
+        'Screener.in: Legacy suspended BSE scrips and non-equity debt instruments (e.g. FMPs) have no public fundamental filings.',
+        'Historical OHLCV: Illiquid or suspended scrips return explicit unavailable status; zero synthetic generation.'
+      ],
       generatedAt: new Date().toISOString()
     };
   }

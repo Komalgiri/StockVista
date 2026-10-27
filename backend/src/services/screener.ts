@@ -331,3 +331,61 @@ export async function getScreenerCompanyDetails(ticker: string) {
   const $ = await fetchScreenerData(ticker);
   return $ ? extractDetails($) : null;
 }
+
+export async function getScreenerHistoricalChart(ticker: string, companyName?: string, bseCode?: string) {
+  const $ = await fetchScreenerData(ticker, companyName, bseCode);
+  if (!$) return null;
+  const companyId = $('div[data-company-id]').attr('data-company-id');
+  if (!companyId) return null;
+
+  try {
+    const url = `https://www.screener.in/api/company/${companyId}/chart/?q=Price-DMA50-DMA200-Volume&days=365`;
+    const res = await axios.get(url, {
+      headers: { 'User-Agent': BROWSER_USER_AGENT },
+      timeout: 10000
+    });
+
+    if (!res.data || !res.data.datasets || !Array.isArray(res.data.datasets)) return null;
+
+    const priceDataset = res.data.datasets.find((d: any) => d.metric === 'Price');
+    const volumeDataset = res.data.datasets.find((d: any) => d.metric === 'Volume');
+
+    if (!priceDataset || !Array.isArray(priceDataset.values) || priceDataset.values.length === 0) {
+      return null;
+    }
+
+    const volumeMap = new Map<string, number>();
+    if (volumeDataset && Array.isArray(volumeDataset.values)) {
+      for (const item of volumeDataset.values) {
+        if (Array.isArray(item) && item[0]) {
+          volumeMap.set(item[0], typeof item[1] === 'number' ? item[1] : parseFloat(item[1]) || 0);
+        }
+      }
+    }
+
+    const records: Array<{ date: string; price: number; open: number; high: number; low: number; close: number; volume: number }> = [];
+
+    for (const item of priceDataset.values) {
+      if (!Array.isArray(item) || item.length < 2) continue;
+      const date = item[0];
+      const price = parseFloat(item[1]);
+      if (!date || isNaN(price) || price <= 0) continue;
+      const volume = volumeMap.get(date) || 0;
+
+      records.push({
+        date,
+        price,
+        close: price,
+        open: price,
+        high: price,
+        low: price,
+        volume
+      });
+    }
+
+    return records.length > 0 ? records : null;
+  } catch (err: any) {
+    console.error(`Screener historical chart fetch failed for ${ticker}:`, err?.message || err);
+    return null;
+  }
+}

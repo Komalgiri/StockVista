@@ -31,8 +31,25 @@ const newsreader = Newsreader({
 });
 
 export const metadata: Metadata = {
-  title: "StockVista",
-  description: "Indian Stock Research Terminal",
+  title: {
+    default: "Opp Code Stock Vision — Institutional Indian Equity Research Platform",
+    template: "%s | Opp Code Stock Vision"
+  },
+  description: "Production-grade equity research and fundamental analysis platform for Indian capital markets (NSE & BSE). Powered by OPP Code Vision Technology.",
+  keywords: ["Opp Code Stock Vision", "OppCode StockVision", "Indian Stock Market", "NSE", "BSE", "Fundamental Analysis", "Equity Research"],
+  authors: [{ name: "OPP Code Vision Technology" }],
+  openGraph: {
+    title: "Opp Code Stock Vision — Institutional Equity Research Platform",
+    description: "Real-time fundamentals, 10-year financials, shareholding, and zero-fabrication analytics across 5,500+ Indian equities. Powered by OPP Code Vision Technology.",
+    siteName: "Opp Code Stock Vision",
+    locale: "en_IN",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Opp Code Stock Vision",
+    description: "Institutional Indian Equity Research Platform. Powered by OPP Code Vision Technology.",
+  },
 };
 
 export default function RootLayout({

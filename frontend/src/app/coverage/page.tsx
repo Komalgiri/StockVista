@@ -6,8 +6,8 @@ import { CoverageClient } from './CoverageClient';
 import { Activity } from 'lucide-react';
 
 export const metadata = {
-  title: 'Data Coverage & Telemetry Report — StockVista',
-  description: 'Audited data coverage statistics and category completeness across 5,588 NSE and BSE listed equities on StockVista.',
+  title: 'Data Coverage & Telemetry Report — Opp Code Stock Vision',
+  description: 'Audited data coverage statistics and category completeness across 5,588 NSE and BSE listed equities on Opp Code Stock Vision. Powered by OPP Code Vision Technology.',
 };
 
 export const instant = false;

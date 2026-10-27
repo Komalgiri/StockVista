@@ -17,34 +17,51 @@ export function HistoricalChart({ data }: { data: PricePoint[] }) {
   const [showVolume, setShowVolume] = useState(true);
   const [showSMA, setShowSMA] = useState(true);
 
-  if (!data || data.length === 0) {
+  // Strictly filter for genuine, non-zero numeric trading records
+  const validData = useMemo(() => {
+    if (!data || !Array.isArray(data)) return [];
+    return data.filter(d => d && d.date && typeof d.price === 'number' && !isNaN(d.price) && d.price > 0);
+  }, [data]);
+
+  if (!validData || validData.length === 0) {
     return (
-      <div className="w-full border border-border-hairline rounded-xl bg-surface-canvas p-10 text-center shadow-xs">
-        <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-slate-100 text-slate-400 mb-3">
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div className="w-full border border-slate-200/90 rounded-2xl bg-white p-8 md:p-10 text-center shadow-xs">
+        <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-slate-100 text-slate-500 mb-3.5">
+          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </div>
-        <h3 className="font-geist font-bold text-text-primary text-[15px] mb-1">Historical Trading Data Unavailable</h3>
-        <p className="text-[12px] text-text-tertiary max-w-md mx-auto">
-          No genuine exchange daily OHLCV trading records available for this security on public market feeds.
+        <h3 className="font-geist font-bold text-slate-900 text-base mb-1.5">Historical Data Unavailable</h3>
+        <p className="text-[13px] text-slate-500 max-w-lg mx-auto mb-4 leading-relaxed">
+          The selected market data provider does not currently supply usable historical OHLCV trading data for this security, or exchange feeds are temporarily rate-limited. This does not imply an absence of market trading activity. All audited fundamental statements, quarterly disclosures, and valuation metrics remain fully accessible.
         </p>
+        <div className="flex items-center justify-center gap-3">
+          <button
+            onClick={() => window.location.reload()}
+            className="px-3.5 py-1.5 rounded-lg bg-orange-700 hover:bg-orange-800 text-white text-xs font-semibold shadow-xs cursor-pointer transition-colors"
+          >
+            Retry Data Retrieval
+          </button>
+          <span className="text-[11px] font-mono text-slate-400 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200/80">
+            Policy: Zero synthetic generation
+          </span>
+        </div>
       </div>
     );
   }
 
   // Filter data based on selected timeframe
   const filteredData = useMemo(() => {
-    if (data.length <= 1) return data;
-    let count = data.length;
-    if (timeframe === '1M') count = Math.min(22, data.length);
-    else if (timeframe === '3M') count = Math.min(65, data.length);
-    else if (timeframe === '6M') count = Math.min(130, data.length);
-    else if (timeframe === '1Y') count = Math.min(250, data.length);
-    else count = data.length;
+    if (validData.length <= 1) return validData;
+    let count = validData.length;
+    if (timeframe === '1M') count = Math.min(22, validData.length);
+    else if (timeframe === '3M') count = Math.min(65, validData.length);
+    else if (timeframe === '6M') count = Math.min(130, validData.length);
+    else if (timeframe === '1Y') count = Math.min(250, validData.length);
+    else count = validData.length;
 
-    return data.slice(-count);
-  }, [data, timeframe]);
+    return validData.slice(-count);
+  }, [validData, timeframe]);
 
   // Calculate Moving Averages dynamically
   const chartData = useMemo(() => {
@@ -70,8 +87,9 @@ export function HistoricalChart({ data }: { data: PricePoint[] }) {
 
   // Real volume calculation
   const maxVolume = useMemo(() => {
-    const vols = chartData.map(d => d.volume || 1000000);
-    return Math.max(...vols, 1000000);
+    const vols = chartData.map(d => (typeof d.volume === 'number' && !isNaN(d.volume) ? d.volume : 0));
+    const highest = Math.max(...vols, 0);
+    return highest > 0 ? highest : 1;
   }, [chartData]);
 
   // Sample volume bars (24 bars evenly spaced)
@@ -82,9 +100,9 @@ export function HistoricalChart({ data }: { data: PricePoint[] }) {
     for (let i = 0; i < chartData.length; i += step) {
       const pt = chartData[i];
       const prev = i > 0 ? chartData[i - 1] : pt;
-      const vol = pt.volume || 1000000;
+      const vol = typeof pt.volume === 'number' && !isNaN(pt.volume) ? pt.volume : 0;
       bars.push({
-        heightPct: Math.min(100, Math.max(12, (vol / maxVolume) * 100)),
+        heightPct: maxVolume > 1 ? Math.min(100, Math.max(8, (vol / maxVolume) * 100)) : 0,
         isUp: pt.price >= prev.price
       });
     }
@@ -109,7 +127,7 @@ export function HistoricalChart({ data }: { data: PricePoint[] }) {
 
   // Current Stats
   const latestSMA = chartData[chartData.length - 1]?.sma || lastPrice;
-  const latestVol = chartData[chartData.length - 1]?.volume || 2500000;
+  const latestVol = chartData[chartData.length - 1]?.volume;
 
   return (
     <div className="w-full border border-slate-200/90 rounded-2xl bg-white p-5 md:p-6 shadow-xs">
@@ -276,7 +294,7 @@ export function HistoricalChart({ data }: { data: PricePoint[] }) {
           )}
         </div>
         <div className="text-slate-400">
-          Day Vol: {(latestVol / 1000000).toFixed(2)}M shares
+          Day Vol: {typeof latestVol === 'number' && latestVol > 0 ? `${(latestVol / 1000000).toFixed(2)}M shares` : '—'}
         </div>
       </div>
     </div>

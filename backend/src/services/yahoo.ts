@@ -118,14 +118,40 @@ export async function getHistoricalData(isin: string, range: string = '1y') {
     const queryOptions = { period1, interval: '1d' as const };
     const result: any[] = await yahooFinance.historical(symbol, queryOptions);
     
-    return result.map((day: any) => ({
-      date: day.date.toISOString().split('T')[0],
-      price: day.close,
-      open: day.open,
-      high: day.high,
-      low: day.low,
-      volume: day.volume
-    }));
+    if (!result || !Array.isArray(result) || result.length === 0) {
+      return null;
+    }
+
+    const validRecords = result
+      .filter((day: any) => {
+        if (!day || !day.date) return false;
+        const d = new Date(day.date);
+        if (isNaN(d.getTime())) return false;
+        const price = typeof day.close === 'number' ? day.close : parseFloat(day.close);
+        if (isNaN(price) || price <= 0) return false;
+        const high = typeof day.high === 'number' ? day.high : (parseFloat(day.high) || price);
+        const low = typeof day.low === 'number' ? day.low : (parseFloat(day.low) || price);
+        if (high < low) return false;
+        return true;
+      })
+      .map((day: any) => {
+        const close = typeof day.close === 'number' ? day.close : parseFloat(day.close);
+        const open = typeof day.open === 'number' ? day.open : (parseFloat(day.open) || close);
+        const high = typeof day.high === 'number' ? day.high : (parseFloat(day.high) || close);
+        const low = typeof day.low === 'number' ? day.low : (parseFloat(day.low) || close);
+        const volume = typeof day.volume === 'number' ? day.volume : (parseFloat(day.volume) || 0);
+
+        return {
+          date: new Date(day.date).toISOString().split('T')[0],
+          price: close,
+          open,
+          high,
+          low,
+          volume: volume >= 0 ? volume : 0
+        };
+      });
+
+    return validRecords.length > 0 ? validRecords : null;
   } catch (error) {
     handleYahooFailure(error, `Historical(${isin})`);
     return null;

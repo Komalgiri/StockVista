@@ -113,10 +113,13 @@ app.post('/api/sync-catalog', async (req: express.Request, res: express.Response
   }
 });
 
-// In-memory fallback for indices when Yahoo Finance is unreachable/rate-limited
-let lastKnownIndices = {
-  nifty50: { value: 24852.15, change: 84.30, changePercent: 0.34 },
-  sensex: { value: 81345.80, change: 275.60, changePercent: 0.34 },
+// Genuinely fetched indices cache (initially null until genuinely fetched from live exchange feeds)
+let lastKnownIndices: {
+  nifty50: { value: number; change: number; changePercent: number } | null;
+  sensex: { value: number; change: number; changePercent: number } | null;
+} = {
+  nifty50: null,
+  sensex: null,
 };
 
 // ─── Live Market Indices ──────────────────────────────────────────────────────
@@ -155,12 +158,25 @@ app.get('/api/indices', async (req: express.Request, res: express.Response) => {
       return res.json({ success: true, data: payload, meta: { source: 'yahoo-finance' } });
     }
 
-    // Both returned null (circuit breaker or rate limit) -> serve last known/baseline
-    indicesCache.set(cacheKey, lastKnownIndices, 300); // 5-minute cache
-    return res.json({ success: true, data: lastKnownIndices, meta: { source: 'market-benchmark-fallback' } });
+    if (lastKnownIndices.nifty50 || lastKnownIndices.sensex) {
+      indicesCache.set(cacheKey, lastKnownIndices, 300);
+      return res.json({ success: true, data: lastKnownIndices, meta: { source: 'last-verified-cache' } });
+    }
+
+    return res.json({
+      success: true,
+      data: { nifty50: null, sensex: null },
+      meta: { source: 'unavailable' }
+    });
   } catch (error) {
-    indicesCache.set(cacheKey, lastKnownIndices, 300);
-    return res.json({ success: true, data: lastKnownIndices, meta: { source: 'fallback-on-error' } });
+    if (lastKnownIndices.nifty50 || lastKnownIndices.sensex) {
+      return res.json({ success: true, data: lastKnownIndices, meta: { source: 'last-verified-cache' } });
+    }
+    return res.json({
+      success: true,
+      data: { nifty50: null, sensex: null },
+      meta: { source: 'unavailable' }
+    });
   }
 });
 
@@ -180,7 +196,7 @@ app.use((err: Error, req: express.Request, res: express.Response, _next: express
 
 app.listen(PORT, async () => {
   const total = CompanyService.getTotalCount();
-  console.log(`✅ StockVista backend running on http://localhost:${PORT}`);
+  console.log(`✅ Opp Code Stock Vision backend running on http://localhost:${PORT}`);
   console.log(`   Database loaded: ${total} NSE & BSE companies indexed in SQLite.`);
 
   // Auto-sync if DB is empty

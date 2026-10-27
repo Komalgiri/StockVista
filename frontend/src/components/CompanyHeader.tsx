@@ -100,11 +100,11 @@ export function CompanyHeader({
           <div className="text-[12px] text-text-secondary font-medium mb-3 flex items-center gap-1.5">
             <span className="text-[#c2410c] font-bold">🏢 {sector}</span>
             <span className="text-text-tertiary">&gt;</span>
-            <span className="text-slate-700">{industry || 'Commercial Enterprise'}</span>
+            <span className="text-slate-700">{industry || 'Unclassified'}</span>
           </div>
 
           <p className="text-[13px] text-text-secondary leading-relaxed mb-4 max-w-3xl line-clamp-3" title={description}>
-            {description || `${name} is an active Indian security listed on the National Stock Exchange (NSE).`}
+            {description || `${name} is an active public security listed on the Indian stock exchanges (${exchange || 'NSE / BSE'}).`}
           </p>
 
           <div className="flex flex-wrap gap-2 text-[12px] font-semibold items-center">

@@ -6,8 +6,8 @@ import { Sparkles } from 'lucide-react';
 import { SectorsClient } from './SectorsClient';
 
 export const metadata = {
-  title: 'Indian Stock Market Sectors & Industries — StockVista',
-  description: 'Browse all NSE & BSE listed companies categorized by sector and industry, mirroring Screener.in directory structure.',
+  title: 'Indian Stock Market Sectors & Industries — Opp Code Stock Vision',
+  description: 'Browse all NSE & BSE listed companies categorized by verified sector and industry taxonomy on Opp Code Stock Vision.',
 };
 
 export const instant = false;

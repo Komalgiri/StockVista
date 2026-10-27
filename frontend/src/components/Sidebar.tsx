@@ -19,15 +19,15 @@ export function Sidebar() {
         href="/"
         className="h-16 flex items-center justify-center md:justify-start md:px-5 border-b border-slate-200/80 gap-3 hover:bg-slate-50/80 transition-colors"
       >
-        <div className="w-8 h-8 rounded-lg bg-[#c2410c] text-white flex items-center justify-center font-bold text-sm font-geist tracking-tight shadow-sm shrink-0">
-          SV
+        <div className="w-8 h-8 rounded-lg bg-[#c2410c] text-white flex items-center justify-center font-bold text-xs font-geist tracking-tight shadow-sm shrink-0">
+          OC
         </div>
         <div className="hidden md:flex flex-col min-w-0">
           <div className="flex items-center gap-1.5">
-            <span className="font-geist font-extrabold text-slate-950 leading-tight text-[15px] tracking-tight">StockVista</span>
-            <span className="text-[9px] font-mono font-bold bg-orange-100 text-[#c2410c] px-1.5 py-0.2 rounded">PRO</span>
+            <span className="font-geist font-extrabold text-slate-950 leading-tight text-[13px] tracking-tight truncate">Opp Code Stock Vision</span>
+            <span className="text-[9px] font-mono font-bold bg-orange-100 text-[#c2410c] px-1 py-0.2 rounded shrink-0">PRO</span>
           </div>
-          <span className="text-[10px] uppercase tracking-wider text-slate-400 font-medium">India Equity Research</span>
+          <span className="text-[9px] uppercase tracking-wider text-slate-400 font-medium truncate">India Equity Research</span>
         </div>
       </Link>
       
@@ -61,18 +61,21 @@ export function Sidebar() {
         />
       </nav>
 
-      {/* Terminal Telemetry Footer */}
+      {/* Terminal Telemetry & Attribution Footer */}
       <div className="p-4 border-t border-slate-200/80 hidden md:block bg-slate-50/50 text-[11px]">
         <div className="flex items-center justify-between mb-1.5">
           <span className="text-slate-500 font-medium">Indexed Equities</span>
           <span className="font-mono text-slate-900 font-bold">5,588</span>
         </div>
-        <div className="flex items-center justify-between text-[10px]">
+        <div className="flex items-center justify-between text-[10px] mb-2">
           <span className="text-slate-500 font-medium">Data Pipeline</span>
           <span className="text-emerald-700 font-bold flex items-center gap-1">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
             Live Ingestion
           </span>
+        </div>
+        <div className="pt-2 border-t border-slate-200/60 text-[9.5px] text-slate-400 font-medium leading-tight">
+          Powered by OPP Code Vision Technology
         </div>
       </div>
     </aside>

@@ -203,7 +203,7 @@ export default async function CompanyPage(props: { params: Promise<{ ticker: str
             <HeaderSearch />
           </div>
           <div className="md:hidden">
-            <span className="font-geist font-semibold text-primary text-lg">StockVista</span>
+            <span className="font-geist font-bold text-primary text-sm">Opp Code Stock Vision</span>
           </div>
           <div className="flex items-center gap-5 ml-auto md:ml-0 text-text-secondary">
             <MarketTicker />

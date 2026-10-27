@@ -119,7 +119,7 @@ export function SectorsClient({
   // Top marquee sectors for spotlight cards
   const spotlightSectors = useMemo(() => {
     return safeSectors
-      .filter(s => s?.sector && SECTOR_META[s.sector] && s.sector !== 'Diversified')
+      .filter(s => s?.sector && SECTOR_META[s.sector] && s.sector !== 'Unclassified')
       .slice(0, 4);
   }, [safeSectors]);
 
@@ -211,38 +211,42 @@ export function SectorsClient({
 
         {/* Multi-segment Progress Bar with Rust Orange Palette */}
         <div className="h-3 w-full bg-surface-dim rounded-full overflow-hidden flex shadow-inner">
-          <div style={{ width: '9.2%' }} className="bg-orange-700 h-full" title="Financial Services: 514" />
-          <div style={{ width: '5.6%' }} className="bg-orange-600 h-full" title="Technology: 316" />
-          <div style={{ width: '3.4%' }} className="bg-amber-600 h-full" title="FMCG: 188" />
-          <div style={{ width: '2.9%' }} className="bg-orange-500 h-full" title="Construction & Real Estate: 162" />
-          <div style={{ width: '2.5%' }} className="bg-amber-700 h-full" title="Energy & Power: 142" />
-          <div style={{ width: '2.5%' }} className="bg-rose-700 h-full" title="Healthcare: 141" />
-          <div style={{ width: '1.6%' }} className="bg-stone-600 h-full" title="Textiles: 92" />
-          <div style={{ width: '1.4%' }} className="bg-amber-800 h-full" title="Chemicals: 79" />
-          <div style={{ width: '70.9%' }} className="bg-stone-300 dark:bg-stone-700 h-full" title="Diversified & Other: 3,954" />
+          <div style={{ width: '11.0%' }} className="bg-orange-700 h-full" title="Financial Services: 617" />
+          <div style={{ width: '6.0%' }} className="bg-orange-600 h-full" title="Technology: 333" />
+          <div style={{ width: '3.8%' }} className="bg-amber-600 h-full" title="FMCG: 211" />
+          <div style={{ width: '3.6%' }} className="bg-orange-500 h-full" title="Construction & Real Estate: 199" />
+          <div style={{ width: '3.1%' }} className="bg-rose-700 h-full" title="Healthcare: 171" />
+          <div style={{ width: '2.9%' }} className="bg-amber-700 h-full" title="Energy & Power: 161" />
+          <div style={{ width: '1.9%' }} className="bg-amber-800 h-full" title="Chemicals: 107" />
+          <div style={{ width: '1.8%' }} className="bg-stone-600 h-full" title="Textiles & Apparel: 102" />
+          <div style={{ width: '7.5%' }} className="bg-orange-400 h-full" title="Other Verified Sectors: 423" />
+          <div style={{ width: '58.4%' }} className="bg-slate-300 dark:bg-slate-700 h-full" title="Unclassified: 3,264" />
         </div>
 
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11px] text-text-secondary pt-1">
           <span className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-orange-700" /> Financials (9.2%)
+            <span className="w-2 h-2 rounded-full bg-orange-700" /> Financials (11.0%)
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-orange-600" /> Tech (5.6%)
+            <span className="w-2 h-2 rounded-full bg-orange-600" /> Tech (6.0%)
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-amber-600" /> FMCG (3.4%)
+            <span className="w-2 h-2 rounded-full bg-amber-600" /> FMCG (3.8%)
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-orange-500" /> Realty & Infra (2.9%)
+            <span className="w-2 h-2 rounded-full bg-orange-500" /> Realty &amp; Infra (3.6%)
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-amber-700" /> Energy (2.5%)
+            <span className="w-2 h-2 rounded-full bg-rose-700" /> Healthcare (3.1%)
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-rose-700" /> Healthcare (2.5%)
+            <span className="w-2 h-2 rounded-full bg-amber-700" /> Energy (2.9%)
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-stone-300 dark:bg-stone-700" /> Diversified & Other (70.9%)
+            <span className="w-2 h-2 rounded-full bg-orange-400" /> Other Verified (11.2%)
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-slate-400" /> Unclassified (58.4%)
           </span>
         </div>
       </div>

@@ -7,9 +7,9 @@ interface CorporateMetadataProps {
 }
 
 export function CorporateMetadata({ profile, ratios }: CorporateMetadataProps) {
-  const sector = profile?.sector || 'Indian Equities';
-  const industry = profile?.industry || 'Commercial Enterprise';
-  const ticker = profile?.ticker || 'NSE';
+  const sector = profile?.sector || 'Unclassified';
+  const industry = profile?.industry || 'Unclassified';
+  const ticker = profile?.ticker || '—';
   const bseCode = profile?.bseCode;
   const website = profile?.website;
 
@@ -39,8 +39,8 @@ export function CorporateMetadata({ profile, ratios }: CorporateMetadataProps) {
       <div className="flex-1 flex flex-col justify-between text-[12px] font-inter">
         <MetaRow label="Macro Sector" value={sector} />
         <MetaRow label="Industry Group" value={industry} />
-        <MetaRow label="Primary Exchange" value={`National Stock Exchange (NSE)`} />
-        <MetaRow label="NSE Symbol" value={<span className="font-mono font-semibold text-primary">{ticker}</span>} />
+        <MetaRow label="Primary Exchange" value={profile?.exchange ? (profile.exchange.includes('NSE') ? 'National Stock Exchange (NSE)' : 'Bombay Stock Exchange (BSE)') : 'Indian Exchanges'} />
+        <MetaRow label="NSE Symbol" value={<span className="font-mono font-semibold text-primary">{profile?.exchange === 'BSE' ? 'BSE Listed Only' : ticker}</span>} />
         
         <MetaRow 
           label="BSE Scrip Code" 

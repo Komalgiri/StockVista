@@ -11,7 +11,8 @@ import {
   getScreenerPeers, 
   getScreenerDocuments,
   getScreenerAnalysis,
-  getScreenerCompanyDetails
+  getScreenerCompanyDetails,
+  getScreenerHistoricalChart
 } from '../services/screener';
 import NodeCache from 'node-cache';
 
@@ -118,7 +119,7 @@ router.get('/:isin', asyncHandler(async (req: Request, res: Response) => {
 
   const resolvedName = (profile?.name && !profile.name.includes('.NS') && profile.name !== isin)
     ? profile.name
-    : (dbCompany?.name || `${upperTicker} India Ltd.`);
+    : (dbCompany?.name || upperTicker);
 
   const resolvedSector = (screenerDetails?.sector)
     || (dbCompany?.sector && dbCompany.sector !== 'Diversified' && dbCompany.sector !== 'Unclassified' ? dbCompany.sector : null)
@@ -166,18 +167,18 @@ router.get('/:isin/quote', asyncHandler(async (req: Request, res: Response) => {
   // 1. Yahoo Finance Live Quote
   try {
     const data = await getMarketQuote(isin);
-    if (data && data.price) {
+    if (data && typeof data.price === 'number' && !isNaN(data.price) && data.price > 0) {
       const quotePayload = {
         currentPrice: data.price,
-        dayChange: data.dayChange || 0,
-        dayChangePercent: data.dayChangePercent || 0,
-        open: data.open || data.price,
-        high: data.high || data.price,
-        low: data.low || data.price,
-        previousClose: data.close || data.price,
-        volume: data.volume || 2500000,
-        weekHigh52: data.weekHigh52 || data.price * 1.15,
-        weekLow52: data.weekLow52 || data.price * 0.85,
+        dayChange: typeof data.dayChange === 'number' ? data.dayChange : 0,
+        dayChangePercent: typeof data.dayChangePercent === 'number' ? data.dayChangePercent : 0,
+        open: typeof data.open === 'number' ? data.open : data.price,
+        high: typeof data.high === 'number' ? data.high : data.price,
+        low: typeof data.low === 'number' ? data.low : data.price,
+        previousClose: typeof data.close === 'number' ? data.close : data.price,
+        volume: typeof data.volume === 'number' ? data.volume : 0,
+        weekHigh52: typeof data.weekHigh52 === 'number' ? data.weekHigh52 : null,
+        weekLow52: typeof data.weekLow52 === 'number' ? data.weekLow52 : null,
         marketCap: data.marketCap ? `₹${(data.marketCap / 10000000).toLocaleString('en-IN', { maximumFractionDigits: 0 })} Cr` : undefined
       };
       CompanyService.setMarketQuoteCache(upper, quotePayload, 5);
@@ -194,30 +195,34 @@ router.get('/:isin/quote', asyncHandler(async (req: Request, res: Response) => {
     const ratios = bundle?.ratios || await getScreenerRatios(isin).catch(() => null);
 
     if (ratios && ratios['Current Price']) {
-      const currentPrice = parseFloat(ratios['Current Price'].replace(/[^0-9.-]+/g, '')) || 100;
-      const rawCap = (ratios['Market Cap'] || '').replace(/\s+/g, ' ').trim();
-      const cleanedCap = rawCap.replace(/₹/g, '').replace(/Cr\.?/gi, '').trim();
-      const marketCap = cleanedCap ? `₹${cleanedCap} Cr` : undefined;
-      const highLowParts = (ratios['High / Low'] || '').split('/');
-      const weekHigh52 = highLowParts[0] ? parseFloat(highLowParts[0].replace(/[^0-9.-]+/g, '')) : currentPrice * 1.18;
-      const weekLow52 = highLowParts[1] ? parseFloat(highLowParts[1].replace(/[^0-9.-]+/g, '')) : currentPrice * 0.82;
+      const parsedPrice = parseFloat(ratios['Current Price'].replace(/[^0-9.-]+/g, ''));
+      if (!isNaN(parsedPrice) && parsedPrice > 0) {
+        const rawCap = (ratios['Market Cap'] || '').replace(/\s+/g, ' ').trim();
+        const cleanedCap = rawCap.replace(/₹/g, '').replace(/Cr\.?/gi, '').trim();
+        const marketCap = cleanedCap ? `₹${cleanedCap} Cr` : undefined;
+        const highLowParts = (ratios['High / Low'] || '').split('/');
+        const parsedHigh = highLowParts[0] ? parseFloat(highLowParts[0].replace(/[^0-9.-]+/g, '')) : null;
+        const parsedLow = highLowParts[1] ? parseFloat(highLowParts[1].replace(/[^0-9.-]+/g, '')) : null;
+        const weekHigh52 = parsedHigh !== null && !isNaN(parsedHigh) ? parsedHigh : null;
+        const weekLow52 = parsedLow !== null && !isNaN(parsedLow) ? parsedLow : null;
 
-      const fallbackPayload = {
-        currentPrice,
-        dayChange: 0,
-        dayChangePercent: 0,
-        open: currentPrice,
-        high: weekHigh52 || currentPrice,
-        low: weekLow52 || currentPrice,
-        previousClose: currentPrice,
-        volume: 0,
-        weekHigh52,
-        weekLow52,
-        marketCap
-      };
-      CompanyService.setMarketQuoteCache(upper, fallbackPayload, 10);
-      respond(res, fallbackPayload, 'screener.in-ratios');
-      return;
+        const fallbackPayload = {
+          currentPrice: parsedPrice,
+          dayChange: 0,
+          dayChangePercent: 0,
+          open: parsedPrice,
+          high: weekHigh52 || parsedPrice,
+          low: weekLow52 || parsedPrice,
+          previousClose: parsedPrice,
+          volume: 0,
+          weekHigh52,
+          weekLow52,
+          marketCap
+        };
+        CompanyService.setMarketQuoteCache(upper, fallbackPayload, 10);
+        respond(res, fallbackPayload, 'screener.in-ratios');
+        return;
+      }
     }
   } catch (err) {
     console.error('Screener quote fallback failed', err);
@@ -239,7 +244,10 @@ router.get('/:isin/history', asyncHandler(async (req: Request, res: Response) =>
     return;
   }
 
-  // 2. Fetch genuine historical OHLCV from Yahoo Finance
+  // 2. Resolve company metadata from DB for aliases / BSE code
+  const dbCompany = CompanyService.getCompany(upper);
+
+  // 3. Fetch genuine historical OHLCV from Yahoo Finance
   try {
     const history = await getHistoricalData(isin, '1y');
     if (history && history.length > 0) {
@@ -252,7 +260,19 @@ router.get('/:isin/history', asyncHandler(async (req: Request, res: Response) =>
     console.error('Yahoo history fetch failed', error);
   }
 
-  // 3. Strictly NO simulated, synthetic or fabricated market data.
+  // 4. Resilient Fallback: Fetch genuine exchange historical trading chart from Screener.in
+  try {
+    const screenerHistory = await getScreenerHistoricalChart(isin, dbCompany?.name, dbCompany?.scrip_bse || undefined);
+    if (screenerHistory && screenerHistory.length > 0) {
+      CompanyService.saveHistoricalPrices(upper, screenerHistory);
+      respond(res, screenerHistory, 'screener.in-historical');
+      return;
+    }
+  } catch (error) {
+    console.error('Screener history fetch failed', error);
+  }
+
+  // 5. Strictly NO simulated, synthetic or fabricated market data.
   // When genuine trading records are unavailable, return an empty array.
   respond(res, [], 'unavailable');
 }));

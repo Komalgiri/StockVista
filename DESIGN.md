@@ -1,5 +1,5 @@
 ---
-name: StockVista Financial Terminal
+name: Opp Code Stock Vision Financial Terminal
 colors:
   surface: '#f8f9ff'
   surface-dim: '#cbdbf5'

@@ -13,9 +13,9 @@ export default function Home() {
           <div className="flex items-center gap-3">
             <div className="md:hidden flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-slate-950 text-white flex items-center justify-center font-bold text-xs font-geist">
-                SV
+                OC
               </div>
-              <span className="font-geist font-bold text-slate-950 text-base">StockVista</span>
+              <span className="font-geist font-bold text-slate-950 text-sm">Opp Code Stock Vision</span>
             </div>
             <div className="hidden md:flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-50 border border-slate-200/70 text-slate-600 text-xs font-medium shadow-2xs">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />

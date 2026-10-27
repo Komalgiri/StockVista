@@ -14,8 +14,8 @@ export async function generateMetadata({ params }: { params: Promise<{ sector: s
   const { sector } = await params;
   const decoded = decodeURIComponent(sector);
   return {
-    title: `${decoded} Stocks in India (NSE & BSE) — StockVista`,
-    description: `Complete list of public companies in the ${decoded} sector listed on NSE and BSE with full financial statements and ratios.`,
+    title: `${decoded} Stocks in India (NSE & BSE) — Opp Code Stock Vision`,
+    description: `Complete list of public companies in the ${decoded} sector listed on NSE and BSE with full financial statements and ratios on Opp Code Stock Vision.`,
   };
 }
 
