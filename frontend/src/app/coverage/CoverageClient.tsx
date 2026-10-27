@@ -16,6 +16,7 @@ import type { CoverageReport } from '@/services/api';
 
 const FINANCIAL_CATEGORIES = [
   {
+    key: 'overview',
     category: 'Company Profile & Identifiers',
     metrics: 'Official Name, Ticker, NSE Symbol, BSE 6-digit Scrip, ISIN, Face Value, Series, About Description',
     frequency: 'Permanent / Dual-Master',
@@ -23,6 +24,7 @@ const FINANCIAL_CATEGORIES = [
     status: '100% Active Universe (5,588 Equities)'
   },
   {
+    key: 'quarterlyIncome',
     category: 'Consecutive Quarterly Results',
     metrics: 'Quarterly Net Sales, Operating Expenses, Operating Profit, OPM %, Other Income, Depreciation, Net Profit, EPS',
     frequency: 'Quarterly (Q1, Q2, Q3, Q4)',
@@ -30,6 +32,7 @@ const FINANCIAL_CATEGORIES = [
     status: 'Live Consolidated & Standalone'
   },
   {
+    key: 'annualIncome',
     category: '10-Year Annual Profit & Loss',
     metrics: '10+ Year historical revenues, expenses, operating margin, tax rate, Net Profit, Trailing Twelve Months (TTM)',
     frequency: 'Annual Multi-Year Series',
@@ -37,6 +40,7 @@ const FINANCIAL_CATEGORIES = [
     status: 'Audited Multi-Year History'
   },
   {
+    key: 'balanceSheet',
     category: 'Balance Sheet Breakdown',
     metrics: 'Equity Capital, Reserves, Borrowings, Other Liabilities, Total Assets, Fixed Assets, CWIP, Cash & Investments',
     frequency: 'Annual Historical',
@@ -44,6 +48,7 @@ const FINANCIAL_CATEGORIES = [
     status: 'Audited Balance Sheets'
   },
   {
+    key: 'cashFlow',
     category: 'Cash Flow Statements',
     metrics: 'Cash from Operating (CFO), Cash from Investing (CFI), Cash from Financing (CFF), Net Cash Flow',
     frequency: 'Annual Cash Flow Series',
@@ -51,6 +56,7 @@ const FINANCIAL_CATEGORIES = [
     status: 'Complete Historical Statements'
   },
   {
+    key: 'shareholding',
     category: 'Shareholding Trends & Distribution',
     metrics: 'Promoter, FII (Foreign), DII (Domestic), Government, and Public historical shareholding %',
     frequency: 'Quarterly Ownership Series',
@@ -58,6 +64,15 @@ const FINANCIAL_CATEGORIES = [
     status: 'Institutional Ownership'
   },
   {
+    key: 'ratios',
+    category: 'Key Financial & Valuation Ratios',
+    metrics: 'Market Cap, P/E, Book Value, ROCE, ROE, Dividend Yield, High/Low 52-Week, Face Value',
+    frequency: 'Real-Time / Daily',
+    source: 'Screener.in Top Ratios Grid',
+    status: 'Audited Ratios'
+  },
+  {
+    key: 'peers',
     category: 'Sector Peer Group Comparison',
     metrics: 'Comparative matrix with peer CMP, P/E, Market Cap, ROCE, and Sales Growth',
     frequency: 'Real-Time Peer Mapping',
@@ -65,6 +80,7 @@ const FINANCIAL_CATEGORIES = [
     status: 'Direct Industry Peers'
   },
   {
+    key: 'documents',
     category: 'Corporate Documents & Filings',
     metrics: 'Annual Reports, Investor Presentations, Concall Transcripts, Credit Ratings',
     frequency: 'Continuous Exchange Filings',
@@ -72,6 +88,7 @@ const FINANCIAL_CATEGORIES = [
     status: 'Categorized Direct Links'
   },
   {
+    key: 'analysis',
     category: 'Algorithmic Pros & Cons Analysis',
     metrics: 'Automated qualitative strengths and limitation alerts derived from financial statements',
     frequency: 'Dynamic Algorithm',
@@ -79,11 +96,12 @@ const FINANCIAL_CATEGORIES = [
     status: 'Qualitative Assessment'
   },
   {
-    category: 'Market Analytics & Trajectory Chart',
+    key: 'historical',
+    category: 'Historical Price Charts (Genuine OHLCV)',
     metrics: 'Interactive timeframe trajectory (1M, 3M, 6M, 1Y, ALL) with real trading volume & 50 DMA',
     frequency: 'Real-Time Daily / Intraday',
-    source: 'Yahoo Finance Time-Series API',
-    status: 'Interactive Candlestick / Area'
+    source: 'Yahoo Finance & Screener Daily OHLCV',
+    status: 'Zero Synthetic Generation'
   }
 ];
 
@@ -715,7 +733,7 @@ export function CoverageClient({ report }: { report: CoverageReport | null }) {
             </p>
           </div>
           <span className="text-xs font-mono font-bold text-orange-700 bg-orange-50 px-2.5 py-1 rounded-full border border-orange-200">
-            {report?.classifiedCount || 1943} Verified Classified
+            {report?.classifiedCount || 2323} Verified Classified
           </span>
         </div>
 
@@ -726,10 +744,10 @@ export function CoverageClient({ report }: { report: CoverageReport | null }) {
               <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200">Verified Sourced</span>
             </div>
             <div className="text-2xl font-bold font-mono text-text-primary mt-1">
-              {report?.classifiedCount?.toLocaleString() || '1,943'}
+              {report?.classifiedCount?.toLocaleString() || '2,323'}
             </div>
             <p className="text-[11px] text-text-tertiary mt-0.5">
-              Classified across verified sectors using official exchange masters and BSE 4-tier taxonomy.
+              41.6% • Classified across verified sectors using official NSE / Nifty Indices constituent master and BSE taxonomy.
             </p>
           </div>
 
@@ -739,10 +757,10 @@ export function CoverageClient({ report }: { report: CoverageReport | null }) {
               <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200">Strictly Preserved</span>
             </div>
             <div className="text-2xl font-bold font-mono text-text-primary mt-1">
-              {report?.unclassifiedCount?.toLocaleString() || '3,645'}
+              {report?.unclassifiedCount?.toLocaleString() || '3,265'}
             </div>
             <p className="text-[11px] text-text-tertiary mt-0.5">
-              65.2% of catalog lacks verified exchange taxonomy; strictly marked Unclassified instead of assigning blanket conglomerates.
+              58.4% • Lacks verified exchange taxonomy; strictly preserved as Unclassified instead of assigning fake conglomerate defaults.
             </p>
           </div>
         </div>
@@ -782,34 +800,46 @@ export function CoverageClient({ report }: { report: CoverageReport | null }) {
                 <th className="py-3 px-4">Financial Metrics Covered</th>
                 <th className="py-3 px-4">Reporting Frequency</th>
                 <th className="py-3 px-4">Data Ingestion Source</th>
+                <th className="py-3 px-4 text-center">Cached in DB</th>
                 <th className="py-3 px-4 text-right">Coverage Status</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border-hairline">
-              {FINANCIAL_CATEGORIES.map((cat) => (
-                <tr key={cat.category} className="hover:bg-surface-subtle transition-colors">
-                  <td className="py-3.5 px-4 font-semibold text-text-primary">
-                    <div className="flex items-center gap-2">
-                      <CheckCircle2 size={15} className="text-emerald-600 shrink-0" />
-                      <span>{cat.category}</span>
-                    </div>
-                  </td>
-                  <td className="py-3.5 px-4 text-xs text-text-secondary max-w-sm">
-                    {cat.metrics}
-                  </td>
-                  <td className="py-3.5 px-4 text-xs font-mono text-text-tertiary">
-                    {cat.frequency}
-                  </td>
-                  <td className="py-3.5 px-4 text-xs font-mono text-text-tertiary">
-                    {cat.source}
-                  </td>
-                  <td className="py-3.5 px-4 text-right">
-                    <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-orange-50 text-orange-800 border border-orange-200">
-                      {cat.status}
-                    </span>
-                  </td>
-                </tr>
-              ))}
+              {FINANCIAL_CATEGORIES.map((cat) => {
+                const count = cat.key === 'overview'
+                  ? (report?.totalCompanies || 5588)
+                  : cat.key === 'historical'
+                  ? (report?.historicalStocksCount || 3)
+                  : (report?.categoryCounts?.[cat.key] || report?.cachedFinancials || 54);
+
+                return (
+                  <tr key={cat.category} className="hover:bg-surface-subtle transition-colors">
+                    <td className="py-3.5 px-4 font-semibold text-text-primary">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 size={15} className="text-emerald-600 shrink-0" />
+                        <span>{cat.category}</span>
+                      </div>
+                    </td>
+                    <td className="py-3.5 px-4 text-xs text-text-secondary max-w-sm">
+                      {cat.metrics}
+                    </td>
+                    <td className="py-3.5 px-4 text-xs font-mono text-text-tertiary">
+                      {cat.frequency}
+                    </td>
+                    <td className="py-3.5 px-4 text-xs font-mono text-text-tertiary">
+                      {cat.source}
+                    </td>
+                    <td className="py-3.5 px-4 text-center font-mono text-xs font-semibold text-text-primary">
+                      {count.toLocaleString()}
+                    </td>
+                    <td className="py-3.5 px-4 text-right">
+                      <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-orange-50 text-orange-800 border border-orange-200">
+                        {cat.status}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
